@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Batch Image Generator Pro</title>
+    <title>AI Batch Image Generator</title>
     <style>
         * {
             margin: 0;
@@ -12,1070 +12,644 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
 
-        .app-wrapper {
-            max-width: 1600px;
+        .container {
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Header */
-        .app-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 45px;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .app-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .app-header h1 {
-            font-size: 48px;
-            font-weight: 900;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .app-header p {
-            font-size: 20px;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
-            font-weight: 300;
-        }
-
-        .app-header .badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 8px 20px;
             border-radius: 20px;
-            margin-top: 15px;
-            font-size: 14px;
-            font-weight: 700;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Main Layout */
-        .app-body {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            min-height: 700px;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: #f8f9fa;
-            padding: 35px 25px;
-            border-right: 1px solid #e9ecef;
-        }
-
-        .sidebar-section {
-            margin-bottom: 35px;
-        }
-
-        .section-title {
-            font-size: 13px;
-            font-weight: 800;
-            color: #667eea;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Aspect Ratio Cards */
-        .ratio-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        .ratio-card {
-            background: white;
-            border: 3px solid #e9ecef;
-            border-radius: 18px;
-            padding: 24px 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
+            display: flex;
+            min-height: 90vh;
         }
 
-        .ratio-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            opacity: 0;
-            transition: opacity 0.3s;
+        .sidebar {
+            width: 400px;
+            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
         }
 
-        .ratio-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.25);
-            border-color: #667eea;
-        }
-
-        .ratio-card.active {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transform: scale(1.08);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.45);
-        }
-
-        .ratio-card.active::before {
-            opacity: 1;
-        }
-
-        .ratio-icon {
-            font-size: 36px;
-            margin-bottom: 10px;
-            display: block;
-            position: relative;
-            z-index: 1;
-        }
-
-        .ratio-label {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .ratio-desc {
-            font-size: 12px;
-            opacity: 0.75;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Settings */
-        .settings-group {
-            margin-bottom: 22px;
-        }
-
-        .settings-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 700;
-            color: #495057;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .settings-select {
-            width: 100%;
-            padding: 14px;
-            border: 3px solid #e9ecef;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #495057;
-        }
-
-        .settings-select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
-
-        /* Main Content Area */
         .main-content {
-            padding: 45px;
-            background: #fafbfc;
+            flex: 1;
+            padding: 30px;
             overflow-y: auto;
         }
 
-        /* Prompt Section */
-        .prompt-section {
-            background: white;
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 35px;
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
         }
 
-        .prompt-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .subtitle {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
             margin-bottom: 25px;
         }
 
-        .prompt-title {
-            font-size: 28px;
-            font-weight: 800;
-            color: #2d3748;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .prompt-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 10px 24px;
-            border-radius: 30px;
-            font-size: 15px;
-            font-weight: 800;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
         }
 
         .prompt-textarea {
             width: 100%;
-            min-height: 380px;
-            padding: 25px;
-            border: 3px solid #e9ecef;
-            border-radius: 18px;
-            font-size: 16px;
-            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-            line-height: 2;
+            min-height: 300px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
             resize: vertical;
-            transition: all 0.3s;
-            background: #f8f9fa;
-            color: #2d3748;
+            transition: border-color 0.3s;
         }
 
         .prompt-textarea:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.12);
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .aspect-ratio-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .ratio-option {
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
             background: white;
         }
 
-        .prompt-textarea::placeholder {
-            color: #adb5bd;
-            line-height: 2;
+        .ratio-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
         }
 
-        .prompt-footer {
+        .ratio-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .ratio-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .ratio-dimensions {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 3px;
+        }
+
+        .options-group {
+            margin-bottom: 25px;
+        }
+
+        .option-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 18px;
-            padding: 18px 22px;
-            background: #f8f9fa;
-            border-radius: 14px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .option-label {
             font-size: 14px;
-            color: #6c757d;
+            font-weight: 500;
         }
 
-        .prompt-footer-tip {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
+        select {
+            padding: 8px 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
         }
 
-        /* Generate Button */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 27px;
+        }
+
         .generate-button {
             width: 100%;
-            padding: 24px;
+            padding: 15px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 18px;
-            font-size: 20px;
-            font-weight: 900;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.45);
-            margin-top: 25px;
-            position: relative;
-            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: auto;
         }
 
-        .generate-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .generate-button:hover:not(:disabled)::before {
-            width: 500px;
-            height: 500px;
-        }
-
-        .generate-button:hover:not(:disabled) {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.55);
-        }
-
-        .generate-button:active:not(:disabled) {
+        .generate-button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .generate-button:active {
+            transform: translateY(0);
         }
 
         .generate-button:disabled {
-            background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+            background: #ccc;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
-        }
-
-        .button-text {
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Results Section */
-        .results-section {
-            background: white;
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .results-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .results-title {
-            font-size: 28px;
-            font-weight: 800;
-            color: #2d3748;
+            font-size: 24px;
+            font-weight: 600;
+            color: #495057;
         }
 
-        .results-count {
-            color: #667eea;
-            font-weight: 900;
+        .button-group {
+            display: flex;
+            gap: 10px;
         }
 
-        .clear-button {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        .clear-button, .download-all-button {
+            padding: 10px 20px;
+            background: #dc3545;
             color: white;
             border: none;
-            padding: 12px 26px;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s;
+            border-radius: 8px;
             font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: none;
+        }
+
+        .download-all-button {
+            background: #28a745;
         }
 
         .clear-button:hover {
-            transform: scale(1.08);
-            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.35);
+            background: #c82333;
         }
 
-        /* Results Grid */
+        .download-all-button:hover {
+            background: #218838;
+        }
+
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
         }
 
         .image-card {
-            background: white;
-            border: 3px solid #e9ecef;
-            border-radius: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            animation: cardFadeIn 0.6s ease;
-        }
-
-        @keyframes cardFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .image-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
-            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
-        .image-container {
+        .image-wrapper {
             width: 100%;
-            height: 300px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #dee2e6;
             position: relative;
             overflow: hidden;
         }
 
-        .image-container img {
+        .image-wrapper.ratio-1-1 {
+            aspect-ratio: 1 / 1;
+        }
+
+        .image-wrapper.ratio-16-9 {
+            aspect-ratio: 16 / 9;
+        }
+
+        .image-wrapper.ratio-9-16 {
+            aspect-ratio: 9 / 16;
+        }
+
+        .image-wrapper.ratio-3-4 {
+            aspect-ratio: 3 / 4;
+        }
+
+        .image-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .image-card:hover .image-container img {
-            transform: scale(1.05);
         }
 
         .loading-spinner {
-            width: 55px;
-            height: 55px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         .image-info {
-            padding: 20px;
+            padding: 15px;
         }
 
         .image-prompt {
-            font-size: 14px;
+            font-size: 13px;
             color: #495057;
-            line-height: 1.6;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            line-height: 1.4;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
-        .image-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .image-ratio-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 7px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
         .download-button {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            width: 100%;
+            padding: 10px;
+            background: #667eea;
             color: white;
             border: none;
-            padding: 9px 20px;
-            border-radius: 10px;
-            font-weight: 800;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
-            font-size: 13px;
+            transition: background 0.3s;
         }
 
         .download-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.35);
+            background: #5568d3;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 80px 30px;
-            color: #adb5bd;
+            padding: 60px 20px;
+            color: #6c757d;
         }
 
-        .empty-icon {
-            font-size: 90px;
+        .empty-state-icon {
+            font-size: 64px;
             margin-bottom: 20px;
-            opacity: 0.5;
-            animation: float 3s ease-in-out infinite;
+            opacity: 0.3;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        .empty-state-text {
+            font-size: 18px;
+            font-weight: 500;
         }
 
-        .empty-state h3 {
-            font-size: 26px;
-            margin-bottom: 12px;
-            color: #6c757d;
-            font-weight: 800;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-            color: #adb5bd;
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.88);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(12px);
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-content {
-            text-align: center;
-            color: white;
-        }
-
-        .loading-spinner-large {
-            width: 80px;
-            height: 80px;
-            border: 6px solid rgba(255, 255, 255, 0.2);
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 28px;
-        }
-
-        .loading-text {
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 14px;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .loading-progress {
-            font-size: 20px;
-            color: #667eea;
-            font-weight: 700;
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 35px;
-            right: 35px;
-            background: white;
-            padding: 22px 30px;
-            border-radius: 14px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
-            display: none;
-            align-items: center;
-            gap: 14px;
-            z-index: 10000;
-            min-width: 320px;
-            animation: toastSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes toastSlideIn {
-            from {
-                transform: translateX(450px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .toast.show {
-            display: flex;
-        }
-
-        .toast.success {
-            border-left: 6px solid #28a745;
-        }
-
-        .toast.error {
-            border-left: 6px solid #dc3545;
-        }
-
-        .toast.info {
-            border-left: 6px solid #17a2b8;
-        }
-
-        .toast-icon {
-            font-size: 28px;
-        }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
-            font-weight: 800;
-            margin-bottom: 5px;
-            font-size: 15px;
-            color: #2d3748;
-        }
-
-        .toast-message {
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .app-body {
-                grid-template-columns: 1fr;
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
             }
 
             .sidebar {
+                width: 100%;
                 border-right: none;
-                border-bottom: 1px solid #e9ecef;
+                border-bottom: 1px solid #dee2e6;
             }
 
-            .ratio-grid {
-                grid-template-columns: repeat(4, 1fr);
+            .results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
         }
 
-        @media (max-width: 768px) {
-            .app-header h1 {
-                font-size: 36px;
-            }
-
-            .app-header p {
-                font-size: 16px;
-            }
-
-            .main-content {
-                padding: 25px;
-            }
-
-            .prompt-section,
-            .results-section {
-                padding: 25px;
-            }
-
-            .ratio-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
+        @media (max-width: 640px) {
             .results-grid {
                 grid-template-columns: 1fr;
             }
 
-            .toast {
-                right: 20px;
-                left: 20px;
-                min-width: auto;
+            .aspect-ratio-group {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-wrapper">
-        <!-- Header -->
-        <div class="app-header">
-            <h1>🎨 AI Batch Image Generator</h1>
-            <p>Generate unlimited AI images • One line = One masterpiece</p>
-            <div class="badge">✨ 100% Free • No API Key Required</div>
-        </div>
+    <div class="container">
+        <div class="sidebar">
+            <h1>🎨 AI Image Generator</h1>
+            <p class="subtitle">Generate multiple AI images in batch</p>
 
-        <!-- Main Body -->
-        <div class="app-body">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <div class="section-title">📐 ASPECT RATIO</div>
-                    <div class="ratio-grid">
-                        <div class="ratio-card active" data-ratio="1:1" data-width="1024" data-height="1024">
-                            <span class="ratio-icon">⬜</span>
-                            <div class="ratio-label">1:1</div>
-                            <div class="ratio-desc">Square</div>
-                        </div>
-                        <div class="ratio-card" data-ratio="16:9" data-width="1024" data-height="576">
-                            <span class="ratio-icon">🖥️</span>
-                            <div class="ratio-label">16:9</div>
-                            <div class="ratio-desc">Landscape</div>
-                        </div>
-                        <div class="ratio-card" data-ratio="9:16" data-width="576" data-height="1024">
-                            <span class="ratio-icon">📱</span>
-                            <div class="ratio-label">9:16</div>
-                            <div class="ratio-desc">Portrait</div>
-                        </div>
-                        <div class="ratio-card" data-ratio="3:4" data-width="768" data-height="1024">
-                            <span class="ratio-icon">🖼️</span>
-                            <div class="ratio-label">3:4</div>
-                            <div class="ratio-desc">Portrait</div>
-                        </div>
+            <div class="input-group">
+                <label for="prompts">Image Prompts (One per line)</label>
+                <textarea 
+                    id="prompts" 
+                    class="prompt-textarea" 
+                    placeholder="A serene mountain landscape at sunset
+A futuristic city with flying cars
+A cute cat wearing a wizard hat
+An abstract painting with vibrant colors"></textarea>
+                <div class="helper-text">Enter each prompt on a new line</div>
+            </div>
+
+            <div class="input-group">
+                <label>Aspect Ratio</label>
+                <div class="aspect-ratio-group">
+                    <div class="ratio-option selected" data-ratio="1:1">
+                        <div class="ratio-label">Square</div>
+                        <div class="ratio-dimensions">1:1</div>
                     </div>
-                </div>
-
-                <div class="sidebar-section">
-                    <div class="section-title">⚙️ SETTINGS</div>
-                    
-                    <div class="settings-group">
-                        <label class="settings-label">AI Model</label>
-                        <select class="settings-select" id="modelSelect">
-                            <option value="flux">Flux (Best Quality)</option>
-                            <option value="turbo">Turbo (Fast)</option>
-                        </select>
+                    <div class="ratio-option" data-ratio="16:9">
+                        <div class="ratio-label">Landscape</div>
+                        <div class="ratio-dimensions">16:9</div>
                     </div>
-
-                    <div class="settings-group">
-                        <label class="settings-label">Enhancement</label>
-                        <select class="settings-select" id="enhanceSelect">
-                            <option value="true">Enhanced (Recommended)</option>
-                            <option value="false">Standard</option>
-                        </select>
+                    <div class="ratio-option" data-ratio="9:16">
+                        <div class="ratio-label">Portrait</div>
+                        <div class="ratio-dimensions">9:16</div>
+                    </div>
+                    <div class="ratio-option" data-ratio="3:4">
+                        <div class="ratio-label">Photo</div>
+                        <div class="ratio-dimensions">3:4</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Prompt Section -->
-                <div class="prompt-section">
-                    <div class="prompt-header">
-                        <h2 class="prompt-title">📝 Enter Your Prompts</h2>
-                        <div class="prompt-badge">
-                            <span id="promptCount">0</span> Prompts
-                        </div>
-                    </div>
-
-                    <textarea 
-                        class="prompt-textarea" 
-                        id="promptInput" 
-                        placeholder="Enter each detailed prompt on a new line for ultra-quality results...
-
-✨ PERFECT EXAMPLES (Ready to Use):
-
-A majestic lion with golden mane standing on rocky cliff at dramatic sunset, cinematic lighting, professional wildlife photography
-
-Futuristic cyberpunk city at night with glowing neon purple and blue lights, wet reflective streets, flying cars, highly detailed
-
-Beautiful cherry blossom tree in full pink bloom, Japanese garden, spring season, soft sunlight, professional photography
-
-Cozy wooden cabin in snowy mountains during winter evening, warm lights from windows, smoke from chimney, peaceful atmosphere
-
-Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic sunset, professional automotive photography
-
-Majestic snow-capped mountain peak at sunrise, crystal clear lake reflection, alpine landscape, breathtaking vista
-
-Ancient medieval castle on hilltop surrounded by morning mist, Gothic architecture, fantasy atmosphere, highly detailed
-
-Tropical paradise beach with turquoise water, white sand, palm trees, colorful sunset sky, travel photography
-
-💡 PRO TIPS FOR PERFECT AI IMAGES:
-• Be VERY specific and descriptive
-• Add style: cinematic, professional photography, highly detailed
-• Mention lighting: golden hour, dramatic, soft, natural
-• Include mood: peaceful, dramatic, vibrant, cozy, majestic
-• Add quality markers: ultra detailed, 8k, photorealistic
-• Each line = One unique AI-generated masterpiece!"></textarea>
-
-                    <div class="prompt-footer">
-                        <span class="prompt-footer-tip">
-                            💡 More details = Better images
-                        </span>
-                        <span id="charCount">0 characters</span>
-                    </div>
-
-                    <button class="generate-button" id="generateBtn" disabled>
-                        <span class="button-text">🚀 Generate All Images</span>
-                    </button>
+            <div class="options-group">
+                <label>Generation Options</label>
+                <div class="option-row">
+                    <span class="option-label">Model</span>
+                    <select id="model">
+                        <option value="flux">Flux (Default)</option>
+                        <option value="turbo">Turbo (Faster)</option>
+                    </select>
                 </div>
-
-                <!-- Results Section -->
-                <div class="results-section">
-                    <div class="results-header">
-                        <h2 class="results-title">
-                            🖼️ Generated Images (<span class="results-count" id="resultCount">0</span>)
-                        </h2>
-                        <button class="clear-button" id="clearBtn" style="display: none;">
-                            🗑️ Clear All
-                        </button>
-                    </div>
-
-                    <div class="results-grid" id="resultsGrid">
-                        <div class="empty-state">
-                            <div class="empty-icon">🎨</div>
-                            <h3>No images generated yet</h3>
-                            <p>Enter your prompts above and start creating AI masterpieces!</p>
-                        </div>
-                    </div>
+                <div class="option-row">
+                    <span class="option-label">Enhance Quality</span>
+                    <div class="toggle-switch" id="enhanceToggle"></div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loading-spinner-large"></div>
-            <div class="loading-text">Generating AI Images...</div>
-            <div class="loading-progress" id="progressText">0 / 0</div>
+            <button class="generate-button" id="generateBtn">Generate Images</button>
         </div>
-    </div>
 
-    <!-- Toast Notification -->
-    <div class="toast" id="toast">
-        <span class="toast-icon" id="toastIcon"></span>
-        <div class="toast-content">
-            <div class="toast-title" id="toastTitle"></div>
-            <div class="toast-message" id="toastMessage"></div>
+        <div class="main-content">
+            <div class="results-header">
+                <h2 class="results-title">Generated Images</h2>
+                <div class="button-group">
+                    <button class="download-all-button" id="downloadAllBtn">Download All</button>
+                    <button class="clear-button" id="clearBtn">Clear All</button>
+                </div>
+            </div>
+
+            <div id="results">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🖼️</div>
+                    <div class="empty-state-text">No images generated yet</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         // DOM Elements
-        const promptInput = document.getElementById('promptInput');
-        const promptCount = document.getElementById('promptCount');
-        const charCount = document.getElementById('charCount');
+        const promptsTextarea = document.getElementById('prompts');
         const generateBtn = document.getElementById('generateBtn');
-        const resultsGrid = document.getElementById('resultsGrid');
-        const resultCount = document.getElementById('resultCount');
         const clearBtn = document.getElementById('clearBtn');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const progressText = document.getElementById('progressText');
-        const ratioCards = document.querySelectorAll('.ratio-card');
-        const modelSelect = document.getElementById('modelSelect');
-        const enhanceSelect = document.getElementById('enhanceSelect');
-        const toast = document.getElementById('toast');
-        const toastIcon = document.getElementById('toastIcon');
-        const toastTitle = document.getElementById('toastTitle');
-        const toastMessage = document.getElementById('toastMessage');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const resultsDiv = document.getElementById('results');
+        const modelSelect = document.getElementById('model');
+        const enhanceToggle = document.getElementById('enhanceToggle');
 
         // State
-        let selectedRatio = {
-            label: '1:1',
-            width: 1024,
-            height: 1024
-        };
-        let generatedImages = [];
+        let selectedRatio = '1:1';
+        let enhanceEnabled = false;
 
-        // Update Counters
-        promptInput.addEventListener('input', function() {
-            const text = this.value;
-            const lines = text.split('\n').filter(line => line.trim() !== '');
-            
-            promptCount.textContent = lines.length;
-            charCount.textContent = text.length + ' characters';
-            generateBtn.disabled = lines.length === 0;
-        });
-
-        // Ratio Selection
-        ratioCards.forEach(card => {
-            card.addEventListener('click', function() {
-                ratioCards.forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                selectedRatio = {
-                    label: this.dataset.ratio,
-                    width: parseInt(this.dataset.width),
-                    height: parseInt(this.dataset.height)
-                };
+        // Aspect Ratio Selection
+        const ratioOptions = document.querySelectorAll('.ratio-option');
+        ratioOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                ratioOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedRatio = option.dataset.ratio;
             });
         });
 
-        // Generate Images
-        generateBtn.addEventListener('click', async function() {
-            const prompts = promptInput.value.split('\n').filter(line => line.trim() !== '');
-            
+        // Enhance Toggle
+        enhanceToggle.addEventListener('click', () => {
+            enhanceEnabled = !enhanceEnabled;
+            enhanceToggle.classList.toggle('active');
+        });
+
+        // Get dimensions based on aspect ratio
+        function getDimensions(ratio) {
+            const dimensions = {
+                '1:1': { width: 1024, height: 1024 },
+                '16:9': { width: 1024, height: 576 },
+                '9:16': { width: 576, height: 1024 },
+                '3:4': { width: 768, height: 1024 }
+            };
+            return dimensions[ratio];
+        }
+
+        // Generate images
+        generateBtn.addEventListener('click', async () => {
+            const promptText = promptsTextarea.value.trim();
+            if (!promptText) {
+                alert('Please enter at least one prompt');
+                return;
+            }
+
+            const prompts = promptText.split('\n').filter(p => p.trim() !== '');
             if (prompts.length === 0) {
-                showToast('⚠️', 'Warning', 'Please enter at least one prompt!', 'error');
+                alert('Please enter at least one valid prompt');
                 return;
             }
 
             // Clear previous results
-            resultsGrid.innerHTML = '';
-            generatedImages = [];
-            clearBtn.style.display = 'none';
+            resultsDiv.innerHTML = '';
 
-            // Show loading
-            loadingOverlay.classList.add('active');
+            // Disable button
             generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
 
+            const dimensions = getDimensions(selectedRatio);
             const model = modelSelect.value;
-            const enhance = enhanceSelect.value;
+            const enhance = enhanceEnabled;
 
-            // Generate images
-            for (let i = 0; i < prompts.length; i++) {
-                progressText.textContent = `${i + 1} / ${prompts.length}`;
+            // Create image cards
+            prompts.forEach((prompt, index) => {
+                const card = createImageCard(prompt, dimensions, model, enhance);
+                resultsDiv.appendChild(card);
+            });
 
-                // Create card
-                const card = createImageCard(prompts[i], i);
-                resultsGrid.appendChild(card);
-
-                // Generate image using Pollinations.ai (FREE API - No key needed)
-                const encodedPrompt = encodeURIComponent(prompts[i]);
-                const seed = Date.now() + i;
-                
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
-
-                // Wait for generation (simulate realistic timing)
-                await new Promise(resolve => setTimeout(resolve, 3000));
-
-                // Load image
-                const imageContainer = card.querySelector('.image-container');
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = prompts[i];
-                img.loading = 'lazy';
-                
-                img.onload = function() {
-                    imageContainer.innerHTML = '';
-                    imageContainer.appendChild(img);
-                };
-
-                img.onerror = function() {
-                    imageContainer.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">⚠️ Generation failed<br><small>Please try again</small></div>';
-                };
-
-                generatedImages.push({
-                    prompt: prompts[i],
-                    ratio: selectedRatio.label,
-                    url: imageUrl
-                });
-
-                resultCount.textContent = generatedImages.length;
-            }
-
-            // Hide loading
-            loadingOverlay.classList.remove('active');
+            // Re-enable button
             generateBtn.disabled = false;
-            clearBtn.style.display = 'block';
+            generateBtn.textContent = 'Generate Images';
 
-            showToast('✅', 'Success!', `Successfully generated ${prompts.length} AI images!`, 'success');
+            // Show clear and download all buttons
+            clearBtn.style.display = 'block';
+            downloadAllBtn.style.display = 'block';
         });
 
-        // Create Image Card
-        function createImageCard(prompt, index) {
+        // Create image card
+        function createImageCard(prompt, dimensions, model, enhance) {
             const card = document.createElement('div');
             card.className = 'image-card';
+
+            const ratioClass = `ratio-${selectedRatio.replace(':', '-')}`;
+
+            // Generate unique seed for each image
+            const seed = Math.floor(Math.random() * 1000000);
+
+            // Create Pollinations.ai URL with all parameters
+            const encodedPrompt = encodeURIComponent(prompt);
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
+
             card.innerHTML = `
-                <div class="image-container">
+                <div class="image-wrapper ${ratioClass}">
                     <div class="loading-spinner"></div>
+                    <img src="${imageUrl}" alt="${prompt}" style="display: none;">
                 </div>
                 <div class="image-info">
                     <div class="image-prompt">${prompt}</div>
-                    <div class="image-meta">
-                        <span class="image-ratio-badge">${selectedRatio.label}</span>
-                        <button class="download-button" onclick="downloadImage(${index})">
-                            ⬇️ Download
-                        </button>
-                    </div>
+                    <button class="download-button" onclick="downloadImage('${imageUrl}', '${prompt.replace(/'/g, "\\'")}')">Download Image</button>
                 </div>
             `;
+
+            // Handle image load
+            const img = card.querySelector('img');
+            const spinner = card.querySelector('.loading-spinner');
+
+            img.onload = () => {
+                spinner.style.display = 'none';
+                img.style.display = 'block';
+            };
+
+            img.onerror = () => {
+                spinner.style.display = 'none';
+                img.style.display = 'block';
+                img.alt = 'Failed to load image';
+            };
+
             return card;
         }
 
-        // Download Image
-        function downloadImage(index) {
-            const image = generatedImages[index];
-            if (image) {
-                fetch(image.url)
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `ai-generated-${index + 1}.png`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
-                        showToast('✅', 'Downloaded!', 'Image saved successfully.', 'success');
-                    })
-                    .catch(error => {
-                        showToast('❌', 'Error', 'Failed to download image.', 'error');
-                    });
-            }
+        // Download single image
+        function downloadImage(url, prompt) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${prompt.substring(0, 50).replace(/[^a-z0-9]/gi, '_')}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        // Clear Results
-        clearBtn.addEventListener('click', function() {
+        // Download all images
+        downloadAllBtn.addEventListener('click', async () => {
+            const images = resultsDiv.querySelectorAll('.image-wrapper img');
+            if (images.length === 0) {
+                alert('No images to download');
+                return;
+            }
+
+            downloadAllBtn.disabled = true;
+            downloadAllBtn.textContent = 'Downloading...';
+
+            for (let i = 0; i < images.length; i++) {
+                const img = images[i];
+                const prompt = img.alt;
+                const url = img.src;
+                
+                await new Promise(resolve => setTimeout(resolve, 500)); // Delay between downloads
+                downloadImage(url, prompt);
+            }
+
+            downloadAllBtn.disabled = false;
+            downloadAllBtn.textContent = 'Download All';
+        });
+
+        // Clear all images
+        clearBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to clear all generated images?')) {
-                resultsGrid.innerHTML = `
+                resultsDiv.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">🎨</div>
-                        <h3>No images generated yet</h3>
-                        <p>Enter your prompts above and start creating AI masterpieces!</p>
+                        <div class="empty-state-icon">🖼️</div>
+                        <div class="empty-state-text">No images generated yet</div>
                     </div>
                 `;
-                generatedImages = [];
-                resultCount.textContent = '0';
                 clearBtn.style.display = 'none';
-                showToast('✅', 'Cleared!', 'All images have been removed.', 'success');
+                downloadAllBtn.style.display = 'none';
             }
         });
-
-        // Show Toast
-        function showToast(icon, title, message, type) {
-            toastIcon.textContent = icon;
-            toastTitle.textContent = title;
-            toastMessage.textContent = message;
-            toast.className = `toast ${type} show`;
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
-        }
-
-        // Keyboard Shortcut (Ctrl+Enter to generate)
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                if (!generateBtn.disabled) {
-                    generateBtn.click();
-                }
-            }
-        });
-
-        // Initialize
-        promptInput.dispatchEvent(new Event('input'));
     </script>
 </body>
 </html>
