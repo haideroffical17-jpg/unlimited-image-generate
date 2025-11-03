@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -27,7 +27,6 @@
             box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
         }
 
-        /* Header */
         .app-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 45px;
@@ -81,14 +80,12 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Main Layout */
         .app-body {
             display: grid;
             grid-template-columns: 320px 1fr;
             min-height: 700px;
         }
 
-        /* Sidebar */
         .sidebar {
             background: #f8f9fa;
             padding: 35px 25px;
@@ -111,7 +108,6 @@
             gap: 8px;
         }
 
-        /* Aspect Ratio Cards */
         .ratio-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -183,7 +179,6 @@
             z-index: 1;
         }
 
-        /* Settings */
         .settings-group {
             margin-bottom: 22px;
         }
@@ -217,14 +212,12 @@
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
-        /* Main Content Area */
         .main-content {
             padding: 45px;
             background: #fafbfc;
             overflow-y: auto;
         }
 
-        /* Prompt Section */
         .prompt-section {
             background: white;
             border-radius: 24px;
@@ -305,7 +298,6 @@
             font-weight: 600;
         }
 
-        /* Generate Button */
         .generate-button {
             width: 100%;
             padding: 24px;
@@ -364,7 +356,6 @@
             z-index: 1;
         }
 
-        /* Results Section */
         .results-section {
             background: white;
             border-radius: 24px;
@@ -426,7 +417,6 @@
             box-shadow: 0 8px 25px rgba(40, 167, 69, 0.35);
         }
 
-        /* Results Grid */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -495,6 +485,27 @@
             to { transform: rotate(360deg); }
         }
 
+        .retry-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .retry-button:hover {
+            background: white;
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
         .image-info {
             padding: 20px;
         }
@@ -542,7 +553,6 @@
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.35);
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 80px 30px;
@@ -573,7 +583,6 @@
             color: #adb5bd;
         }
 
-        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -620,7 +629,6 @@
             font-weight: 700;
         }
 
-        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 35px;
@@ -684,7 +692,6 @@
             color: #6c757d;
         }
 
-        /* Responsive Design */
         @media (max-width: 1200px) {
             .app-body {
                 grid-template-columns: 1fr;
@@ -736,16 +743,13 @@
 </head>
 <body>
     <div class="app-wrapper">
-        <!-- Header -->
         <div class="app-header">
             <h1>🎨 AI Batch Image Generator</h1>
             <p>Generate unlimited AI images • One line = One masterpiece</p>
             <div class="badge">✨ 100% Free • No API Key Required</div>
         </div>
 
-        <!-- Main Body -->
         <div class="app-body">
-            <!-- Sidebar -->
             <div class="sidebar">
                 <div class="sidebar-section">
                     <div class="section-title">📐 ASPECT RATIO</div>
@@ -794,9 +798,7 @@
                 </div>
             </div>
 
-            <!-- Main Content -->
             <div class="main-content">
-                <!-- Prompt Section -->
                 <div class="prompt-section">
                     <div class="prompt-header">
                         <h2 class="prompt-title">📝 Enter Your Prompts</h2>
@@ -822,12 +824,6 @@ Cozy wooden cabin in snowy mountains during winter evening, warm lights from win
 
 Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic sunset, professional automotive photography
 
-Majestic snow-capped mountain peak at sunrise, crystal clear lake reflection, alpine landscape, breathtaking vista
-
-Ancient medieval castle on hilltop surrounded by morning mist, Gothic architecture, fantasy atmosphere, highly detailed
-
-Tropical paradise beach with turquoise water, white sand, palm trees, colorful sunset sky, travel photography
-
 💡 PRO TIPS FOR PERFECT AI IMAGES:
 • Be VERY specific and descriptive
 • Add style: cinematic, professional photography, highly detailed
@@ -848,7 +844,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
                     </button>
                 </div>
 
-                <!-- Results Section -->
                 <div class="results-section">
                     <div class="results-header">
                         <h2 class="results-title">
@@ -876,7 +871,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
         </div>
     </div>
 
-    <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner-large"></div>
@@ -885,7 +879,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div class="toast" id="toast">
         <span class="toast-icon" id="toastIcon"></span>
         <div class="toast-content">
@@ -895,7 +888,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
     </div>
 
     <script>
-        // DOM Elements
         const promptInput = document.getElementById('promptInput');
         const promptCount = document.getElementById('promptCount');
         const charCount = document.getElementById('charCount');
@@ -914,7 +906,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
         const toastTitle = document.getElementById('toastTitle');
         const toastMessage = document.getElementById('toastMessage');
 
-        // State
         let selectedRatio = {
             label: '1:1',
             width: 1024,
@@ -922,7 +913,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
         };
         let generatedImages = [];
 
-        // Update Counters
         promptInput.addEventListener('input', function() {
             const text = this.value;
             const lines = text.split('\n').filter(line => line.trim() !== '');
@@ -932,7 +922,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             generateBtn.disabled = lines.length === 0;
         });
 
-        // Ratio Selection
         ratioCards.forEach(card => {
             card.addEventListener('click', function() {
                 ratioCards.forEach(c => c.classList.remove('active'));
@@ -945,7 +934,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             });
         });
 
-        // Generate Images
         generateBtn.addEventListener('click', async function() {
             const prompts = promptInput.value.split('\n').filter(line => line.trim() !== '');
             
@@ -954,51 +942,33 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
                 return;
             }
 
-            // Clear previous results
             resultsGrid.innerHTML = '';
             generatedImages = [];
             clearBtn.style.display = 'none';
             downloadAllBtn.style.display = 'none';
 
-            // Show loading
             loadingOverlay.classList.add('active');
             generateBtn.disabled = true;
 
             const model = modelSelect.value;
             const enhance = enhanceSelect.value;
 
-            // Generate images
             for (let i = 0; i < prompts.length; i++) {
                 progressText.textContent = `${i + 1} / ${prompts.length}`;
 
-                // Create card
                 const card = createImageCard(prompts[i], i);
                 resultsGrid.appendChild(card);
 
-                // Generate image using Pollinations.ai (FREE API - No key needed)
-                const encodedPrompt = encodeURIComponent(prompts[i]);
                 const seed = Date.now() + i;
                 
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts[i])}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
 
-                // Wait for generation (simulate realistic timing)
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                await new Promise(resolve => setTimeout(resolve, 2000));
 
-                // Load image
                 const imageContainer = card.querySelector('.image-container');
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = prompts[i];
-                img.loading = 'lazy';
                 
-                img.onload = function() {
-                    imageContainer.innerHTML = '';
-                    imageContainer.appendChild(img);
-                };
-
-                img.onerror = function() {
-                    imageContainer.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">⚠️ Generation failed<br><small>Please try again</small></div>';
-                };
+                // TRY TO LOAD IMAGE WITH RETRY
+                await loadImageWithRetry(imageContainer, imageUrl, prompts[i], i, 3);
 
                 generatedImages.push({
                     prompt: prompts[i],
@@ -1009,7 +979,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
                 resultCount.textContent = generatedImages.length;
             }
 
-            // Hide loading
             loadingOverlay.classList.remove('active');
             generateBtn.disabled = false;
             clearBtn.style.display = 'block';
@@ -1018,7 +987,79 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             showToast('✅', 'Success!', `Successfully generated ${prompts.length} AI images!`, 'success');
         });
 
-        // Create Image Card
+        // LOAD IMAGE WITH RETRY SYSTEM
+        async function loadImageWithRetry(container, url, prompt, index, maxRetries) {
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const success = await loadImage(container, url, prompt);
+                    if (success) return;
+                    
+                    // Generate new seed for retry
+                    const newSeed = Date.now() + Math.floor(Math.random() * 10000);
+                    const model = modelSelect.value;
+                    const enhance = enhanceSelect.value;
+                    url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${newSeed}&model=${model}&nologo=true&enhance=${enhance}`;
+                    
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed:`, error);
+                }
+            }
+            
+            // All retries failed - show retry button
+            container.innerHTML = `
+                <div style="color: white; text-align: center; padding: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+                    <div style="font-size: 14px; margin-bottom: 15px;">Generation Failed</div>
+                    <button class="retry-button" onclick="manualRetry(${index}, '${prompt.replace(/'/g, "\\'")}')">
+                        🔄 Retry
+                    </button>
+                </div>
+            `;
+        }
+
+        // LOAD IMAGE PROMISE
+        function loadImage(container, url, prompt) {
+            return new Promise((resolve) => {
+                const img = document.createElement('img');
+                img.crossOrigin = 'anonymous';
+                
+                const timeout = setTimeout(() => {
+                    img.src = '';
+                    resolve(false);
+                }, 30000);
+                
+                img.onload = function() {
+                    clearTimeout(timeout);
+                    container.innerHTML = '';
+                    container.appendChild(img);
+                    resolve(true);
+                };
+                
+                img.onerror = function() {
+                    clearTimeout(timeout);
+                    resolve(false);
+                };
+                
+                img.src = url;
+            });
+        }
+
+        // MANUAL RETRY FUNCTION
+        window.manualRetry = async function(index, prompt) {
+            const card = resultsGrid.children[index];
+            const container = card.querySelector('.image-container');
+            
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            
+            const newSeed = Date.now() + Math.floor(Math.random() * 10000);
+            const model = modelSelect.value;
+            const enhance = enhanceSelect.value;
+            const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${newSeed}&model=${model}&nologo=true&enhance=${enhance}`;
+            
+            await loadImageWithRetry(container, url, prompt, index, 3);
+        };
+
         function createImageCard(prompt, index) {
             const card = document.createElement('div');
             card.className = 'image-card';
@@ -1039,30 +1080,62 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             return card;
         }
 
-        // Download Single Image
-        function downloadImage(index) {
+        // PROPER DOWNLOAD FUNCTION - FIXED
+        async function downloadImage(index) {
             const image = generatedImages[index];
-            if (image) {
-                fetch(image.url)
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const url = window.URL.createObjectURL(blob);
+            if (!image) {
+                showToast('❌', 'Error', 'No image data found!', 'error');
+                return;
+            }
+
+            const card = resultsGrid.children[index];
+            const img = card.querySelector('.image-container img');
+            
+            if (!img || !img.complete) {
+                showToast('❌', 'Error', 'Image not loaded yet!', 'error');
+                return;
+            }
+
+            try {
+                // Method 1: Fetch and download directly
+                const response = await fetch(image.url);
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `ai-image-${index + 1}-${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showToast('✅', 'Downloaded!', 'Image saved successfully.', 'success');
+            } catch (error) {
+                // Fallback: Canvas method
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth || selectedRatio.width;
+                    canvas.height = img.naturalHeight || selectedRatio.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
                         const link = document.createElement('a');
                         link.href = url;
-                        link.download = `ai-generated-${index + 1}.png`;
+                        link.download = `ai-image-${index + 1}-${Date.now()}.png`;
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
+                        URL.revokeObjectURL(url);
                         showToast('✅', 'Downloaded!', 'Image saved successfully.', 'success');
-                    })
-                    .catch(error => {
-                        showToast('❌', 'Error', 'Failed to download image.', 'error');
-                    });
+                    }, 'image/png');
+                } catch (err) {
+                    showToast('❌', 'Error', 'Failed to download image.', 'error');
+                    console.error('Download error:', err);
+                }
             }
         }
 
-        // Download All Images
         downloadAllBtn.addEventListener('click', async function() {
             if (generatedImages.length === 0) {
                 showToast('⚠️', 'Warning', 'No images to download!', 'error');
@@ -1074,8 +1147,8 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             
             for (let i = 0; i < generatedImages.length; i++) {
                 downloadAllBtn.textContent = `Downloading ${i + 1}/${generatedImages.length}...`;
-                await downloadImage(i);
-                await new Promise(resolve => setTimeout(resolve, 800));
+                downloadImage(i);
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
 
             downloadAllBtn.textContent = originalText;
@@ -1083,7 +1156,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             showToast('✅', 'Complete!', `Downloaded all ${generatedImages.length} images!`, 'success');
         });
 
-        // Clear Results
         clearBtn.addEventListener('click', function() {
             if (confirm('Are you sure you want to clear all generated images?')) {
                 resultsGrid.innerHTML = `
@@ -1101,7 +1173,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             }
         });
 
-        // Show Toast
         function showToast(icon, title, message, type) {
             toastIcon.textContent = icon;
             toastTitle.textContent = title;
@@ -1113,7 +1184,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             }, 4000);
         }
 
-        // Keyboard Shortcut (Ctrl+Enter to generate)
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
@@ -1123,7 +1193,6 @@ Tropical paradise beach with turquoise water, white sand, palm trees, colorful s
             }
         });
 
-        // Initialize
         promptInput.dispatchEvent(new Event('input'));
     </script>
 </body>
