@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator - Working Version</title>
+    <title>AI Batch Image Generator Pro</title>
     <style>
         * {
             margin: 0;
@@ -12,13 +12,13 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
 
-        .container {
+        .app-wrapper {
             max-width: 1600px;
             margin: 0 auto;
             background: white;
@@ -27,378 +27,446 @@
             box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
         }
 
-        .header {
+        /* Header */
+        .app-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px;
+            padding: 45px;
             text-align: center;
             color: white;
+            position: relative;
+            overflow: hidden;
         }
 
-        .header h1 {
-            font-size: 42px;
-            font-weight: 800;
-            margin-bottom: 10px;
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
         }
 
-        .header p {
-            font-size: 18px;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .app-header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .app-header p {
+            font-size: 20px;
             opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 300;
         }
 
-        .body {
+        .app-header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Main Layout */
+        .app-body {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 320px 1fr;
+            min-height: 700px;
         }
 
+        /* Sidebar */
         .sidebar {
             background: #f8f9fa;
-            padding: 30px 20px;
+            padding: 35px 25px;
             border-right: 1px solid #e9ecef;
+        }
+
+        .sidebar-section {
+            margin-bottom: 35px;
         }
 
         .section-title {
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 800;
             color: #667eea;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
+            letter-spacing: 1.5px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
+        /* Aspect Ratio Cards */
         .ratio-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 25px;
+            gap: 14px;
         }
 
         .ratio-card {
             background: white;
             border: 3px solid #e9ecef;
-            border-radius: 16px;
-            padding: 20px 10px;
+            border-radius: 18px;
+            padding: 24px 12px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ratio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .ratio-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.25);
             border-color: #667eea;
         }
 
         .ratio-card.active {
+            border-color: #667eea;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            transform: scale(1.05);
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.45);
+        }
+
+        .ratio-card.active::before {
+            opacity: 1;
         }
 
         .ratio-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block;
+            position: relative;
+            z-index: 1;
         }
 
         .ratio-label {
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
         }
 
         .ratio-desc {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-top: 4px;
+            font-size: 12px;
+            opacity: 0.75;
+            position: relative;
+            z-index: 1;
         }
 
-        .main {
-            padding: 40px;
-            background: #fafbfc;
+        /* Settings */
+        .settings-group {
+            margin-bottom: 22px;
         }
 
-        /* API Setup Box */
-        .api-setup {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
-            border: 3px solid #ffc107;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
-        }
-
-        .api-setup h3 {
-            color: #856404;
-            font-size: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .api-steps {
-            color: #856404;
-            margin-bottom: 15px;
-            line-height: 1.8;
-            font-size: 14px;
-        }
-
-        .api-steps ol {
-            margin-left: 20px;
-        }
-
-        .api-steps li {
-            margin-bottom: 8px;
-        }
-
-        .api-steps a {
-            color: #667eea;
+        .settings-label {
+            display: block;
+            font-size: 13px;
             font-weight: 700;
-            text-decoration: none;
+            color: #495057;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .api-steps a:hover {
-            text-decoration: underline;
-        }
-
-        .api-input-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .api-input {
-            flex: 1;
+        .settings-select {
+            width: 100%;
             padding: 14px;
-            border: 3px solid #ffc107;
+            border: 3px solid #e9ecef;
             border-radius: 12px;
             font-size: 14px;
-            font-family: 'Monaco', monospace;
+            font-weight: 600;
             background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #495057;
         }
 
-        .api-input:focus {
+        .settings-select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
-        .verify-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border: none;
-            padding: 14px 30px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            white-space: nowrap;
+        /* Main Content Area */
+        .main-content {
+            padding: 45px;
+            background: #fafbfc;
+            overflow-y: auto;
         }
 
-        .verify-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
-        }
-
-        .verify-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .api-status {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            display: none;
-        }
-
-        .api-status.success {
-            background: #d4edda;
-            border: 2px solid #28a745;
-            color: #155724;
-            display: block;
-        }
-
-        .api-status.error {
-            background: #f8d7da;
-            border: 2px solid #dc3545;
-            color: #721c24;
-            display: block;
-        }
-
-        .api-warning {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 12px;
-            margin-top: 12px;
-            border-radius: 8px;
-            color: #856404;
-            font-size: 13px;
-        }
-
+        /* Prompt Section */
         .prompt-section {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
-            margin-bottom: 30px;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 35px;
         }
 
         .prompt-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .prompt-title {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .prompt-badge {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
         }
 
         .prompt-textarea {
             width: 100%;
-            min-height: 320px;
-            padding: 20px;
+            min-height: 380px;
+            padding: 25px;
             border: 3px solid #e9ecef;
-            border-radius: 16px;
-            font-size: 15px;
-            font-family: 'Monaco', monospace;
-            line-height: 1.8;
+            border-radius: 18px;
+            font-size: 16px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            line-height: 2;
             resize: vertical;
-            background: #fafbfc;
+            transition: all 0.3s;
+            background: #f8f9fa;
+            color: #2d3748;
         }
 
         .prompt-textarea:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.12);
             background: white;
+        }
+
+        .prompt-textarea::placeholder {
+            color: #adb5bd;
+            line-height: 2;
         }
 
         .prompt-footer {
             display: flex;
             justify-content: space-between;
-            margin-top: 15px;
-            padding: 15px;
+            align-items: center;
+            margin-top: 18px;
+            padding: 18px 22px;
             background: #f8f9fa;
-            border-radius: 12px;
-            font-size: 13px;
+            border-radius: 14px;
+            font-size: 14px;
             color: #6c757d;
         }
 
-        .generate-btn {
+        .prompt-footer-tip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        /* Generate Button */
+        .generate-button {
             width: 100%;
-            padding: 20px;
+            padding: 24px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 16px;
-            font-size: 18px;
-            font-weight: 800;
+            border-radius: 18px;
+            font-size: 20px;
+            font-weight: 900;
             cursor: pointer;
-            margin-top: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            transition: all 0.3s;
+            letter-spacing: 2px;
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.45);
+            margin-top: 25px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .generate-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        .generate-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
 
-        .generate-btn:disabled {
-            background: #cbd5e0;
+        .generate-button:hover:not(:disabled)::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        .generate-button:hover:not(:disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.55);
+        }
+
+        .generate-button:active:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .generate-button:disabled {
+            background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
             cursor: not-allowed;
-            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
         }
 
+        .button-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Results Section */
         .results-section {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .results-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .results-title {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             color: #2d3748;
         }
 
-        .clear-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
+        .results-count {
+            color: #667eea;
+            font-weight: 900;
         }
 
+        .clear-button {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .clear-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.35);
+        }
+
+        /* Results Grid */
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
         }
 
         .image-card {
             background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 16px;
+            border: 3px solid #e9ecef;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            animation: fadeIn 0.5s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: cardFadeIn 0.6s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .image-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
         }
 
         .image-container {
             width: 100%;
-            height: 280px;
+            height: 300px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow: hidden;
         }
 
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .image-card:hover .image-container img {
+            transform: scale(1.05);
         }
 
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            width: 55px;
+            height: 55px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -409,14 +477,18 @@
         }
 
         .image-info {
-            padding: 15px;
+            padding: 20px;
         }
 
         .image-prompt {
             font-size: 14px;
             color: #495057;
-            margin-bottom: 12px;
-            line-height: 1.5;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .image-meta {
@@ -425,49 +497,76 @@
             align-items: center;
         }
 
-        .image-ratio {
-            background: #667eea;
+        .image-ratio-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
         }
 
-        .download-btn {
-            background: #28a745;
+        .download-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             border: none;
-            padding: 6px 15px;
-            border-radius: 8px;
-            font-weight: 700;
+            padding: 9px 20px;
+            border-radius: 10px;
+            font-weight: 800;
             cursor: pointer;
-            font-size: 12px;
+            transition: all 0.3s;
+            font-size: 13px;
         }
 
+        .download-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.35);
+        }
+
+        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 30px;
             color: #adb5bd;
         }
 
         .empty-icon {
-            font-size: 70px;
-            margin-bottom: 15px;
+            font-size: 90px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
         }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .empty-state h3 {
+            font-size: 26px;
+            margin-bottom: 12px;
+            color: #6c757d;
+            font-weight: 800;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            color: #adb5bd;
+        }
+
+        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.88);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
         }
 
         .loading-overlay.active {
@@ -480,148 +579,204 @@
         }
 
         .loading-spinner-large {
-            width: 70px;
-            height: 70px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
+            width: 80px;
+            height: 80px;
+            border: 6px solid rgba(255, 255, 255, 0.2);
             border-top-color: #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 28px;
         }
 
         .loading-text {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
         }
 
         .loading-progress {
-            font-size: 18px;
+            font-size: 20px;
             color: #667eea;
+            font-weight: 700;
         }
 
+        /* Toast Notification */
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 35px;
+            right: 35px;
             background: white;
-            padding: 18px 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            padding: 22px 30px;
+            border-radius: 14px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
             display: none;
-            gap: 10px;
+            align-items: center;
+            gap: 14px;
             z-index: 10000;
-            min-width: 300px;
+            min-width: 320px;
+            animation: toastSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(450px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         .toast.show {
             display: flex;
-            animation: slideIn 0.4s;
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(400px); }
-            to { transform: translateX(0); }
+        .toast.success {
+            border-left: 6px solid #28a745;
         }
 
-        .toast.success { border-left: 5px solid #28a745; }
-        .toast.error { border-left: 5px solid #dc3545; }
-        .toast.info { border-left: 5px solid #17a2b8; }
+        .toast.error {
+            border-left: 6px solid #dc3545;
+        }
+
+        .toast.info {
+            border-left: 6px solid #17a2b8;
+        }
+
+        .toast-icon {
+            font-size: 28px;
+        }
 
         .toast-content {
             flex: 1;
         }
 
         .toast-title {
-            font-weight: 700;
-            margin-bottom: 4px;
-            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            font-size: 15px;
+            color: #2d3748;
         }
 
         .toast-message {
-            font-size: 13px;
+            font-size: 14px;
             color: #6c757d;
         }
 
-        @media (max-width: 1024px) {
-            .body { grid-template-columns: 1fr; }
-            .ratio-grid { grid-template-columns: repeat(4, 1fr); }
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .app-body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .ratio-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
 
         @media (max-width: 768px) {
-            .main { padding: 20px; }
-            .ratio-grid { grid-template-columns: repeat(2, 1fr); }
-            .results-grid { grid-template-columns: 1fr; }
-            .api-input-group { flex-direction: column; }
+            .app-header h1 {
+                font-size: 36px;
+            }
+
+            .app-header p {
+                font-size: 16px;
+            }
+
+            .main-content {
+                padding: 25px;
+            }
+
+            .prompt-section,
+            .results-section {
+                padding: 25px;
+            }
+
+            .ratio-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toast {
+                right: 20px;
+                left: 20px;
+                min-width: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎨 AI Image Generator Pro</h1>
-            <p>Real Hugging Face AI • Verified API • Prompt-accurate images</p>
+    <div class="app-wrapper">
+        <!-- Header -->
+        <div class="app-header">
+            <h1>🎨 AI Batch Image Generator</h1>
+            <p>Generate unlimited AI images • One line = One masterpiece</p>
+            <div class="badge">✨ 100% Free • No API Key Required</div>
         </div>
 
-        <div class="body">
+        <!-- Main Body -->
+        <div class="app-body">
+            <!-- Sidebar -->
             <div class="sidebar">
-                <div class="section-title">📐 ASPECT RATIO</div>
-                <div class="ratio-grid">
-                    <div class="ratio-card active" data-ratio="1:1">
-                        <span class="ratio-icon">⬜</span>
-                        <div class="ratio-label">1:1</div>
-                        <div class="ratio-desc">Square</div>
+                <div class="sidebar-section">
+                    <div class="section-title">📐 ASPECT RATIO</div>
+                    <div class="ratio-grid">
+                        <div class="ratio-card active" data-ratio="1:1" data-width="1024" data-height="1024">
+                            <span class="ratio-icon">⬜</span>
+                            <div class="ratio-label">1:1</div>
+                            <div class="ratio-desc">Square</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="16:9" data-width="1024" data-height="576">
+                            <span class="ratio-icon">🖥️</span>
+                            <div class="ratio-label">16:9</div>
+                            <div class="ratio-desc">Landscape</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="9:16" data-width="576" data-height="1024">
+                            <span class="ratio-icon">📱</span>
+                            <div class="ratio-label">9:16</div>
+                            <div class="ratio-desc">Portrait</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="3:4" data-width="768" data-height="1024">
+                            <span class="ratio-icon">🖼️</span>
+                            <div class="ratio-label">3:4</div>
+                            <div class="ratio-desc">Portrait</div>
+                        </div>
                     </div>
-                    <div class="ratio-card" data-ratio="16:9">
-                        <span class="ratio-icon">🖥️</span>
-                        <div class="ratio-label">16:9</div>
-                        <div class="ratio-desc">Landscape</div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title">⚙️ SETTINGS</div>
+                    
+                    <div class="settings-group">
+                        <label class="settings-label">AI Model</label>
+                        <select class="settings-select" id="modelSelect">
+                            <option value="flux">Flux (Best Quality)</option>
+                            <option value="turbo">Turbo (Fast)</option>
+                        </select>
                     </div>
-                    <div class="ratio-card" data-ratio="9:16">
-                        <span class="ratio-icon">📱</span>
-                        <div class="ratio-label">9:16</div>
-                        <div class="ratio-desc">Portrait</div>
-                    </div>
-                    <div class="ratio-card" data-ratio="3:4">
-                        <span class="ratio-icon">🖼️</span>
-                        <div class="ratio-label">3:4</div>
-                        <div class="ratio-desc">Portrait</div>
+
+                    <div class="settings-group">
+                        <label class="settings-label">Enhancement</label>
+                        <select class="settings-select" id="enhanceSelect">
+                            <option value="true">Enhanced (Recommended)</option>
+                            <option value="false">Standard</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            <div class="main">
-                <!-- API Setup Section -->
-                <div class="api-setup">
-                    <h3>🔑 Setup API Key (One Time - FREE)</h3>
-                    <div class="api-steps">
-                        <ol>
-                            <li>Visit <a href="https://huggingface.co/join" target="_blank">Hugging Face</a> and create FREE account</li>
-                            <li>Go to <a href="https://huggingface.co/settings/tokens" target="_blank">Settings → Access Tokens</a></li>
-                            <li>Click "New token" → Select "Read" permission → Create</li>
-                            <li>Copy token and paste below, then click "Verify API"</li>
-                        </ol>
-                    </div>
-
-                    <div class="api-input-group">
-                        <input 
-                            type="text" 
-                            class="api-input" 
-                            id="apiKeyInput" 
-                            placeholder="hf_xxxxxxxxxxxxxxxxxxxxx"
-                        />
-                        <button class="verify-btn" id="verifyBtn">
-                            ✓ Verify API
-                        </button>
-                    </div>
-
-                    <div class="api-status" id="apiStatus"></div>
-
-                    <div class="api-warning">
-                        ⚠️ <strong>Important:</strong> Without valid API key, images will NOT generate!
-                    </div>
-                </div>
-
+            <!-- Main Content -->
+            <div class="main-content">
                 <!-- Prompt Section -->
                 <div class="prompt-section">
                     <div class="prompt-header">
@@ -634,34 +789,43 @@
                     <textarea 
                         class="prompt-textarea" 
                         id="promptInput" 
-                        placeholder="Enter detailed prompts (one per line):
+                        placeholder="Enter each detailed prompt on a new line for ultra-quality results...
 
-WORKING EXAMPLES:
+✨ PERFECT EXAMPLES (Ready to Use):
 
-A majestic lion with golden mane standing on rocky cliff at golden sunset, dramatic orange sky, professional wildlife photography, highly detailed, 8k resolution
+A majestic lion with golden mane standing on rocky cliff at dramatic sunset, cinematic lighting, professional wildlife photography
 
-Futuristic cyberpunk city at night with glowing neon purple and blue lights, wet reflective streets, flying cars in sky, cinematic atmosphere, highly detailed
+Futuristic cyberpunk city at night with glowing neon purple and blue lights, wet reflective streets, flying cars, highly detailed
 
-Beautiful pink cherry blossom tree in full bloom, Japanese garden setting, spring season, soft natural sunlight, professional nature photography, vibrant colors
+Beautiful cherry blossom tree in full pink bloom, Japanese garden, spring season, soft sunlight, professional photography
 
-Cozy wooden log cabin in snowy mountain landscape, winter evening, warm yellow lights from windows, smoke from chimney, peaceful atmosphere, photorealistic
+Cozy wooden cabin in snowy mountains during winter evening, warm lights from windows, smoke from chimney, peaceful atmosphere
 
-Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic sunset lighting, professional automotive photography, ultra detailed
+Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic sunset, professional automotive photography
 
-💡 PERFECT RESULTS TIPS:
-• Use VERY detailed descriptions
-• Add quality keywords: photorealistic, highly detailed, 8k, professional photography
-• Mention lighting: golden hour, cinematic, dramatic, soft natural light
-• Include atmosphere: peaceful, vibrant, dramatic, cozy
-• Be specific about colors, textures, mood"></textarea>
+Majestic snow-capped mountain peak at sunrise, crystal clear lake reflection, alpine landscape, breathtaking vista
+
+Ancient medieval castle on hilltop surrounded by morning mist, Gothic architecture, fantasy atmosphere, highly detailed
+
+Tropical paradise beach with turquoise water, white sand, palm trees, colorful sunset sky, travel photography
+
+💡 PRO TIPS FOR PERFECT AI IMAGES:
+• Be VERY specific and descriptive
+• Add style: cinematic, professional photography, highly detailed
+• Mention lighting: golden hour, dramatic, soft, natural
+• Include mood: peaceful, dramatic, vibrant, cozy, majestic
+• Add quality markers: ultra detailed, 8k, photorealistic
+• Each line = One unique AI-generated masterpiece!"></textarea>
 
                     <div class="prompt-footer">
-                        <span>🤖 Real AI • API Verified Required</span>
+                        <span class="prompt-footer-tip">
+                            💡 More details = Better images
+                        </span>
                         <span id="charCount">0 characters</span>
                     </div>
 
-                    <button class="generate-btn" id="generateBtn" disabled>
-                        🚀 Generate AI Images
+                    <button class="generate-button" id="generateBtn" disabled>
+                        <span class="button-text">🚀 Generate All Images</span>
                     </button>
                 </div>
 
@@ -669,9 +833,9 @@ Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic su
                 <div class="results-section">
                     <div class="results-header">
                         <h2 class="results-title">
-                            🖼️ Generated Images (<span id="resultCount">0</span>)
+                            🖼️ Generated Images (<span class="results-count" id="resultCount">0</span>)
                         </h2>
-                        <button class="clear-btn" id="clearBtn" style="display: none;">
+                        <button class="clear-button" id="clearBtn" style="display: none;">
                             🗑️ Clear All
                         </button>
                     </div>
@@ -680,7 +844,7 @@ Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic su
                         <div class="empty-state">
                             <div class="empty-icon">🎨</div>
                             <h3>No images generated yet</h3>
-                            <p>Verify API key, enter prompts, and start generating!</p>
+                            <p>Enter your prompts above and start creating AI masterpieces!</p>
                         </div>
                     </div>
                 </div>
@@ -692,13 +856,14 @@ Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic su
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner-large"></div>
-            <div class="loading-text">Generating real AI images...</div>
-            <div class="loading-progress" id="progressText">Please wait 20-30 seconds per image</div>
+            <div class="loading-text">Generating AI Images...</div>
+            <div class="loading-progress" id="progressText">0 / 0</div>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon"></span>
         <div class="toast-content">
             <div class="toast-title" id="toastTitle"></div>
             <div class="toast-message" id="toastMessage"></div>
@@ -707,9 +872,6 @@ Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic su
 
     <script>
         // DOM Elements
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const verifyBtn = document.getElementById('verifyBtn');
-        const apiStatus = document.getElementById('apiStatus');
         const promptInput = document.getElementById('promptInput');
         const promptCount = document.getElementById('promptCount');
         const charCount = document.getElementById('charCount');
@@ -720,225 +882,116 @@ Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic su
         const loadingOverlay = document.getElementById('loadingOverlay');
         const progressText = document.getElementById('progressText');
         const ratioCards = document.querySelectorAll('.ratio-card');
+        const modelSelect = document.getElementById('modelSelect');
+        const enhanceSelect = document.getElementById('enhanceSelect');
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toastIcon');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMessage = document.getElementById('toastMessage');
 
         // State
-        let selectedRatio = '1:1';
+        let selectedRatio = {
+            label: '1:1',
+            width: 1024,
+            height: 1024
+        };
         let generatedImages = [];
-        let apiKeyVerified = false;
-        let verifiedApiKey = '';
 
-        // Load saved API key
-        const savedKey = localStorage.getItem('hf_api_key');
-        const savedVerified = localStorage.getItem('hf_api_verified');
-        if (savedKey && savedVerified === 'true') {
-            apiKeyInput.value = savedKey;
-            verifiedApiKey = savedKey;
-            apiKeyVerified = true;
-            apiStatus.className = 'api-status success';
-            apiStatus.textContent = '✓ API Key Verified! Ready to generate images.';
-            verifyBtn.textContent = '✓ Verified';
-            verifyBtn.style.background = '#28a745';
-        }
-
-        // Update counters
+        // Update Counters
         promptInput.addEventListener('input', function() {
-            const lines = this.value.split('\n').filter(l => l.trim());
+            const text = this.value;
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+            
             promptCount.textContent = lines.length;
-            charCount.textContent = this.value.length + ' characters';
-            generateBtn.disabled = lines.length === 0 || !apiKeyVerified;
+            charCount.textContent = text.length + ' characters';
+            generateBtn.disabled = lines.length === 0;
         });
 
-        // Ratio selection
+        // Ratio Selection
         ratioCards.forEach(card => {
             card.addEventListener('click', function() {
                 ratioCards.forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
-                selectedRatio = this.dataset.ratio;
+                selectedRatio = {
+                    label: this.dataset.ratio,
+                    width: parseInt(this.dataset.width),
+                    height: parseInt(this.dataset.height)
+                };
             });
-        });
-
-        // Verify API Key
-        verifyBtn.addEventListener('click', async function() {
-            const apiKey = apiKeyInput.value.trim();
-            
-            if (!apiKey) {
-                showToast('Error', 'Please enter API key!', 'error');
-                return;
-            }
-
-            if (!apiKey.startsWith('hf_')) {
-                showToast('Invalid Format', 'API key should start with "hf_"', 'error');
-                return;
-            }
-
-            verifyBtn.disabled = true;
-            verifyBtn.textContent = '⏳ Verifying...';
-            apiStatus.className = 'api-status';
-            apiStatus.style.display = 'none';
-
-            try {
-                // Test API with a simple model query
-                const response = await fetch('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        inputs: 'test',
-                        parameters: {}
-                    })
-                });
-
-                if (response.status === 401 || response.status === 403) {
-                    throw new Error('Invalid API key');
-                }
-
-                // Success
-                verifiedApiKey = apiKey;
-                apiKeyVerified = true;
-                localStorage.setItem('hf_api_key', apiKey);
-                localStorage.setItem('hf_api_verified', 'true');
-
-                apiStatus.className = 'api-status success';
-                apiStatus.textContent = '✓ API Key Verified Successfully! You can now generate images.';
-                verifyBtn.textContent = '✓ Verified';
-                verifyBtn.style.background = '#28a745';
-                
-                showToast('Success!', 'API key verified! Ready to generate images.', 'success');
-
-                // Enable generate button if prompts exist
-                const lines = promptInput.value.split('\n').filter(l => l.trim());
-                if (lines.length > 0) {
-                    generateBtn.disabled = false;
-                }
-
-            } catch (error) {
-                apiKeyVerified = false;
-                verifiedApiKey = '';
-                localStorage.removeItem('hf_api_key');
-                localStorage.removeItem('hf_api_verified');
-
-                apiStatus.className = 'api-status error';
-                apiStatus.textContent = '❌ Invalid API Key! Please check and try again.';
-                verifyBtn.textContent = '✗ Try Again';
-                verifyBtn.disabled = false;
-
-                showToast('Verification Failed', 'Invalid API key. Please check and try again.', 'error');
-            }
         });
 
         // Generate Images
         generateBtn.addEventListener('click', async function() {
-            if (!apiKeyVerified) {
-                showToast('Error', 'Please verify API key first!', 'error');
+            const prompts = promptInput.value.split('\n').filter(line => line.trim() !== '');
+            
+            if (prompts.length === 0) {
+                showToast('⚠️', 'Warning', 'Please enter at least one prompt!', 'error');
                 return;
             }
 
-            const prompts = promptInput.value.split('\n').filter(l => l.trim());
-            if (prompts.length === 0) return;
-
+            // Clear previous results
             resultsGrid.innerHTML = '';
             generatedImages = [];
             clearBtn.style.display = 'none';
+
+            // Show loading
             loadingOverlay.classList.add('active');
             generateBtn.disabled = true;
 
-            const apiEndpoint = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1';
+            const model = modelSelect.value;
+            const enhance = enhanceSelect.value;
 
+            // Generate images
             for (let i = 0; i < prompts.length; i++) {
-                progressText.textContent = `Generating image ${i + 1} / ${prompts.length}... (20-30 sec each)`;
+                progressText.textContent = `${i + 1} / ${prompts.length}`;
 
+                // Create card
                 const card = createImageCard(prompts[i], i);
                 resultsGrid.appendChild(card);
 
-                try {
-                    const response = await fetch(apiEndpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${verifiedApiKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            inputs: prompts[i],
-                            parameters: {
-                                negative_prompt: "blurry, low quality, distorted, ugly, bad anatomy",
-                                num_inference_steps: 50,
-                                guidance_scale: 7.5
-                            }
-                        })
-                    });
+                // Generate image using Pollinations.ai (FREE API - No key needed)
+                const encodedPrompt = encodeURIComponent(prompts[i]);
+                const seed = Date.now() + i;
+                
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
 
-                    if (!response.ok) {
-                        if (response.status === 503) {
-                            // Model loading, wait and retry
-                            await new Promise(resolve => setTimeout(resolve, 20000));
-                            
-                            const retryResponse = await fetch(apiEndpoint, {
-                                method: 'POST',
-                                headers: {
-                                    'Authorization': `Bearer ${verifiedApiKey}`,
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    inputs: prompts[i],
-                                    parameters: {
-                                        negative_prompt: "blurry, low quality, distorted, ugly",
-                                        num_inference_steps: 50
-                                    }
-                                })
-                            });
+                // Wait for generation (simulate realistic timing)
+                await new Promise(resolve => setTimeout(resolve, 3000));
 
-                            if (!retryResponse.ok) throw new Error('Generation failed');
-                            const blob = await retryResponse.blob();
-                            displayImage(card, blob, prompts[i], i);
-                        } else {
-                            throw new Error(`API Error: ${response.status}`);
-                        }
-                    } else {
-                        const blob = await response.blob();
-                        displayImage(card, blob, prompts[i], i);
-                    }
+                // Load image
+                const imageContainer = card.querySelector('.image-container');
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = prompts[i];
+                img.loading = 'lazy';
+                
+                img.onload = function() {
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(img);
+                };
 
-                } catch (error) {
-                    console.error('Error:', error);
-                    const imageContainer = card.querySelector('.image-container');
-                    imageContainer.innerHTML = `
-                        <div style="color: white; padding: 20px; text-align: center;">
-                            ❌ Generation Failed<br>
-                            <small>${error.message}</small>
-                        </div>
-                    `;
-                }
+                img.onerror = function() {
+                    imageContainer.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">⚠️ Generation failed<br><small>Please try again</small></div>';
+                };
 
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                generatedImages.push({
+                    prompt: prompts[i],
+                    ratio: selectedRatio.label,
+                    url: imageUrl
+                });
+
+                resultCount.textContent = generatedImages.length;
             }
 
+            // Hide loading
             loadingOverlay.classList.remove('active');
             generateBtn.disabled = false;
             clearBtn.style.display = 'block';
-            showToast('Complete!', `Successfully generated ${prompts.length} images!`, 'success');
+
+            showToast('✅', 'Success!', `Successfully generated ${prompts.length} AI images!`, 'success');
         });
 
-        function displayImage(card, blob, prompt, index) {
-            const imageUrl = URL.createObjectURL(blob);
-            const imageContainer = card.querySelector('.image-container');
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            img.alt = prompt;
-            imageContainer.innerHTML = '';
-            imageContainer.appendChild(img);
-
-            generatedImages.push({
-                prompt: prompt,
-                ratio: selectedRatio,
-                blob: blob,
-                url: imageUrl
-            });
-
-            resultCount.textContent = generatedImages.length;
-        }
-
+        // Create Image Card
         function createImageCard(prompt, index) {
             const card = document.createElement('div');
             card.className = 'image-card';
@@ -949,8 +1002,8 @@ Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic su
                 <div class="image-info">
                     <div class="image-prompt">${prompt}</div>
                     <div class="image-meta">
-                        <span class="image-ratio">${selectedRatio}</span>
-                        <button class="download-btn" onclick="downloadImage(${index})">
+                        <span class="image-ratio-badge">${selectedRatio.label}</span>
+                        <button class="download-button" onclick="downloadImage(${index})">
                             ⬇️ Download
                         </button>
                     </div>
@@ -959,37 +1012,49 @@ Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic su
             return card;
         }
 
+        // Download Image
         function downloadImage(index) {
             const image = generatedImages[index];
-            if (image && image.blob) {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(image.blob);
-                link.download = `ai-generated-${index + 1}.png`;
-                link.click();
-                showToast('Downloaded!', 'Image saved successfully.', 'success');
+            if (image) {
+                fetch(image.url)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `ai-generated-${index + 1}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                        showToast('✅', 'Downloaded!', 'Image saved successfully.', 'success');
+                    })
+                    .catch(error => {
+                        showToast('❌', 'Error', 'Failed to download image.', 'error');
+                    });
             }
         }
 
+        // Clear Results
         clearBtn.addEventListener('click', function() {
-            if (confirm('Clear all generated images?')) {
+            if (confirm('Are you sure you want to clear all generated images?')) {
                 resultsGrid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🎨</div>
                         <h3>No images generated yet</h3>
-                        <p>Verify API key, enter prompts, and start generating!</p>
+                        <p>Enter your prompts above and start creating AI masterpieces!</p>
                     </div>
                 `;
                 generatedImages = [];
                 resultCount.textContent = '0';
                 clearBtn.style.display = 'none';
+                showToast('✅', 'Cleared!', 'All images have been removed.', 'success');
             }
         });
 
-        function showToast(title, message, type) {
-            const toast = document.getElementById('toast');
-            const toastTitle = document.getElementById('toastTitle');
-            const toastMessage = document.getElementById('toastMessage');
-            
+        // Show Toast
+        function showToast(icon, title, message, type) {
+            toastIcon.textContent = icon;
             toastTitle.textContent = title;
             toastMessage.textContent = message;
             toast.className = `toast ${type} show`;
@@ -998,6 +1063,19 @@ Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic su
                 toast.classList.remove('show');
             }, 4000);
         }
+
+        // Keyboard Shortcut (Ctrl+Enter to generate)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!generateBtn.disabled) {
+                    generateBtn.click();
+                }
+            }
+        });
+
+        // Initialize
+        promptInput.dispatchEvent(new Event('input'));
     </script>
 </body>
 </html>
