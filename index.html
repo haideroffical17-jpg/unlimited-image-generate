@@ -1,737 +1,655 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Batch Image Generator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            display: flex;
-            min-height: 90vh;
-        }
-
-        .sidebar {
-            width: 400px;
-            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 30px;
-            border-right: 1px solid #dee2e6;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-        }
-
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            color: #6c757d;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #495057;
-            font-size: 14px;
-        }
-
-        .prompt-textarea {
-            width: 100%;
-            min-height: 300px;
-            padding: 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
-            resize: vertical;
-            transition: border-color 0.3s;
-        }
-
-        .prompt-textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .helper-text {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-
-        .aspect-ratio-group {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .ratio-option {
-            padding: 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s;
-            background: white;
-        }
-
-        .ratio-option:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-
-        .ratio-option.selected {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-        }
-
-        .ratio-label {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .ratio-dimensions {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-top: 3px;
-        }
-
-        .options-group {
-            margin-bottom: 25px;
-        }
-
-        .option-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .option-label {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        select {
-            padding: 8px 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            background: white;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 26px;
-            background: #ccc;
-            border-radius: 13px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toggle-switch.active {
-            background: #667eea;
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            top: 3px;
-            left: 3px;
-            transition: left 0.3s;
-        }
-
-        .toggle-switch.active::after {
-            left: 27px;
-        }
-
-        .generate-button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: auto;
-        }
-
-        .generate-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .generate-button:active {
-            transform: translateY(0);
-        }
-
-        .generate-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .results-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .clear-button, .download-all-button {
-            padding: 10px 20px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: none;
-        }
-
-        .download-all-button {
-            background: #28a745;
-        }
-
-        .clear-button:hover {
-            background: #c82333;
-        }
-
-        .download-all-button:hover {
-            background: #218838;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .image-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .image-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-
-        .image-wrapper {
-            width: 100%;
-            background: #dee2e6;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-wrapper.ratio-1-1 {
-            aspect-ratio: 1 / 1;
-        }
-
-        .image-wrapper.ratio-16-9 {
-            aspect-ratio: 16 / 9;
-        }
-
-        .image-wrapper.ratio-9-16 {
-            aspect-ratio: 9 / 16;
-        }
-
-        .image-wrapper.ratio-3-4 {
-            aspect-ratio: 3 / 4;
-        }
-
-        .image-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .loading-spinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .image-info {
-            padding: 15px;
-        }
-
-        .image-prompt {
-            font-size: 13px;
-            color: #495057;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .download-button {
-            width: 100%;
-            padding: 10px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .download-button:hover {
-            background: #5568d3;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
-        }
-
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        .empty-state-text {
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        @media (max-width: 1024px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #dee2e6;
-            }
-
-            .results-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
-
-        @media (max-width: 640px) {
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .aspect-ratio-group {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <h1>🎨 AI Image Generator</h1>
-            <p class="subtitle">Generate multiple AI images in batch</p>
-
-            <div class="input-group">
-                <label for="prompts">Image Prompts (One per line)</label>
-                <textarea 
-                    id="prompts" 
-                    class="prompt-textarea" 
-                    placeholder="A serene mountain landscape at sunset
-A futuristic city with flying cars
-A cute cat wearing a wizard hat
-An abstract painting with vibrant colors"></textarea>
-                <div class="helper-text">Enter each prompt on a new line</div>
-            </div>
-
-            <div class="input-group">
-                <label>Aspect Ratio</label>
-                <div class="aspect-ratio-group">
-                    <div class="ratio-option selected" data-ratio="1:1">
-                        <div class="ratio-label">Square</div>
-                        <div class="ratio-dimensions">1:1</div>
-                    </div>
-                    <div class="ratio-option" data-ratio="16:9">
-                        <div class="ratio-label">Landscape</div>
-                        <div class="ratio-dimensions">16:9</div>
-                    </div>
-                    <div class="ratio-option" data-ratio="9:16">
-                        <div class="ratio-label">Portrait</div>
-                        <div class="ratio-dimensions">9:16</div>
-                    </div>
-                    <div class="ratio-option" data-ratio="3:4">
-                        <div class="ratio-label">Photo</div>
-                        <div class="ratio-dimensions">3:4</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="options-group">
-                <label>Generation Options</label>
-                <div class="option-row">
-                    <span class="option-label">Model</span>
-                    <select id="model">
-                        <option value="flux">Flux (Default)</option>
-                        <option value="turbo">Turbo (Faster)</option>
-                    </select>
-                </div>
-                <div class="option-row">
-                    <span class="option-label">Enhance Quality</span>
-                    <div class="toggle-switch" id="enhanceToggle"></div>
-                </div>
-            </div>
-
-            <button class="generate-button" id="generateBtn">Generate Images</button>
-        </div>
-
-        <div class="main-content">
-            <div class="results-header">
-                <h2 class="results-title">Generated Images</h2>
-                <div class="button-group">
-                    <button class="download-all-button" id="downloadAllBtn">Download All</button>
-                    <button class="clear-button" id="clearBtn">Clear All</button>
-                </div>
-            </div>
-
-            <div id="results">
-                <div class="empty-state">
-                    <div class="empty-state-icon">🖼️</div>
-                    <div class="empty-state-text">No images generated yet</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // DOM Elements
-        const promptsTextarea = document.getElementById('prompts');
-        const generateBtn = document.getElementById('generateBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const downloadAllBtn = document.getElementById('downloadAllBtn');
-        const resultsDiv = document.getElementById('results');
-        const modelSelect = document.getElementById('model');
-        const enhanceToggle = document.getElementById('enhanceToggle');
-
-        // State
-        let selectedRatio = '1:1';
-        let enhanceEnabled = false;
-        let generatedImages = [];
-
-        // Aspect Ratio Selection
-        const ratioOptions = document.querySelectorAll('.ratio-option');
-        ratioOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                ratioOptions.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                selectedRatio = option.dataset.ratio;
-            });
-        });
-
-        // Enhance Toggle
-        enhanceToggle.addEventListener('click', () => {
-            enhanceEnabled = !enhanceEnabled;
-            enhanceToggle.classList.toggle('active');
-        });
-
-        // Get dimensions - BALANCED QUALITY
-        function getDimensions(ratio) {
-            const dimensions = {
-                '1:1': { width: 1024, height: 1024 },
-                '16:9': { width: 1024, height: 576 },
-                '9:16': { width: 576, height: 1024 },
-                '3:4': { width: 768, height: 1024 }
-            };
-            return dimensions[ratio];
-        }
-
-        // Generate images
-        generateBtn.addEventListener('click', async () => {
-            const promptText = promptsTextarea.value.trim();
-            if (!promptText) {
-                alert('Please enter at least one prompt');
-                return;
-            }
-
-            const prompts = promptText.split('\n').filter(p => p.trim() !== '');
-            if (prompts.length === 0) {
-                alert('Please enter at least one valid prompt');
-                return;
-            }
-
-            resultsDiv.innerHTML = '';
-            generatedImages = [];
-
-            generateBtn.disabled = true;
-            generateBtn.textContent = 'Generating...';
-
-            const dimensions = getDimensions(selectedRatio);
-            const model = modelSelect.value;
-            const enhance = enhanceEnabled;
-
-            prompts.forEach((prompt, index) => {
-                const seed = Math.floor(Math.random() * 1000000);
-                const timestamp = Date.now(); // Cache busting
-                const imageData = {
-                    prompt: prompt,
-                    url: generateImageUrl(prompt, dimensions, model, enhance, seed, timestamp),
-                    seed: seed,
-                    timestamp: timestamp
-                };
-                generatedImages.push(imageData);
-                
-                const card = createImageCard(imageData, index);
-                resultsDiv.appendChild(card);
-            });
-
-            generateBtn.disabled = false;
-            generateBtn.textContent = 'Generate Images';
-
-            clearBtn.style.display = 'block';
-            downloadAllBtn.style.display = 'block';
-        });
-
-        // Generate image URL with cache busting
-        function generateImageUrl(prompt, dimensions, model, enhance, seed, timestamp) {
-            const encodedPrompt = encodeURIComponent(prompt);
-            // Added timestamp for cache busting
-            return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}&nofeed=true&t=${timestamp}`;
-        }
-
-        // Create image card
-        function createImageCard(imageData, index) {
-            const card = document.createElement('div');
-            card.className = 'image-card';
-            card.dataset.index = index;
-
-            const ratioClass = `ratio-${selectedRatio.replace(':', '-')}`;
-
-            card.innerHTML = `
-                <div class="image-wrapper ${ratioClass}">
-                    <div class="loading-spinner"></div>
-                    <img data-index="${index}" alt="${imageData.prompt}" style="display: none;">
-                </div>
-                <div class="image-info">
-                    <div class="image-prompt">${imageData.prompt}</div>
-                    <button class="download-button" data-index="${index}">Download Image</button>
-                </div>
-            `;
-
-            const img = card.querySelector('img');
-            const spinner = card.querySelector('.loading-spinner');
-
-            // Load image with timeout
-            loadImageWithTimeout(img, imageData.url, spinner);
-
-            const downloadBtn = card.querySelector('.download-button');
-            downloadBtn.addEventListener('click', () => {
-                downloadSingleImage(index);
-            });
-
-            return card;
-        }
-
-        // Load image with timeout and retry
-        function loadImageWithTimeout(img, url, spinner) {
-            let loadTimeout;
-            
-            const startLoad = () => {
-                img.style.display = 'none';
-                spinner.style.display = 'block';
-                
-                // Set timeout for 30 seconds
-                loadTimeout = setTimeout(() => {
-                    img.onerror = null;
-                    img.onload = null;
-                    spinner.style.display = 'none';
-                    img.alt = 'Loading timeout - Click download to retry';
-                    console.error('Image load timeout:', url);
-                }, 30000);
-                
-                img.onload = () => {
-                    clearTimeout(loadTimeout);
-                    spinner.style.display = 'none';
-                    img.style.display = 'block';
-                };
-                
-                img.onerror = () => {
-                    clearTimeout(loadTimeout);
-                    spinner.style.display = 'none';
-                    img.style.display = 'block';
-                    img.alt = 'Failed to load - Server busy, try download button';
-                    console.error('Image load error:', url);
-                };
-                
-                // Start loading
-                img.src = url;
-            };
-            
-            startLoad();
-        }
-
-        // Download single image
-        async function downloadSingleImage(index) {
-            const imageData = generatedImages[index];
-            try {
-                // Show loading state
-                const card = document.querySelector(`.image-card[data-index="${index}"]`);
-                const downloadBtn = card.querySelector('.download-button');
-                const originalText = downloadBtn.textContent;
-                downloadBtn.textContent = 'Downloading...';
-                downloadBtn.disabled = true;
-
-                const response = await fetch(imageData.url);
-                if (!response.ok) throw new Error('Download failed');
-                
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                
-                const link = document.createElement('a');
-                link.href = url;
-                const filename = `${imageData.prompt.substring(0, 50).replace(/[^a-z0-9]/gi, '_')}_${imageData.seed}.png`;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(url);
-
-                // Reset button
-                downloadBtn.textContent = originalText;
-                downloadBtn.disabled = false;
-            } catch (error) {
-                console.error('Download failed:', error);
-                alert('Failed to download image. Please try again.');
-                
-                // Reset button
-                const card = document.querySelector(`.image-card[data-index="${index}"]`);
-                const downloadBtn = card.querySelector('.download-button');
-                downloadBtn.textContent = 'Download Image';
-                downloadBtn.disabled = false;
-            }
-        }
-
-        // Download all images
-        downloadAllBtn.addEventListener('click', async () => {
-            if (generatedImages.length === 0) {
-                alert('No images to download');
-                return;
-            }
-
-            downloadAllBtn.disabled = true;
-            downloadAllBtn.textContent = `Downloading 0/${generatedImages.length}...`;
-
-            let successCount = 0;
-            for (let i = 0; i < generatedImages.length; i++) {
-                downloadAllBtn.textContent = `Downloading ${i + 1}/${generatedImages.length}...`;
-                try {
-                    await downloadSingleImage(i);
-                    successCount++;
-                } catch (error) {
-                    console.error(`Failed to download image ${i + 1}:`, error);
-                }
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-
-            downloadAllBtn.disabled = false;
-            downloadAllBtn.textContent = 'Download All';
-            
-            if (successCount === generatedImages.length) {
-                alert(`✅ Successfully downloaded all ${generatedImages.length} images!`);
-            } else {
-                alert(`Downloaded ${successCount}/${generatedImages.length} images. Some failed due to server issues.`);
-            }
-        });
-
-        // Clear all
-        clearBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to clear all generated images?')) {
-                resultsDiv.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🖼️</div>
-                        <div class="empty-state-text">No images generated yet</div>
-                    </div>
-                `;
-                generatedImages = [];
-                clearBtn.style.display = 'none';
-                downloadAllBtn.style.display = 'none';
-            }
-        });
-    </script>
-</body>
-</html>
+  1	<!DOCTYPE html>
+     2	<html lang="en">
+     3	<head>
+     4	    <meta charset="UTF-8">
+     5	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6	    <title>AI Batch Image Generator</title>
+     7	    <style>
+     8	        * {
+     9	            margin: 0;
+    10	            padding: 0;
+    11	            box-sizing: border-box;
+    12	        }
+    13	
+    14	        body {
+    15	            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    16	            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    17	            min-height: 100vh;
+    18	            padding: 20px;
+    19	            color: #333;
+    20	        }
+    21	
+    22	        .container {
+    23	            max-width: 1400px;
+    24	            margin: 0 auto;
+    25	            background: white;
+    26	            border-radius: 20px;
+    27	            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    28	            overflow: hidden;
+    29	            display: flex;
+    30	            min-height: 90vh;
+    31	        }
+    32	
+    33	        .sidebar {
+    34	            width: 400px;
+    35	            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+    36	            padding: 30px;
+    37	            border-right: 1px solid #dee2e6;
+    38	            display: flex;
+    39	            flex-direction: column;
+    40	        }
+    41	
+    42	        .main-content {
+    43	            flex: 1;
+    44	            padding: 30px;
+    45	            overflow-y: auto;
+    46	        }
+    47	
+    48	        h1 {
+    49	            color: #667eea;
+    50	            margin-bottom: 10px;
+    51	            font-size: 28px;
+    52	        }
+    53	
+    54	        .subtitle {
+    55	            color: #6c757d;
+    56	            font-size: 14px;
+    57	            margin-bottom: 30px;
+    58	        }
+    59	
+    60	        .input-group {
+    61	            margin-bottom: 25px;
+    62	        }
+    63	
+    64	        label {
+    65	            display: block;
+    66	            margin-bottom: 8px;
+    67	            font-weight: 600;
+    68	            color: #495057;
+    69	            font-size: 14px;
+    70	        }
+    71	
+    72	        .prompt-textarea {
+    73	            width: 100%;
+    74	            min-height: 300px;
+    75	            padding: 15px;
+    76	            border: 2px solid #dee2e6;
+    77	            border-radius: 10px;
+    78	            font-size: 14px;
+    79	            font-family: 'Courier New', monospace;
+    80	            resize: vertical;
+    81	            transition: border-color 0.3s;
+    82	        }
+    83	
+    84	        .prompt-textarea:focus {
+    85	            outline: none;
+    86	            border-color: #667eea;
+    87	        }
+    88	
+    89	        .helper-text {
+    90	            font-size: 12px;
+    91	            color: #6c757d;
+    92	            margin-top: 5px;
+    93	        }
+    94	
+    95	        .aspect-ratio-group {
+    96	            display: grid;
+    97	            grid-template-columns: repeat(2, 1fr);
+    98	            gap: 10px;
+    99	            margin-bottom: 25px;
+   100	        }
+   101	
+   102	        .ratio-option {
+   103	            padding: 12px;
+   104	            border: 2px solid #dee2e6;
+   105	            border-radius: 10px;
+   106	            cursor: pointer;
+   107	            text-align: center;
+   108	            transition: all 0.3s;
+   109	            background: white;
+   110	        }
+   111	
+   112	        .ratio-option:hover {
+   113	            border-color: #667eea;
+   114	            background: #f8f9ff;
+   115	        }
+   116	
+   117	        .ratio-option.selected {
+   118	            border-color: #667eea;
+   119	            background: #667eea;
+   120	            color: white;
+   121	        }
+   122	
+   123	        .ratio-label {
+   124	            font-weight: 600;
+   125	            font-size: 14px;
+   126	        }
+   127	
+   128	        .ratio-dimensions {
+   129	            font-size: 11px;
+   130	            opacity: 0.7;
+   131	            margin-top: 3px;
+   132	        }
+   133	
+   134	        .options-group {
+   135	            margin-bottom: 25px;
+   136	        }
+   137	
+   138	        .option-row {
+   139	            display: flex;
+   140	            justify-content: space-between;
+   141	            align-items: center;
+   142	            padding: 12px;
+   143	            background: white;
+   144	            border-radius: 8px;
+   145	            margin-bottom: 10px;
+   146	        }
+   147	
+   148	        .option-label {
+   149	            font-size: 14px;
+   150	            font-weight: 500;
+   151	        }
+   152	
+   153	        select {
+   154	            padding: 8px 12px;
+   155	            border: 2px solid #dee2e6;
+   156	            border-radius: 6px;
+   157	            font-size: 14px;
+   158	            cursor: pointer;
+   159	            background: white;
+   160	        }
+   161	
+   162	        .toggle-switch {
+   163	            position: relative;
+   164	            width: 50px;
+   165	            height: 26px;
+   166	            background: #ccc;
+   167	            border-radius: 13px;
+   168	            cursor: pointer;
+   169	            transition: background 0.3s;
+   170	        }
+   171	
+   172	        .toggle-switch.active {
+   173	            background: #667eea;
+   174	        }
+   175	
+   176	        .toggle-switch::after {
+   177	            content: '';
+   178	            position: absolute;
+   179	            width: 20px;
+   180	            height: 20px;
+   181	            background: white;
+   182	            border-radius: 50%;
+   183	            top: 3px;
+   184	            left: 3px;
+   185	            transition: left 0.3s;
+   186	        }
+   187	
+   188	        .toggle-switch.active::after {
+   189	            left: 27px;
+   190	        }
+   191	
+   192	        .generate-button {
+   193	            width: 100%;
+   194	            padding: 15px;
+   195	            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+   196	            color: white;
+   197	            border: none;
+   198	            border-radius: 10px;
+   199	            font-size: 16px;
+   200	            font-weight: 600;
+   201	            cursor: pointer;
+   202	            transition: transform 0.2s, box-shadow 0.2s;
+   203	            margin-top: auto;
+   204	        }
+   205	
+   206	        .generate-button:hover {
+   207	            transform: translateY(-2px);
+   208	            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+   209	        }
+   210	
+   211	        .generate-button:active {
+   212	            transform: translateY(0);
+   213	        }
+   214	
+   215	        .generate-button:disabled {
+   216	            background: #ccc;
+   217	            cursor: not-allowed;
+   218	            transform: none;
+   219	        }
+   220	
+   221	        .results-header {
+   222	            display: flex;
+   223	            justify-content: space-between;
+   224	            align-items: center;
+   225	            margin-bottom: 20px;
+   226	        }
+   227	
+   228	        .results-title {
+   229	            font-size: 24px;
+   230	            font-weight: 600;
+   231	            color: #495057;
+   232	        }
+   233	
+   234	        .button-group {
+   235	            display: flex;
+   236	            gap: 10px;
+   237	        }
+   238	
+   239	        .clear-button, .download-all-button {
+   240	            padding: 10px 20px;
+   241	            background: #dc3545;
+   242	            color: white;
+   243	            border: none;
+   244	            border-radius: 8px;
+   245	            font-size: 14px;
+   246	            font-weight: 500;
+   247	            cursor: pointer;
+   248	            transition: background 0.3s;
+   249	            display: none;
+   250	        }
+   251	
+   252	        .download-all-button {
+   253	            background: #28a745;
+   254	        }
+   255	
+   256	        .clear-button:hover {
+   257	            background: #c82333;
+   258	        }
+   259	
+   260	        .download-all-button:hover {
+   261	            background: #218838;
+   262	        }
+   263	
+   264	        .results-grid {
+   265	            display: grid;
+   266	            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+   267	            gap: 20px;
+   268	        }
+   269	
+   270	        .image-card {
+   271	            background: #f8f9fa;
+   272	            border-radius: 12px;
+   273	            overflow: hidden;
+   274	            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+   275	            transition: transform 0.3s, box-shadow 0.3s;
+   276	        }
+   277	
+   278	        .image-card:hover {
+   279	            transform: translateY(-5px);
+   280	            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+   281	        }
+   282	
+   283	        .image-wrapper {
+   284	            width: 100%;
+   285	            background: #dee2e6;
+   286	            position: relative;
+   287	            overflow: hidden;
+   288	        }
+   289	
+   290	        .image-wrapper.ratio-1-1 {
+   291	            aspect-ratio: 1 / 1;
+   292	        }
+   293	
+   294	        .image-wrapper.ratio-16-9 {
+   295	            aspect-ratio: 16 / 9;
+   296	        }
+   297	
+   298	        .image-wrapper.ratio-9-16 {
+   299	            aspect-ratio: 9 / 16;
+   300	        }
+   301	
+   302	        .image-wrapper.ratio-3-4 {
+   303	            aspect-ratio: 3 / 4;
+   304	        }
+   305	
+   306	        .image-wrapper img {
+   307	            width: 100%;
+   308	            height: 100%;
+   309	            object-fit: cover;
+   310	        }
+   311	
+   312	        .loading-spinner {
+   313	            position: absolute;
+   314	            top: 50%;
+   315	            left: 50%;
+   316	            transform: translate(-50%, -50%);
+   317	            width: 40px;
+   318	            height: 40px;
+   319	            border: 4px solid #f3f3f3;
+   320	            border-top: 4px solid #667eea;
+   321	            border-radius: 50%;
+   322	            animation: spin 1s linear infinite;
+   323	        }
+   324	
+   325	        @keyframes spin {
+   326	            0% { transform: translate(-50%, -50%) rotate(0deg); }
+   327	            100% { transform: translate(-50%, -50%) rotate(360deg); }
+   328	        }
+   329	
+   330	        .image-info {
+   331	            padding: 15px;
+   332	        }
+   333	
+   334	        .image-prompt {
+   335	            font-size: 13px;
+   336	            color: #495057;
+   337	            margin-bottom: 10px;
+   338	            line-height: 1.4;
+   339	            display: -webkit-box;
+   340	            -webkit-line-clamp: 2;
+   341	            -webkit-box-orient: vertical;
+   342	            overflow: hidden;
+   343	        }
+   344	
+   345	        .download-button {
+   346	            width: 100%;
+   347	            padding: 10px;
+   348	            background: #667eea;
+   349	            color: white;
+   350	            border: none;
+   351	            border-radius: 6px;
+   352	            font-size: 14px;
+   353	            font-weight: 500;
+   354	            cursor: pointer;
+   355	            transition: background 0.3s;
+   356	        }
+   357	
+   358	        .download-button:hover {
+   359	            background: #5568d3;
+   360	        }
+   361	
+   362	        .empty-state {
+   363	            text-align: center;
+   364	            padding: 60px 20px;
+   365	            color: #6c757d;
+   366	        }
+   367	
+   368	        .empty-state-icon {
+   369	            font-size: 64px;
+   370	            margin-bottom: 20px;
+   371	            opacity: 0.3;
+   372	        }
+   373	
+   374	        .empty-state-text {
+   375	            font-size: 18px;
+   376	            font-weight: 500;
+   377	        }
+   378	
+   379	        @media (max-width: 1024px) {
+   380	            .container {
+   381	                flex-direction: column;
+   382	            }
+   383	
+   384	            .sidebar {
+   385	                width: 100%;
+   386	                border-right: none;
+   387	                border-bottom: 1px solid #dee2e6;
+   388	            }
+   389	
+   390	            .results-grid {
+   391	                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+   392	            }
+   393	        }
+   394	
+   395	        @media (max-width: 640px) {
+   396	            .results-grid {
+   397	                grid-template-columns: 1fr;
+   398	            }
+   399	
+   400	            .aspect-ratio-group {
+   401	                grid-template-columns: 1fr;
+   402	            }
+   403	        }
+   404	    </style>
+   405	</head>
+   406	<body>
+   407	    <div class="container">
+   408	        <div class="sidebar">
+   409	            <h1>🎨 AI Image Generator</h1>
+   410	            <p class="subtitle">Generate multiple AI images in batch</p>
+   411	
+   412	            <div class="input-group">
+   413	                <label for="prompts">Image Prompts (One per line)</label>
+   414	                <textarea 
+   415	                    id="prompts" 
+   416	                    class="prompt-textarea" 
+   417	                    placeholder="A serene mountain landscape at sunset
+   418	A futuristic city with flying cars
+   419	A cute cat wearing a wizard hat
+   420	An abstract painting with vibrant colors"></textarea>
+   421	                <div class="helper-text">Enter each prompt on a new line</div>
+   422	            </div>
+   423	
+   424	            <div class="input-group">
+   425	                <label>Aspect Ratio</label>
+   426	                <div class="aspect-ratio-group">
+   427	                    <div class="ratio-option selected" data-ratio="1:1">
+   428	                        <div class="ratio-label">Square</div>
+   429	                        <div class="ratio-dimensions">1:1</div>
+   430	                    </div>
+   431	                    <div class="ratio-option" data-ratio="16:9">
+   432	                        <div class="ratio-label">Landscape</div>
+   433	                        <div class="ratio-dimensions">16:9</div>
+   434	                    </div>
+   435	                    <div class="ratio-option" data-ratio="9:16">
+   436	                        <div class="ratio-label">Portrait</div>
+   437	                        <div class="ratio-dimensions">9:16</div>
+   438	                    </div>
+   439	                    <div class="ratio-option" data-ratio="3:4">
+   440	                        <div class="ratio-label">Photo</div>
+   441	                        <div class="ratio-dimensions">3:4</div>
+   442	                    </div>
+   443	                </div>
+   444	            </div>
+   445	
+   446	            <div class="options-group">
+   447	                <label>Generation Options</label>
+   448	                <div class="option-row">
+   449	                    <span class="option-label">Model</span>
+   450	                    <select id="model">
+   451	                        <option value="flux">Flux (Default)</option>
+   452	                        <option value="turbo">Turbo (Faster)</option>
+   453	                    </select>
+   454	                </div>
+   455	                <div class="option-row">
+   456	                    <span class="option-label">Enhance Quality</span>
+   457	                    <div class="toggle-switch" id="enhanceToggle"></div>
+   458	                </div>
+   459	            </div>
+   460	
+   461	            <button class="generate-button" id="generateBtn">Generate Images</button>
+   462	        </div>
+   463	
+   464	        <div class="main-content">
+   465	            <div class="results-header">
+   466	                <h2 class="results-title">Generated Images</h2>
+   467	                <div class="button-group">
+   468	                    <button class="download-all-button" id="downloadAllBtn">Download All</button>
+   469	                    <button class="clear-button" id="clearBtn">Clear All</button>
+   470	                </div>
+   471	            </div>
+   472	
+   473	            <div id="results">
+   474	                <div class="empty-state">
+   475	                    <div class="empty-state-icon">🖼️</div>
+   476	                    <div class="empty-state-text">No images generated yet</div>
+   477	                </div>
+   478	            </div>
+   479	        </div>
+   480	    </div>
+   481	
+   482	    <script>
+   483	        // DOM Elements
+   484	        const promptsTextarea = document.getElementById('prompts');
+   485	        const generateBtn = document.getElementById('generateBtn');
+   486	        const clearBtn = document.getElementById('clearBtn');
+   487	        const downloadAllBtn = document.getElementById('downloadAllBtn');
+   488	        const resultsDiv = document.getElementById('results');
+   489	        const modelSelect = document.getElementById('model');
+   490	        const enhanceToggle = document.getElementById('enhanceToggle');
+   491	
+   492	        // State
+   493	        let selectedRatio = '1:1';
+   494	        let enhanceEnabled = false;
+   495	
+   496	        // Aspect Ratio Selection
+   497	        const ratioOptions = document.querySelectorAll('.ratio-option');
+   498	        ratioOptions.forEach(option => {
+   499	            option.addEventListener('click', () => {
+   500	                ratioOptions.forEach(opt => opt.classList.remove('selected'));
+   501	                option.classList.add('selected');
+   502	                selectedRatio = option.dataset.ratio;
+   503	            });
+   504	        });
+   505	
+   506	        // Enhance Toggle
+   507	        enhanceToggle.addEventListener('click', () => {
+   508	            enhanceEnabled = !enhanceEnabled;
+   509	            enhanceToggle.classList.toggle('active');
+   510	        });
+   511	
+   512	        // Get dimensions based on aspect ratio
+   513	        function getDimensions(ratio) {
+   514	            const dimensions = {
+   515	                '1:1': { width: 1024, height: 1024 },
+   516	                '16:9': { width: 1024, height: 576 },
+   517	                '9:16': { width: 576, height: 1024 },
+   518	                '3:4': { width: 768, height: 1024 }
+   519	            };
+   520	            return dimensions[ratio];
+   521	        }
+   522	
+   523	        // Generate images
+   524	        generateBtn.addEventListener('click', async () => {
+   525	            const promptText = promptsTextarea.value.trim();
+   526	            if (!promptText) {
+   527	                alert('Please enter at least one prompt');
+   528	                return;
+   529	            }
+   530	
+   531	            const prompts = promptText.split('\n').filter(p => p.trim() !== '');
+   532	            if (prompts.length === 0) {
+   533	                alert('Please enter at least one valid prompt');
+   534	                return;
+   535	            }
+   536	
+   537	            // Clear previous results
+   538	            resultsDiv.innerHTML = '';
+   539	
+   540	            // Disable button
+   541	            generateBtn.disabled = true;
+   542	            generateBtn.textContent = 'Generating...';
+   543	
+   544	            const dimensions = getDimensions(selectedRatio);
+   545	            const model = modelSelect.value;
+   546	            const enhance = enhanceEnabled;
+   547	
+   548	            // Create image cards
+   549	            prompts.forEach((prompt, index) => {
+   550	                const card = createImageCard(prompt, dimensions, model, enhance);
+   551	                resultsDiv.appendChild(card);
+   552	            });
+   553	
+   554	            // Re-enable button
+   555	            generateBtn.disabled = false;
+   556	            generateBtn.textContent = 'Generate Images';
+   557	
+   558	            // Show clear and download all buttons
+   559	            clearBtn.style.display = 'block';
+   560	            downloadAllBtn.style.display = 'block';
+   561	        });
+   562	
+   563	        // Create image card
+   564	        function createImageCard(prompt, dimensions, model, enhance) {
+   565	            const card = document.createElement('div');
+   566	            card.className = 'image-card';
+   567	
+   568	            const ratioClass = `ratio-${selectedRatio.replace(':', '-')}`;
+   569	
+   570	            // Generate unique seed for each image
+   571	            const seed = Math.floor(Math.random() * 1000000);
+   572	
+   573	            // Create Pollinations.ai URL with all parameters
+   574	            const encodedPrompt = encodeURIComponent(prompt);
+   575	            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
+   576	
+   577	            card.innerHTML = `
+   578	                <div class="image-wrapper ${ratioClass}">
+   579	                    <div class="loading-spinner"></div>
+   580	                    <img src="${imageUrl}" alt="${prompt}" style="display: none;">
+   581	                </div>
+   582	                <div class="image-info">
+   583	                    <div class="image-prompt">${prompt}</div>
+   584	                    <button class="download-button" onclick="downloadImage('${imageUrl}', '${prompt.replace(/'/g, "\\'")}')">Download Image</button>
+   585	                </div>
+   586	            `;
+   587	
+   588	            // Handle image load
+   589	            const img = card.querySelector('img');
+   590	            const spinner = card.querySelector('.loading-spinner');
+   591	
+   592	            img.onload = () => {
+   593	                spinner.style.display = 'none';
+   594	                img.style.display = 'block';
+   595	            };
+   596	
+   597	            img.onerror = () => {
+   598	                spinner.style.display = 'none';
+   599	                img.style.display = 'block';
+   600	                img.alt = 'Failed to load image';
+   601	            };
+   602	
+   603	            return card;
+   604	        }
+   605	
+   606	        // Download single image
+   607	        function downloadImage(url, prompt) {
+   608	            const link = document.createElement('a');
+   609	            link.href = url;
+   610	            link.download = `${prompt.substring(0, 50).replace(/[^a-z0-9]/gi, '_')}.png`;
+   611	            document.body.appendChild(link);
+   612	            link.click();
+   613	            document.body.removeChild(link);
+   614	        }
+   615	
+   616	        // Download all images
+   617	        downloadAllBtn.addEventListener('click', async () => {
+   618	            const images = resultsDiv.querySelectorAll('.image-wrapper img');
+   619	            if (images.length === 0) {
+   620	                alert('No images to download');
+   621	                return;
+   622	            }
+   623	
+   624	            downloadAllBtn.disabled = true;
+   625	            downloadAllBtn.textContent = 'Downloading...';
+   626	
+   627	            for (let i = 0; i < images.length; i++) {
+   628	                const img = images[i];
+   629	                const prompt = img.alt;
+   630	                const url = img.src;
+   631	                
+   632	                await new Promise(resolve => setTimeout(resolve, 500)); // Delay between downloads
+   633	                downloadImage(url, prompt);
+   634	            }
+   635	
+   636	            downloadAllBtn.disabled = false;
+   637	            downloadAllBtn.textContent = 'Download All';
+   638	        });
+   639	
+   640	        // Clear all images
+   641	        clearBtn.addEventListener('click', () => {
+   642	            if (confirm('Are you sure you want to clear all generated images?')) {
+   643	                resultsDiv.innerHTML = `
+   644	                    <div class="empty-state">
+   645	                        <div class="empty-state-icon">🖼️</div>
+   646	                        <div class="empty-state-text">No images generated yet</div>
+   647	                    </div>
+   648	                `;
+   649	                clearBtn.style.display = 'none';
+   650	                downloadAllBtn.style.display = 'none';
+   651	            }
+   652	        });
+   653	    </script>
+   654	</body>
+   655	</html>
