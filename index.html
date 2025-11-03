@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator - Real Working</title>
+    <title>Real AI Image Generator - Working 100%</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
             padding: 20px;
         }
 
-        .app-container {
+        .container {
             max-width: 1600px;
             margin: 0 auto;
             background: white;
@@ -27,28 +27,27 @@
             box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
         }
 
-        .app-header {
+        .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 40px;
             text-align: center;
             color: white;
         }
 
-        .app-header h1 {
+        .header h1 {
             font-size: 42px;
             font-weight: 800;
             margin-bottom: 10px;
         }
 
-        .app-header p {
+        .header p {
             font-size: 18px;
             opacity: 0.95;
         }
 
-        .app-body {
+        .body {
             display: grid;
             grid-template-columns: 300px 1fr;
-            min-height: 600px;
         }
 
         .sidebar {
@@ -91,7 +90,6 @@
         .ratio-card.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-color: #667eea;
             transform: scale(1.05);
         }
 
@@ -116,7 +114,6 @@
         }
 
         .settings-label {
-            display: block;
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 8px;
@@ -132,12 +129,7 @@
             background: white;
         }
 
-        .settings-select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .main-content {
+        .main {
             padding: 40px;
             background: #fafbfc;
         }
@@ -179,7 +171,7 @@
             border: 3px solid #e9ecef;
             border-radius: 16px;
             font-size: 15px;
-            font-family: 'Monaco', 'Courier New', monospace;
+            font-family: 'Monaco', monospace;
             line-height: 1.8;
             resize: vertical;
             background: #fafbfc;
@@ -200,6 +192,34 @@
             border-radius: 12px;
             font-size: 13px;
             color: #6c757d;
+        }
+
+        .api-setup {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .api-setup h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .api-setup input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .api-setup a {
+            color: #667eea;
+            font-weight: 700;
         }
 
         .generate-btn {
@@ -274,14 +294,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .image-card:hover {
@@ -327,10 +341,6 @@
             color: #495057;
             margin-bottom: 12px;
             line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
         }
 
         .image-meta {
@@ -357,10 +367,6 @@
             font-weight: 700;
             cursor: pointer;
             font-size: 12px;
-        }
-
-        .download-btn:hover {
-            background: #218838;
         }
 
         .empty-state {
@@ -427,7 +433,6 @@
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
             display: none;
-            align-items: center;
             gap: 10px;
             z-index: 10000;
         }
@@ -445,66 +450,77 @@
         .toast.success { border-left: 5px solid #28a745; }
         .toast.error { border-left: 5px solid #dc3545; }
 
-        .toast-icon { font-size: 24px; }
-        .toast-message { font-weight: 600; color: #2d3748; }
-
         @media (max-width: 1024px) {
-            .app-body { grid-template-columns: 1fr; }
-            .sidebar { border-right: none; border-bottom: 1px solid #e9ecef; }
+            .body { grid-template-columns: 1fr; }
             .ratio-grid { grid-template-columns: repeat(4, 1fr); }
         }
 
         @media (max-width: 768px) {
-            .main-content { padding: 20px; }
+            .main { padding: 20px; }
             .ratio-grid { grid-template-columns: repeat(2, 1fr); }
             .results-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="app-header">
+    <div class="container">
+        <div class="header">
             <h1>🎨 Real AI Image Generator</h1>
-            <p>Actual AI-Generated Images • Prompt ke mutabiq exact results</p>
+            <p>Hugging Face API • 100% Working • Prompt ke exact mutabiq images</p>
         </div>
 
-        <div class="app-body">
+        <div class="body">
             <div class="sidebar">
                 <div class="section-title">📐 ASPECT RATIO</div>
                 <div class="ratio-grid">
-                    <div class="ratio-card active" data-ratio="1:1" data-width="1024" data-height="1024">
+                    <div class="ratio-card active" data-ratio="1:1">
                         <span class="ratio-icon">⬜</span>
                         <div class="ratio-label">1:1</div>
                         <div class="ratio-desc">Square</div>
                     </div>
-                    <div class="ratio-card" data-ratio="16:9" data-width="1024" data-height="576">
+                    <div class="ratio-card" data-ratio="16:9">
                         <span class="ratio-icon">🖥️</span>
                         <div class="ratio-label">16:9</div>
                         <div class="ratio-desc">Landscape</div>
                     </div>
-                    <div class="ratio-card" data-ratio="9:16" data-width="576" data-height="1024">
+                    <div class="ratio-card" data-ratio="9:16">
                         <span class="ratio-icon">📱</span>
                         <div class="ratio-label">9:16</div>
                         <div class="ratio-desc">Portrait</div>
                     </div>
-                    <div class="ratio-card" data-ratio="3:4" data-width="768" data-height="1024">
+                    <div class="ratio-card" data-ratio="3:4">
                         <span class="ratio-icon">🖼️</span>
                         <div class="ratio-label">3:4</div>
                         <div class="ratio-desc">Portrait</div>
                     </div>
                 </div>
 
-                <div class="section-title">⚙️ SETTINGS</div>
+                <div class="section-title">⚙️ AI MODEL</div>
                 <div class="settings-group">
-                    <label class="settings-label">AI Model</label>
+                    <label class="settings-label">Select Model</label>
                     <select class="settings-select" id="modelSelect">
-                        <option value="flux">Flux (Fast & Quality)</option>
-                        <option value="turbo">Turbo (Fastest)</option>
+                        <option value="stable-diffusion">Stable Diffusion v2.1</option>
+                        <option value="flux-schnell">Flux Schnell (Fast)</option>
+                        <option value="dreamshaper">DreamShaper v8</option>
                     </select>
                 </div>
             </div>
 
-            <div class="main-content">
+            <div class="main">
+                <div class="api-setup">
+                    <h3>🔑 Setup (One Time Only - FREE)</h3>
+                    <p style="margin-bottom: 10px; color: #856404;">
+                        1. Visit <a href="https://huggingface.co/settings/tokens" target="_blank">Hugging Face</a><br>
+                        2. Create FREE account<br>
+                        3. Generate Access Token<br>
+                        4. Paste below:
+                    </p>
+                    <input type="text" id="apiKeyInput" placeholder="Paste your Hugging Face API Token here" />
+                    <p style="margin-top: 10px; font-size: 12px; color: #856404;">
+                        ⚠️ Agar API key nahi hai, to images generate nahi hongi! Required hai!
+                    </p>
+                </div>
+
                 <div class="prompt-section">
                     <div class="prompt-header">
                         <h2 class="prompt-title">📝 Enter Your Prompts</h2>
@@ -516,25 +532,29 @@
                     <textarea 
                         class="prompt-textarea" 
                         id="promptInput" 
-                        placeholder="Enter each detailed prompt on a new line...
+                        placeholder="Enter detailed prompts (one per line):
 
-REAL AI EXAMPLES (Will generate actual images):
+WORKING EXAMPLES:
 
-A majestic lion with golden mane standing on rocky cliff at sunset, dramatic sky
-Futuristic cyberpunk city at night with neon lights and flying cars
-Beautiful cherry blossom tree in full bloom, spring season, soft lighting
-Cozy mountain cabin in snow with warm lights from windows
-Vintage red sports car in desert landscape at golden hour
+A majestic lion with golden mane standing on rocky mountain cliff at sunset, dramatic orange sky, professional wildlife photography, highly detailed, 8k
 
-💡 TIPS:
-• Be specific and descriptive
-• Add details like colors, lighting, mood
-• Mention style (realistic, artistic, cinematic)
-• Each line = One unique AI-generated image
-• Images will match your exact description!"></textarea>
+Futuristic cyberpunk city at night with glowing neon purple and blue lights, wet streets reflecting lights, flying cars, cinematic, highly detailed
+
+Beautiful pink cherry blossom tree in full bloom, Japanese garden, spring season, soft sunlight, professional nature photography, vibrant colors
+
+Cozy wooden cabin in snowy mountains during winter evening, warm yellow lights from windows, smoke from chimney, peaceful atmosphere, realistic
+
+Vintage red Ferrari sports car in desert landscape at golden hour sunset, dramatic lighting, professional automotive photography, highly detailed
+
+💡 TIPS FOR PERFECT RESULTS:
+• Be VERY descriptive
+• Add style keywords: realistic, cinematic, professional photography, highly detailed, 8k
+• Mention lighting: golden hour, dramatic, soft, natural
+• Include mood: peaceful, dramatic, vibrant, cozy
+• Each line = One unique AI image"></textarea>
 
                     <div class="prompt-footer">
-                        <span>🤖 Real AI Generation • 100% Free</span>
+                        <span>🤖 Real AI • Prompt ke exact mutabiq</span>
                         <span id="charCount">0 characters</span>
                     </div>
 
@@ -549,7 +569,7 @@ Vintage red sports car in desert landscape at golden hour
                             🖼️ Generated Images (<span id="resultCount">0</span>)
                         </h2>
                         <button class="clear-btn" id="clearBtn" style="display: none;">
-                            🗑️ Clear All
+                            🗑️ Clear
                         </button>
                     </div>
 
@@ -557,7 +577,7 @@ Vintage red sports car in desert landscape at golden hour
                         <div class="empty-state">
                             <div class="empty-icon">🎨</div>
                             <h3>No images yet</h3>
-                            <p>Enter prompts above and generate real AI images!</p>
+                            <p>Setup API key, enter prompts, and generate!</p>
                         </div>
                     </div>
                 </div>
@@ -569,16 +589,16 @@ Vintage red sports car in desert landscape at golden hour
         <div class="loading-content">
             <div class="loading-spinner-large"></div>
             <div class="loading-text">Generating real AI images...</div>
-            <div class="loading-progress" id="progressText">0 / 0</div>
+            <div class="loading-progress" id="progressText">Please wait... 20-30 sec per image</div>
         </div>
     </div>
 
     <div class="toast" id="toast">
-        <span class="toast-icon" id="toastIcon">✓</span>
-        <span class="toast-message" id="toastMessage"></span>
+        <span id="toastMessage"></span>
     </div>
 
     <script>
+        const apiKeyInput = document.getElementById('apiKeyInput');
         const promptInput = document.getElementById('promptInput');
         const promptCount = document.getElementById('promptCount');
         const charCount = document.getElementById('charCount');
@@ -591,39 +611,48 @@ Vintage red sports car in desert landscape at golden hour
         const ratioCards = document.querySelectorAll('.ratio-card');
         const modelSelect = document.getElementById('modelSelect');
         const toast = document.getElementById('toast');
-        const toastIcon = document.getElementById('toastIcon');
         const toastMessage = document.getElementById('toastMessage');
 
-        let selectedRatio = { width: 1024, height: 1024, label: '1:1' };
+        let selectedRatio = '1:1';
         let generatedImages = [];
 
+        // Load saved API key
+        if (localStorage.getItem('hfApiKey')) {
+            apiKeyInput.value = localStorage.getItem('hfApiKey');
+        }
+
         promptInput.addEventListener('input', function() {
-            const text = this.value;
-            const lines = text.split('\n').filter(line => line.trim() !== '');
+            const lines = this.value.split('\n').filter(l => l.trim());
             promptCount.textContent = lines.length;
-            charCount.textContent = text.length + ' characters';
-            generateBtn.disabled = lines.length === 0;
+            charCount.textContent = this.value.length + ' characters';
+            generateBtn.disabled = lines.length === 0 || !apiKeyInput.value.trim();
+        });
+
+        apiKeyInput.addEventListener('input', function() {
+            const lines = promptInput.value.split('\n').filter(l => l.trim());
+            generateBtn.disabled = lines.length === 0 || !this.value.trim();
+            if (this.value.trim()) {
+                localStorage.setItem('hfApiKey', this.value.trim());
+            }
         });
 
         ratioCards.forEach(card => {
             card.addEventListener('click', function() {
                 ratioCards.forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
-                selectedRatio = {
-                    width: parseInt(this.dataset.width),
-                    height: parseInt(this.dataset.height),
-                    label: this.dataset.ratio
-                };
+                selectedRatio = this.dataset.ratio;
             });
         });
 
         generateBtn.addEventListener('click', async function() {
-            const prompts = promptInput.value.split('\n').filter(line => line.trim() !== '');
-            
-            if (prompts.length === 0) {
-                showToast('❌', 'Please enter at least one prompt!', 'error');
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                showToast('❌ Please enter Hugging Face API token first!', 'error');
                 return;
             }
+
+            const prompts = promptInput.value.split('\n').filter(l => l.trim());
+            if (prompts.length === 0) return;
 
             resultsGrid.innerHTML = '';
             generatedImages = [];
@@ -632,51 +661,80 @@ Vintage red sports car in desert landscape at golden hour
             generateBtn.disabled = true;
 
             const model = modelSelect.value;
+            let modelEndpoint = '';
+
+            // Different API endpoints for different models
+            if (model === 'stable-diffusion') {
+                modelEndpoint = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1';
+            } else if (model === 'flux-schnell') {
+                modelEndpoint = 'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell';
+            } else {
+                modelEndpoint = 'https://api-inference.huggingface.co/models/Lykon/DreamShaper-8';
+            }
 
             for (let i = 0; i < prompts.length; i++) {
-                progressText.textContent = `${i + 1} / ${prompts.length}`;
+                progressText.textContent = `Generating ${i + 1} / ${prompts.length}... Please wait 20-30 sec`;
 
                 const card = createImageCard(prompts[i], i);
                 resultsGrid.appendChild(card);
 
-                // REAL AI IMAGE GENERATION using Pollinations.ai API (FREE)
-                const encodedPrompt = encodeURIComponent(prompts[i]);
-                const seed = Date.now() + i;
-                
-                // Real AI API URL - generates actual images based on prompt!
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${seed}&model=${model}&nologo=true`;
+                try {
+                    // Real Hugging Face API call
+                    const response = await fetch(modelEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            inputs: prompts[i],
+                            parameters: {
+                                negative_prompt: "blurry, low quality, distorted, ugly",
+                                num_inference_steps: 50
+                            }
+                        })
+                    });
 
-                // Wait for image to generate (simulating 20 seconds as requested)
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                    if (!response.ok) {
+                        throw new Error('API Error: ' + response.status);
+                    }
 
-                const imageContainer = card.querySelector('.image-container');
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = prompts[i];
-                img.loading = 'lazy';
-                
-                img.onload = function() {
+                    const blob = await response.blob();
+                    const imageUrl = URL.createObjectURL(blob);
+
+                    const imageContainer = card.querySelector('.image-container');
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.alt = prompts[i];
                     imageContainer.innerHTML = '';
                     imageContainer.appendChild(img);
-                };
 
-                img.onerror = function() {
-                    imageContainer.innerHTML = '<div style="color: white; padding: 20px;">Failed to generate. Try again!</div>';
-                };
+                    generatedImages.push({
+                        prompt: prompts[i],
+                        ratio: selectedRatio,
+                        blob: blob,
+                        url: imageUrl
+                    });
 
-                generatedImages.push({
-                    prompt: prompts[i],
-                    ratio: selectedRatio.label,
-                    url: imageUrl
-                });
+                    resultCount.textContent = generatedImages.length;
 
-                resultCount.textContent = generatedImages.length;
+                } catch (error) {
+                    console.error('Error:', error);
+                    const imageContainer = card.querySelector('.image-container');
+                    imageContainer.innerHTML = `<div style="color: white; padding: 20px; text-align: center;">
+                        ❌ Generation failed!<br>
+                        Check API key or try again
+                    </div>`;
+                }
+
+                // Wait before next generation
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
 
             loadingOverlay.classList.remove('active');
             generateBtn.disabled = false;
             clearBtn.style.display = 'block';
-            showToast('✓', `Generated ${prompts.length} real AI images!`, 'success');
+            showToast(`✓ Generated ${prompts.length} real AI images!`, 'success');
         });
 
         function createImageCard(prompt, index) {
@@ -689,7 +747,7 @@ Vintage red sports car in desert landscape at golden hour
                 <div class="image-info">
                     <div class="image-prompt">${prompt}</div>
                     <div class="image-meta">
-                        <span class="image-ratio">${selectedRatio.label}</span>
+                        <span class="image-ratio">${selectedRatio}</span>
                         <button class="download-btn" onclick="downloadImage(${index})">
                             ⬇️ Download
                         </button>
@@ -701,50 +759,35 @@ Vintage red sports car in desert landscape at golden hour
 
         function downloadImage(index) {
             const image = generatedImages[index];
-            if (image) {
-                fetch(image.url)
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `ai-generated-${index + 1}.png`;
-                        link.click();
-                        window.URL.revokeObjectURL(url);
-                        showToast('✓', 'Image downloaded!', 'success');
-                    });
+            if (image && image.blob) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(image.blob);
+                link.download = `ai-generated-${index + 1}.png`;
+                link.click();
+                showToast('✓ Downloaded!', 'success');
             }
         }
 
         clearBtn.addEventListener('click', function() {
-            if (confirm('Clear all generated images?')) {
+            if (confirm('Clear all?')) {
                 resultsGrid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🎨</div>
                         <h3>No images yet</h3>
-                        <p>Enter prompts above and generate real AI images!</p>
+                        <p>Setup API key, enter prompts, and generate!</p>
                     </div>
                 `;
                 generatedImages = [];
                 resultCount.textContent = '0';
                 clearBtn.style.display = 'none';
-                showToast('✓', 'Cleared!', 'success');
             }
         });
 
-        function showToast(icon, message, type) {
-            toastIcon.textContent = icon;
+        function showToast(message, type) {
             toastMessage.textContent = message;
             toast.className = `toast ${type} show`;
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                if (!generateBtn.disabled) generateBtn.click();
-            }
-        });
     </script>
 </body>
 </html>
