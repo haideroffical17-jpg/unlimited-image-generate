@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Batch Image Generator - Multi-Prompt Tool</title>
+    <title>AI Batch Image Generator</title>
     <style>
         * {
             margin: 0;
@@ -12,160 +12,98 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f7fa;
+            display: flex;
             min-height: 100vh;
-            padding: 20px;
-        }
-
-        .app-container {
-            max-width: 1600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Header */
-        .app-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .app-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-
-        .app-header h1 {
-            font-size: 48px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .app-header p {
-            font-size: 20px;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
-            font-weight: 300;
-        }
-
-        /* Main Content */
-        .app-body {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            min-height: calc(100vh - 200px);
         }
 
         /* Sidebar */
         .sidebar {
-            background: #f8f9fa;
-            padding: 30px;
-            border-right: 1px solid #e9ecef;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #667eea;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
+            width: 280px;
+            background: #ffffff;
+            padding: 30px 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .ratio-selector {
+        /* Aspect Ratio Cards */
+        .ratio-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 10px;
         }
 
         .ratio-card {
-            background: white;
+            background: #f8f9fa;
             border: 3px solid #e9ecef;
             border-radius: 16px;
-            padding: 20px 10px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 25px 15px;
             text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-        }
-
-        .ratio-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            opacity: 0;
-            transition: opacity 0.3s;
         }
 
         .ratio-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
             border-color: #667eea;
         }
 
         .ratio-card.active {
-            border-color: #667eea;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
             color: white;
             transform: scale(1.05);
-            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
         .ratio-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
+            font-size: 36px;
+            margin-bottom: 10px;
             display: block;
-            position: relative;
-            z-index: 1;
         }
 
         .ratio-label {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 4px;
         }
 
         .ratio-desc {
-            font-size: 11px;
+            font-size: 12px;
             opacity: 0.7;
-            margin-top: 4px;
-            position: relative;
-            z-index: 1;
+        }
+
+        .ratio-card.active .ratio-desc {
+            opacity: 0.9;
+        }
+
+        /* Settings Section */
+        .settings-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .settings-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .settings-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .settings-label {
@@ -173,61 +111,71 @@
             font-size: 13px;
             font-weight: 600;
             color: #495057;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .settings-input,
         .settings-select {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px 14px;
             border: 2px solid #e9ecef;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
-            transition: all 0.3s;
             background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #495057;
         }
 
-        .settings-input:focus,
         .settings-select:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* Main Area */
-        .main-area {
+        /* Main Content */
+        .main-content {
+            flex: 1;
             padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
+            background: #f5f7fa;
+            overflow-y: auto;
         }
 
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Prompt Section */
         .prompt-section {
             background: white;
             border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            padding: 35px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+            margin-bottom: 30px;
         }
 
         .prompt-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .prompt-title {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
             color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .prompt-counter {
+        .prompt-badge {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 8px 20px;
-            border-radius: 30px;
+            border-radius: 25px;
             font-size: 14px;
             font-weight: 700;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
@@ -235,22 +183,23 @@
 
         .prompt-textarea {
             width: 100%;
-            min-height: 350px;
-            padding: 24px;
+            min-height: 320px;
+            padding: 25px;
             border: 3px solid #e9ecef;
             border-radius: 16px;
             font-size: 16px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
             line-height: 2;
             resize: vertical;
             transition: all 0.3s;
-            background: #f8f9fa;
+            background: #fafbfc;
+            color: #2d3748;
         }
 
         .prompt-textarea:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.1);
             background: white;
         }
 
@@ -258,7 +207,7 @@
             color: #adb5bd;
         }
 
-        .prompt-info {
+        .prompt-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -270,6 +219,13 @@
             color: #6c757d;
         }
 
+        .tip-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Generate Button */
         .generate-button {
             width: 100%;
             padding: 22px;
@@ -277,63 +233,42 @@
             color: white;
             border: none;
             border-radius: 16px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
-        .generate-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+        .generate-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
         }
 
-        .generate-button:hover::before {
-            width: 400px;
-            height: 400px;
-        }
-
-        .generate-button:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 48px rgba(102, 126, 234, 0.5);
-        }
-
-        .generate-button:active {
-            transform: translateY(-2px);
+        .generate-button:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .generate-button:disabled {
-            background: #adb5bd;
+            background: #cbd5e0;
             cursor: not-allowed;
-            transform: none;
             box-shadow: none;
-        }
-
-        .button-text {
-            position: relative;
-            z-index: 1;
+            opacity: 0.6;
         }
 
         /* Results Section */
         .results-section {
             background: white;
             border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            padding: 35px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
         }
 
         .results-header {
@@ -363,6 +298,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 14px;
         }
 
         .clear-button:hover {
@@ -370,40 +306,43 @@
             transform: scale(1.05);
         }
 
+        /* Results Grid */
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
         }
 
         .image-card {
-            background: #f8f9fa;
+            background: white;
+            border: 2px solid #e9ecef;
             border-radius: 16px;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            animation: cardAppear 0.5s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            animation: fadeInUp 0.5s ease;
         }
 
-        @keyframes cardAppear {
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px) scale(0.9);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
 
         .image-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            border-color: #667eea;
         }
 
         .image-container {
             width: 100%;
-            height: 300px;
+            height: 280px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
@@ -419,12 +358,12 @@
         }
 
         .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
@@ -438,10 +377,10 @@
         .image-prompt {
             font-size: 14px;
             color: #495057;
-            margin-bottom: 15px;
             line-height: 1.6;
+            margin-bottom: 15px;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -452,16 +391,16 @@
             align-items: center;
         }
 
-        .image-ratio {
+        .image-ratio-badge {
             background: #667eea;
             color: white;
             padding: 6px 14px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
         }
 
-        .download-button {
+        .download-btn {
             background: #28a745;
             color: white;
             border: none;
@@ -470,14 +409,15 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 12px;
+            font-size: 13px;
         }
 
-        .download-button:hover {
+        .download-btn:hover {
             background: #218838;
             transform: scale(1.05);
         }
 
+        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 80px 20px;
@@ -487,13 +427,17 @@
         .empty-icon {
             font-size: 80px;
             margin-bottom: 20px;
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
         .empty-state h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 22px;
             color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 15px;
         }
 
         /* Loading Overlay */
@@ -508,7 +452,7 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
         }
 
         .loading-overlay.active {
@@ -521,62 +465,25 @@
         }
 
         .loading-spinner-large {
-            width: 80px;
-            height: 80px;
-            border: 6px solid rgba(255, 255, 255, 0.2);
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
             border-top-color: #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 30px;
+            margin: 0 auto 25px;
         }
 
         .loading-text {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .loading-progress {
             font-size: 18px;
             color: #667eea;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .app-body {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                border-right: none;
-                border-bottom: 1px solid #e9ecef;
-            }
-
-            .ratio-selector {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .app-header h1 {
-                font-size: 32px;
-            }
-
-            .app-header p {
-                font-size: 16px;
-            }
-
-            .main-area {
-                padding: 20px;
-            }
-
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .ratio-selector {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            font-weight: 600;
         }
 
         /* Toast Notification */
@@ -585,14 +492,15 @@
             bottom: 30px;
             right: 30px;
             background: white;
-            padding: 20px 30px;
+            padding: 18px 28px;
             border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
             display: none;
             align-items: center;
             gap: 12px;
             z-index: 10000;
-            animation: slideIn 0.3s ease;
+            animation: slideIn 0.4s ease;
+            min-width: 300px;
         }
 
         @keyframes slideIn {
@@ -611,161 +519,159 @@
         }
 
         .toast.success {
-            border-left: 4px solid #28a745;
+            border-left: 5px solid #28a745;
         }
 
         .toast.error {
-            border-left: 4px solid #dc3545;
+            border-left: 5px solid #dc3545;
         }
 
         .toast-icon {
-            font-size: 24px;
+            font-size: 26px;
         }
 
         .toast-message {
             font-weight: 600;
             color: #2d3748;
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            }
+
+            .ratio-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .prompt-section,
+            .results-section {
+                padding: 25px;
+            }
+
+            .ratio-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <div class="app-header">
-            <h1>🎨 AI Batch Image Generator</h1>
-            <p>Generate unlimited images at once • One line = One prompt • All aspect ratios supported</p>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Aspect Ratio Selection -->
+        <div class="ratio-grid">
+            <div class="ratio-card active" data-ratio="9:16">
+                <span class="ratio-icon">📱</span>
+                <div class="ratio-label">9:16</div>
+                <div class="ratio-desc">Portrait</div>
+            </div>
+            <div class="ratio-card" data-ratio="16:9">
+                <span class="ratio-icon">🖥️</span>
+                <div class="ratio-label">16:9</div>
+                <div class="ratio-desc">Landscape</div>
+            </div>
+            <div class="ratio-card" data-ratio="1:1">
+                <span class="ratio-icon">⬜</span>
+                <div class="ratio-label">1:1</div>
+                <div class="ratio-desc">Square</div>
+            </div>
+            <div class="ratio-card" data-ratio="3:4">
+                <span class="ratio-icon">🖼️</span>
+                <div class="ratio-label">3:4</div>
+                <div class="ratio-desc">Portrait</div>
+            </div>
         </div>
 
-        <!-- Main Body -->
-        <div class="app-body">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="section-title">📐 Aspect Ratio</div>
-                <div class="ratio-selector">
-                    <div class="ratio-card active" data-ratio="9:16">
-                        <span class="ratio-icon">📱</span>
-                        <div class="ratio-label">9:16</div>
-                        <div class="ratio-desc">Portrait</div>
-                    </div>
-                    <div class="ratio-card" data-ratio="16:9">
-                        <span class="ratio-icon">🖥️</span>
-                        <div class="ratio-label">16:9</div>
-                        <div class="ratio-desc">Landscape</div>
-                    </div>
-                    <div class="ratio-card" data-ratio="1:1">
-                        <span class="ratio-icon">⬜</span>
-                        <div class="ratio-label">1:1</div>
-                        <div class="ratio-desc">Square</div>
-                    </div>
-                    <div class="ratio-card" data-ratio="3:4">
-                        <span class="ratio-icon">🖼️</span>
-                        <div class="ratio-label">3:4</div>
-                        <div class="ratio-desc">Portrait</div>
-                    </div>
-                </div>
-
-                <div class="section-title">⚙️ Settings</div>
-                
-                <div class="settings-group">
-                    <label class="settings-label">Quality Level</label>
-                    <select class="settings-select" id="qualitySelect">
-                        <option value="standard">Standard (Fast)</option>
-                        <option value="hd" selected>HD (Recommended)</option>
-                        <option value="ultra">Ultra (Best Quality)</option>
-                    </select>
-                </div>
-
-                <div class="settings-group">
-                    <label class="settings-label">Style Preset</label>
-                    <select class="settings-select" id="styleSelect">
-                        <option value="none">No Style</option>
-                        <option value="photorealistic">Photorealistic</option>
-                        <option value="digital-art">Digital Art</option>
-                        <option value="anime">Anime Style</option>
-                        <option value="oil-painting">Oil Painting</option>
-                        <option value="3d-render">3D Render</option>
-                        <option value="watercolor">Watercolor</option>
-                        <option value="sketch">Pencil Sketch</option>
-                    </select>
-                </div>
-
-                <div class="settings-group">
-                    <label class="settings-label">Images Per Prompt</label>
-                    <input type="number" class="settings-input" id="countInput" min="1" max="4" value="1">
-                </div>
-
-                <div class="settings-group">
-                    <label class="settings-label">Model</label>
-                    <select class="settings-select" id="modelSelect">
-                        <option value="flux">Flux Pro (Fast)</option>
-                        <option value="dall-e">DALL-E 3 (Creative)</option>
-                        <option value="midjourney">Midjourney Style</option>
-                        <option value="stable-diffusion">Stable Diffusion</option>
-                    </select>
-                </div>
+        <!-- Settings Section -->
+        <div class="settings-section">
+            <div class="settings-title">⚙️ SETTINGS</div>
+            
+            <div class="settings-group">
+                <label class="settings-label">Quality Level</label>
+                <select class="settings-select" id="qualitySelect">
+                    <option value="standard">Standard (Fast)</option>
+                    <option value="hd">HD Quality</option>
+                    <option value="ultra" selected>Ultra (Best Quality)</option>
+                </select>
             </div>
+        </div>
+    </div>
 
-            <!-- Main Area -->
-            <div class="main-area">
-                <!-- Prompt Section -->
-                <div class="prompt-section">
-                    <div class="prompt-header">
-                        <h2 class="prompt-title">📝 Enter Your Prompts</h2>
-                        <div class="prompt-counter">
-                            <span id="lineCounter">0</span> Prompts
-                        </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-wrapper">
+            <!-- Prompt Input Section -->
+            <div class="prompt-section">
+                <div class="prompt-header">
+                    <h2 class="prompt-title">📝 Enter Your Prompts</h2>
+                    <div class="prompt-badge">
+                        <span id="promptCount">0</span> Prompts
                     </div>
+                </div>
 
-                    <textarea 
-                        class="prompt-textarea" 
-                        id="promptTextarea" 
-                        placeholder="Enter each prompt on a new line...
+                <textarea 
+                    class="prompt-textarea" 
+                    id="promptInput" 
+                    placeholder="Enter each prompt on a new line...
 
 Examples:
-A majestic lion standing on a cliff at sunset, cinematic lighting
-Futuristic cyberpunk cityscape with neon lights and flying cars
-Beautiful cherry blossom tree in full bloom, spring season
+A majestic lion standing on a cliff at golden sunset
+Futuristic cyberpunk city with neon lights and flying cars
+Beautiful cherry blossom tree in full spring bloom
+Cozy mountain cabin with warm glowing lights in snow
 Abstract geometric patterns in vibrant colors
-Vintage sports car parked in front of a classic diner
-Cozy cabin in snowy mountains with warm lights glowing
-Astronaut floating in space with Earth in background
-Magical fairy tale forest with glowing mushrooms
+Vintage sports car in desert landscape at dusk
 
 ✨ Tips:
 • One line = One image
 • Be descriptive for better results
-• No limit on number of prompts
-• Mix different styles and subjects
-• Add details like lighting, mood, camera angle"></textarea>
+• No limit on prompts
+• Add details like lighting, mood, style"></textarea>
 
-                    <div class="prompt-info">
-                        <span>💡 Pro Tip: More detailed prompts = Better results</span>
-                        <span id="charCounter">0 characters</span>
-                    </div>
+                <div class="prompt-footer">
+                    <span class="tip-text">💡 Pro Tip: More detailed prompts = Better results</span>
+                    <span id="charCount">0 characters</span>
+                </div>
 
-                    <button class="generate-button" id="generateButton" disabled>
-                        <span class="button-text">🚀 Generate All Images</span>
+                <button class="generate-button" id="generateBtn" disabled>
+                    🚀 Generate All Images
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div class="results-header">
+                    <h2 class="results-title">
+                        🖼️ Generated Images 
+                        (<span class="results-count" id="resultCount">0</span>)
+                    </h2>
+                    <button class="clear-button" id="clearBtn" style="display: none;">
+                        🗑️ Clear All
                     </button>
                 </div>
 
-                <!-- Results Section -->
-                <div class="results-section">
-                    <div class="results-header">
-                        <h2 class="results-title">
-                            🖼️ Generated Images 
-                            (<span class="results-count" id="resultsCount">0</span>)
-                        </h2>
-                        <button class="clear-button" id="clearButton" style="display: none;">
-                            🗑️ Clear All
-                        </button>
-                    </div>
-
-                    <div class="results-grid" id="resultsGrid">
-                        <div class="empty-state">
-                            <div class="empty-icon">🎨</div>
-                            <h3>No images generated yet</h3>
-                            <p>Enter your prompts above and click "Generate All Images"</p>
-                        </div>
+                <div class="results-grid" id="resultsGrid">
+                    <div class="empty-state">
+                        <div class="empty-icon">🎨</div>
+                        <h3>No images generated yet</h3>
+                        <p>Enter your prompts above and click "Generate All Images"</p>
                     </div>
                 </div>
             </div>
@@ -777,28 +683,29 @@ Magical fairy tale forest with glowing mushrooms
         <div class="loading-content">
             <div class="loading-spinner-large"></div>
             <div class="loading-text">Generating your images...</div>
-            <div class="loading-progress" id="loadingProgress">0 / 0</div>
+            <div class="loading-progress" id="progressText">0 / 0</div>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast">
         <span class="toast-icon" id="toastIcon">✓</span>
-        <span class="toast-message" id="toastMessage">Success!</span>
+        <span class="toast-message" id="toastMessage"></span>
     </div>
 
     <script>
         // DOM Elements
-        const promptTextarea = document.getElementById('promptTextarea');
-        const lineCounter = document.getElementById('lineCounter');
-        const charCounter = document.getElementById('charCounter');
-        const generateButton = document.getElementById('generateButton');
+        const promptInput = document.getElementById('promptInput');
+        const promptCount = document.getElementById('promptCount');
+        const charCount = document.getElementById('charCount');
+        const generateBtn = document.getElementById('generateBtn');
         const resultsGrid = document.getElementById('resultsGrid');
-        const resultsCount = document.getElementById('resultsCount');
-        const clearButton = document.getElementById('clearButton');
+        const resultCount = document.getElementById('resultCount');
+        const clearBtn = document.getElementById('clearBtn');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        const loadingProgress = document.getElementById('loadingProgress');
+        const progressText = document.getElementById('progressText');
         const ratioCards = document.querySelectorAll('.ratio-card');
+        const qualitySelect = document.getElementById('qualitySelect');
         const toast = document.getElementById('toast');
         const toastIcon = document.getElementById('toastIcon');
         const toastMessage = document.getElementById('toastMessage');
@@ -807,11 +714,17 @@ Magical fairy tale forest with glowing mushrooms
         let selectedRatio = '9:16';
         let generatedImages = [];
 
-        // Event Listeners
-        promptTextarea.addEventListener('input', updateCounters);
-        generateButton.addEventListener('click', generateImages);
-        clearButton.addEventListener('click', clearResults);
+        // Update Counters
+        promptInput.addEventListener('input', function() {
+            const text = this.value;
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+            
+            promptCount.textContent = lines.length;
+            charCount.textContent = text.length + ' characters';
+            generateBtn.disabled = lines.length === 0;
+        });
 
+        // Ratio Selection
         ratioCards.forEach(card => {
             card.addEventListener('click', function() {
                 ratioCards.forEach(c => c.classList.remove('active'));
@@ -820,19 +733,9 @@ Magical fairy tale forest with glowing mushrooms
             });
         });
 
-        // Update Counters
-        function updateCounters() {
-            const text = promptTextarea.value;
-            const lines = text.split('\n').filter(line => line.trim() !== '');
-            
-            lineCounter.textContent = lines.length;
-            charCounter.textContent = text.length + ' characters';
-            generateButton.disabled = lines.length === 0;
-        }
-
         // Generate Images
-        async function generateImages() {
-            const prompts = promptTextarea.value.split('\n').filter(line => line.trim() !== '');
+        generateBtn.addEventListener('click', async function() {
+            const prompts = promptInput.value.split('\n').filter(line => line.trim() !== '');
             
             if (prompts.length === 0) {
                 showToast('❌', 'Please enter at least one prompt!', 'error');
@@ -842,51 +745,47 @@ Magical fairy tale forest with glowing mushrooms
             // Clear previous results
             resultsGrid.innerHTML = '';
             generatedImages = [];
-            clearButton.style.display = 'none';
+            clearBtn.style.display = 'none';
 
             // Show loading
             loadingOverlay.classList.add('active');
-            generateButton.disabled = true;
+            generateBtn.disabled = true;
 
-            // Get settings
-            const quality = document.getElementById('qualitySelect').value;
-            const style = document.getElementById('styleSelect').value;
-            const count = parseInt(document.getElementById('countInput').value);
-            const model = document.getElementById('modelSelect').value;
+            const quality = qualitySelect.value;
 
-            // Generate images
+            // Generate each image
             for (let i = 0; i < prompts.length; i++) {
-                loadingProgress.textContent = `${i + 1} / ${prompts.length}`;
+                progressText.textContent = `${i + 1} / ${prompts.length}`;
 
                 // Create card
                 const card = createImageCard(prompts[i], i);
                 resultsGrid.appendChild(card);
 
-                // Simulate image generation (replace with actual API call)
+                // Simulate generation (replace with actual API)
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
-                // Load image (demo with placeholder)
+                // Load demo image
                 const imageContainer = card.querySelector('.image-container');
-                imageContainer.innerHTML = `<img src="https://picsum.photos/seed/${Date.now() + i}/${getRatioDimensions(selectedRatio)}" alt="${prompts[i]}">`;
+                const dimensions = getRatioDimensions(selectedRatio);
+                imageContainer.innerHTML = `<img src="https://picsum.photos/seed/${Date.now() + i}/${dimensions}" alt="${prompts[i]}">`;
 
                 generatedImages.push({
                     prompt: prompts[i],
                     ratio: selectedRatio,
                     quality: quality,
-                    style: style,
-                    url: `https://picsum.photos/seed/${Date.now() + i}/${getRatioDimensions(selectedRatio)}`
+                    url: `https://picsum.photos/seed/${Date.now() + i}/${dimensions}`
                 });
 
-                resultsCount.textContent = generatedImages.length;
+                resultCount.textContent = generatedImages.length;
             }
 
             // Hide loading
             loadingOverlay.classList.remove('active');
-            generateButton.disabled = false;
-            clearButton.style.display = 'block';
+            generateBtn.disabled = false;
+            clearBtn.style.display = 'block';
 
             showToast('✓', `Successfully generated ${prompts.length} images!`, 'success');
-        }
+        });
 
         // Create Image Card
         function createImageCard(prompt, index) {
@@ -899,8 +798,8 @@ Magical fairy tale forest with glowing mushrooms
                 <div class="image-info">
                     <div class="image-prompt">${prompt}</div>
                     <div class="image-meta">
-                        <span class="image-ratio">${selectedRatio}</span>
-                        <button class="download-button" onclick="downloadImage(${index})">
+                        <span class="image-ratio-badge">${selectedRatio}</span>
+                        <button class="download-btn" onclick="downloadImage(${index})">
                             ⬇️ Download
                         </button>
                     </div>
@@ -911,13 +810,13 @@ Magical fairy tale forest with glowing mushrooms
 
         // Get Ratio Dimensions
         function getRatioDimensions(ratio) {
-            const dimensions = {
+            const dims = {
                 '9:16': '450/800',
                 '16:9': '800/450',
                 '1:1': '600/600',
                 '3:4': '600/800'
             };
-            return dimensions[ratio] || '600/600';
+            return dims[ratio] || '600/600';
         }
 
         // Download Image
@@ -926,14 +825,14 @@ Magical fairy tale forest with glowing mushrooms
             if (image) {
                 const link = document.createElement('a');
                 link.href = image.url;
-                link.download = `generated-image-${index + 1}.jpg`;
+                link.download = `generated-${index + 1}.jpg`;
                 link.click();
                 showToast('✓', 'Image downloaded!', 'success');
             }
         }
 
         // Clear Results
-        function clearResults() {
+        clearBtn.addEventListener('click', function() {
             if (confirm('Are you sure you want to clear all generated images?')) {
                 resultsGrid.innerHTML = `
                     <div class="empty-state">
@@ -943,11 +842,11 @@ Magical fairy tale forest with glowing mushrooms
                     </div>
                 `;
                 generatedImages = [];
-                resultsCount.textContent = '0';
-                clearButton.style.display = 'none';
+                resultCount.textContent = '0';
+                clearBtn.style.display = 'none';
                 showToast('✓', 'All images cleared!', 'success');
             }
-        }
+        });
 
         // Show Toast
         function showToast(icon, message, type) {
@@ -960,19 +859,15 @@ Magical fairy tale forest with glowing mushrooms
             }, 3000);
         }
 
-        // Keyboard Shortcuts
+        // Keyboard Shortcut
         document.addEventListener('keydown', function(e) {
-            // Ctrl/Cmd + Enter to generate
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
-                if (!generateButton.disabled) {
-                    generateImages();
+                if (!generateBtn.disabled) {
+                    generateBtn.click();
                 }
             }
         });
-
-        // Initialize
-        updateCounters();
     </script>
 </body>
 </html>
