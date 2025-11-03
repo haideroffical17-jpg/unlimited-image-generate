@@ -327,36 +327,6 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        .retry-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .retry-button:hover {
-            background: #5568d3;
-        }
-
-        .error-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #dc3545;
-            font-size: 12px;
-            padding: 0 10px;
-        }
-
         .image-info {
             padding: 15px;
         }
@@ -580,8 +550,7 @@ An abstract painting with vibrant colors"></textarea>
                 const imageData = {
                     prompt: prompt,
                     url: generateImageUrl(prompt, dimensions, model, enhance, seed),
-                    seed: seed,
-                    retryCount: 0
+                    seed: seed
                 };
                 generatedImages.push(imageData);
                 
@@ -596,13 +565,13 @@ An abstract painting with vibrant colors"></textarea>
             downloadAllBtn.style.display = 'block';
         });
 
-        // Generate image URL with high quality
+        // Generate image URL
         function generateImageUrl(prompt, dimensions, model, enhance, seed) {
             const encodedPrompt = encodeURIComponent(prompt);
-            return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}&quality=100`;
+            return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
         }
 
-        // Create image card with RETRY system
+        // Create image card - SIMPLE VERSION (WORKING)
         function createImageCard(imageData, index) {
             const card = document.createElement('div');
             card.className = 'image-card';
@@ -623,43 +592,18 @@ An abstract painting with vibrant colors"></textarea>
 
             const img = card.querySelector('img');
             const spinner = card.querySelector('.loading-spinner');
-            const wrapper = card.querySelector('.image-wrapper');
 
-            // AUTO RETRY on load error (3 attempts max)
             img.onload = () => {
                 spinner.style.display = 'none';
                 img.style.display = 'block';
             };
 
             img.onerror = () => {
-                if (imageData.retryCount < 3) {
-                    // Retry with new seed
-                    imageData.retryCount++;
-                    const newSeed = Math.floor(Math.random() * 1000000);
-                    const dimensions = getDimensions(selectedRatio);
-                    const model = modelSelect.value;
-                    const enhance = enhanceEnabled;
-                    
-                    imageData.url = generateImageUrl(imageData.prompt, dimensions, model, enhance, newSeed);
-                    imageData.seed = newSeed;
-                    
-                    console.log(`Retrying image ${index + 1}, attempt ${imageData.retryCount}`);
-                    
-                    // Retry after 1 second
-                    setTimeout(() => {
-                        img.src = imageData.url;
-                    }, 1000);
-                } else {
-                    // Failed after 3 attempts - show retry button
-                    spinner.style.display = 'none';
-                    wrapper.innerHTML = `
-                        <div class="error-message">❌ Failed to load<br>(Server issue)</div>
-                        <button class="retry-button" onclick="manualRetry(${index})">🔄 Retry</button>
-                    `;
-                }
+                spinner.style.display = 'none';
+                img.style.display = 'block';
+                img.alt = 'Failed to load image';
             };
 
-            // Download button
             const downloadBtn = card.querySelector('.download-button');
             downloadBtn.addEventListener('click', () => {
                 downloadSingleImage(index);
@@ -667,56 +611,6 @@ An abstract painting with vibrant colors"></textarea>
 
             return card;
         }
-
-        // Manual retry function
-        window.manualRetry = function(index) {
-            const card = document.querySelector(`.image-card[data-index="${index}"]`);
-            const wrapper = card.querySelector('.image-wrapper');
-            const imageData = generatedImages[index];
-            
-            // Reset retry count and generate new seed
-            imageData.retryCount = 0;
-            const newSeed = Math.floor(Math.random() * 1000000);
-            const dimensions = getDimensions(selectedRatio);
-            const model = modelSelect.value;
-            const enhance = enhanceEnabled;
-            
-            imageData.url = generateImageUrl(imageData.prompt, dimensions, model, enhance, newSeed);
-            imageData.seed = newSeed;
-            
-            const ratioClass = `ratio-${selectedRatio.replace(':', '-')}`;
-            
-            wrapper.innerHTML = `
-                <div class="loading-spinner"></div>
-                <img src="${imageData.url}" alt="${imageData.prompt}" style="display: none;">
-            `;
-            
-            const img = wrapper.querySelector('img');
-            const spinner = wrapper.querySelector('.loading-spinner');
-            
-            img.onload = () => {
-                spinner.style.display = 'none';
-                img.style.display = 'block';
-            };
-            
-            img.onerror = () => {
-                if (imageData.retryCount < 3) {
-                    imageData.retryCount++;
-                    const newSeed = Math.floor(Math.random() * 1000000);
-                    imageData.url = generateImageUrl(imageData.prompt, dimensions, model, enhance, newSeed);
-                    imageData.seed = newSeed;
-                    setTimeout(() => {
-                        img.src = imageData.url;
-                    }, 1000);
-                } else {
-                    spinner.style.display = 'none';
-                    wrapper.innerHTML = `
-                        <div class="error-message">❌ Failed to load<br>(Server issue)</div>
-                        <button class="retry-button" onclick="manualRetry(${index})">🔄 Retry</button>
-                    `;
-                }
-            };
-        };
 
         // Download single image
         async function downloadSingleImage(index) {
@@ -750,21 +644,15 @@ An abstract painting with vibrant colors"></textarea>
             downloadAllBtn.disabled = true;
             downloadAllBtn.textContent = `Downloading 0/${generatedImages.length}...`;
 
-            let successCount = 0;
             for (let i = 0; i < generatedImages.length; i++) {
                 downloadAllBtn.textContent = `Downloading ${i + 1}/${generatedImages.length}...`;
-                try {
-                    await downloadSingleImage(i);
-                    successCount++;
-                } catch (error) {
-                    console.error(`Failed to download image ${i + 1}:`, error);
-                }
+                await downloadSingleImage(i);
                 await new Promise(resolve => setTimeout(resolve, 800));
             }
 
             downloadAllBtn.disabled = false;
             downloadAllBtn.textContent = 'Download All';
-            alert(`Successfully downloaded ${successCount}/${generatedImages.length} images!`);
+            alert(`Successfully downloaded ${generatedImages.length} images!`);
         });
 
         // Clear all
