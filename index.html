@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real AI Image Generator - Working 100%</title>
+    <title>AI Image Generator - Working Version</title>
     <style>
         * {
             margin: 0;
@@ -109,29 +109,132 @@
             margin-top: 4px;
         }
 
-        .settings-group {
-            margin-bottom: 20px;
-        }
-
-        .settings-label {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #495057;
-        }
-
-        .settings-select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 14px;
-            background: white;
-        }
-
         .main {
             padding: 40px;
             background: #fafbfc;
+        }
+
+        /* API Setup Box */
+        .api-setup {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border: 3px solid #ffc107;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+        }
+
+        .api-setup h3 {
+            color: #856404;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .api-steps {
+            color: #856404;
+            margin-bottom: 15px;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .api-steps ol {
+            margin-left: 20px;
+        }
+
+        .api-steps li {
+            margin-bottom: 8px;
+        }
+
+        .api-steps a {
+            color: #667eea;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .api-steps a:hover {
+            text-decoration: underline;
+        }
+
+        .api-input-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .api-input {
+            flex: 1;
+            padding: 14px;
+            border: 3px solid #ffc107;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Monaco', monospace;
+            background: white;
+        }
+
+        .api-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .verify-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .verify-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .verify-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .api-status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .api-status.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+
+        .api-status.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+
+        .api-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 8px;
+            color: #856404;
+            font-size: 13px;
         }
 
         .prompt-section {
@@ -166,7 +269,7 @@
 
         .prompt-textarea {
             width: 100%;
-            min-height: 350px;
+            min-height: 320px;
             padding: 20px;
             border: 3px solid #e9ecef;
             border-radius: 16px;
@@ -194,34 +297,6 @@
             color: #6c757d;
         }
 
-        .api-setup {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .api-setup h3 {
-            color: #856404;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .api-setup input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ffc107;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .api-setup a {
-            color: #667eea;
-            font-weight: 700;
-        }
-
         .generate-btn {
             width: 100%;
             padding: 20px;
@@ -246,6 +321,7 @@
         .generate-btn:disabled {
             background: #cbd5e0;
             cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .results-section {
@@ -435,6 +511,7 @@
             display: none;
             gap: 10px;
             z-index: 10000;
+            min-width: 300px;
         }
 
         .toast.show {
@@ -449,6 +526,22 @@
 
         .toast.success { border-left: 5px solid #28a745; }
         .toast.error { border-left: 5px solid #dc3545; }
+        .toast.info { border-left: 5px solid #17a2b8; }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: #6c757d;
+        }
 
         @media (max-width: 1024px) {
             .body { grid-template-columns: 1fr; }
@@ -459,14 +552,15 @@
             .main { padding: 20px; }
             .ratio-grid { grid-template-columns: repeat(2, 1fr); }
             .results-grid { grid-template-columns: 1fr; }
+            .api-input-group { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎨 Real AI Image Generator</h1>
-            <p>Hugging Face API • 100% Working • Prompt ke exact mutabiq images</p>
+            <h1>🎨 AI Image Generator Pro</h1>
+            <p>Real Hugging Face AI • Verified API • Prompt-accurate images</p>
         </div>
 
         <div class="body">
@@ -494,33 +588,41 @@
                         <div class="ratio-desc">Portrait</div>
                     </div>
                 </div>
-
-                <div class="section-title">⚙️ AI MODEL</div>
-                <div class="settings-group">
-                    <label class="settings-label">Select Model</label>
-                    <select class="settings-select" id="modelSelect">
-                        <option value="stable-diffusion">Stable Diffusion v2.1</option>
-                        <option value="flux-schnell">Flux Schnell (Fast)</option>
-                        <option value="dreamshaper">DreamShaper v8</option>
-                    </select>
-                </div>
             </div>
 
             <div class="main">
+                <!-- API Setup Section -->
                 <div class="api-setup">
-                    <h3>🔑 Setup (One Time Only - FREE)</h3>
-                    <p style="margin-bottom: 10px; color: #856404;">
-                        1. Visit <a href="https://huggingface.co/settings/tokens" target="_blank">Hugging Face</a><br>
-                        2. Create FREE account<br>
-                        3. Generate Access Token<br>
-                        4. Paste below:
-                    </p>
-                    <input type="text" id="apiKeyInput" placeholder="Paste your Hugging Face API Token here" />
-                    <p style="margin-top: 10px; font-size: 12px; color: #856404;">
-                        ⚠️ Agar API key nahi hai, to images generate nahi hongi! Required hai!
-                    </p>
+                    <h3>🔑 Setup API Key (One Time - FREE)</h3>
+                    <div class="api-steps">
+                        <ol>
+                            <li>Visit <a href="https://huggingface.co/join" target="_blank">Hugging Face</a> and create FREE account</li>
+                            <li>Go to <a href="https://huggingface.co/settings/tokens" target="_blank">Settings → Access Tokens</a></li>
+                            <li>Click "New token" → Select "Read" permission → Create</li>
+                            <li>Copy token and paste below, then click "Verify API"</li>
+                        </ol>
+                    </div>
+
+                    <div class="api-input-group">
+                        <input 
+                            type="text" 
+                            class="api-input" 
+                            id="apiKeyInput" 
+                            placeholder="hf_xxxxxxxxxxxxxxxxxxxxx"
+                        />
+                        <button class="verify-btn" id="verifyBtn">
+                            ✓ Verify API
+                        </button>
+                    </div>
+
+                    <div class="api-status" id="apiStatus"></div>
+
+                    <div class="api-warning">
+                        ⚠️ <strong>Important:</strong> Without valid API key, images will NOT generate!
+                    </div>
                 </div>
 
+                <!-- Prompt Section -->
                 <div class="prompt-section">
                     <div class="prompt-header">
                         <h2 class="prompt-title">📝 Enter Your Prompts</h2>
@@ -536,48 +638,49 @@
 
 WORKING EXAMPLES:
 
-A majestic lion with golden mane standing on rocky mountain cliff at sunset, dramatic orange sky, professional wildlife photography, highly detailed, 8k
+A majestic lion with golden mane standing on rocky cliff at golden sunset, dramatic orange sky, professional wildlife photography, highly detailed, 8k resolution
 
-Futuristic cyberpunk city at night with glowing neon purple and blue lights, wet streets reflecting lights, flying cars, cinematic, highly detailed
+Futuristic cyberpunk city at night with glowing neon purple and blue lights, wet reflective streets, flying cars in sky, cinematic atmosphere, highly detailed
 
-Beautiful pink cherry blossom tree in full bloom, Japanese garden, spring season, soft sunlight, professional nature photography, vibrant colors
+Beautiful pink cherry blossom tree in full bloom, Japanese garden setting, spring season, soft natural sunlight, professional nature photography, vibrant colors
 
-Cozy wooden cabin in snowy mountains during winter evening, warm yellow lights from windows, smoke from chimney, peaceful atmosphere, realistic
+Cozy wooden log cabin in snowy mountain landscape, winter evening, warm yellow lights from windows, smoke from chimney, peaceful atmosphere, photorealistic
 
-Vintage red Ferrari sports car in desert landscape at golden hour sunset, dramatic lighting, professional automotive photography, highly detailed
+Vintage red Ferrari 250 GTO in vast desert landscape at golden hour, dramatic sunset lighting, professional automotive photography, ultra detailed
 
-💡 TIPS FOR PERFECT RESULTS:
-• Be VERY descriptive
-• Add style keywords: realistic, cinematic, professional photography, highly detailed, 8k
-• Mention lighting: golden hour, dramatic, soft, natural
-• Include mood: peaceful, dramatic, vibrant, cozy
-• Each line = One unique AI image"></textarea>
+💡 PERFECT RESULTS TIPS:
+• Use VERY detailed descriptions
+• Add quality keywords: photorealistic, highly detailed, 8k, professional photography
+• Mention lighting: golden hour, cinematic, dramatic, soft natural light
+• Include atmosphere: peaceful, vibrant, dramatic, cozy
+• Be specific about colors, textures, mood"></textarea>
 
                     <div class="prompt-footer">
-                        <span>🤖 Real AI • Prompt ke exact mutabiq</span>
+                        <span>🤖 Real AI • API Verified Required</span>
                         <span id="charCount">0 characters</span>
                     </div>
 
                     <button class="generate-btn" id="generateBtn" disabled>
-                        🚀 Generate Real AI Images
+                        🚀 Generate AI Images
                     </button>
                 </div>
 
+                <!-- Results Section -->
                 <div class="results-section">
                     <div class="results-header">
                         <h2 class="results-title">
                             🖼️ Generated Images (<span id="resultCount">0</span>)
                         </h2>
                         <button class="clear-btn" id="clearBtn" style="display: none;">
-                            🗑️ Clear
+                            🗑️ Clear All
                         </button>
                     </div>
 
                     <div class="results-grid" id="resultsGrid">
                         <div class="empty-state">
                             <div class="empty-icon">🎨</div>
-                            <h3>No images yet</h3>
-                            <p>Setup API key, enter prompts, and generate!</p>
+                            <h3>No images generated yet</h3>
+                            <p>Verify API key, enter prompts, and start generating!</p>
                         </div>
                     </div>
                 </div>
@@ -585,20 +688,28 @@ Vintage red Ferrari sports car in desert landscape at golden hour sunset, dramat
         </div>
     </div>
 
+    <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner-large"></div>
             <div class="loading-text">Generating real AI images...</div>
-            <div class="loading-progress" id="progressText">Please wait... 20-30 sec per image</div>
+            <div class="loading-progress" id="progressText">Please wait 20-30 seconds per image</div>
         </div>
     </div>
 
+    <!-- Toast Notification -->
     <div class="toast" id="toast">
-        <span id="toastMessage"></span>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle"></div>
+            <div class="toast-message" id="toastMessage"></div>
+        </div>
     </div>
 
     <script>
+        // DOM Elements
         const apiKeyInput = document.getElementById('apiKeyInput');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const apiStatus = document.getElementById('apiStatus');
         const promptInput = document.getElementById('promptInput');
         const promptCount = document.getElementById('promptCount');
         const charCount = document.getElementById('charCount');
@@ -609,33 +720,35 @@ Vintage red Ferrari sports car in desert landscape at golden hour sunset, dramat
         const loadingOverlay = document.getElementById('loadingOverlay');
         const progressText = document.getElementById('progressText');
         const ratioCards = document.querySelectorAll('.ratio-card');
-        const modelSelect = document.getElementById('modelSelect');
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toastMessage');
 
+        // State
         let selectedRatio = '1:1';
         let generatedImages = [];
+        let apiKeyVerified = false;
+        let verifiedApiKey = '';
 
         // Load saved API key
-        if (localStorage.getItem('hfApiKey')) {
-            apiKeyInput.value = localStorage.getItem('hfApiKey');
+        const savedKey = localStorage.getItem('hf_api_key');
+        const savedVerified = localStorage.getItem('hf_api_verified');
+        if (savedKey && savedVerified === 'true') {
+            apiKeyInput.value = savedKey;
+            verifiedApiKey = savedKey;
+            apiKeyVerified = true;
+            apiStatus.className = 'api-status success';
+            apiStatus.textContent = '✓ API Key Verified! Ready to generate images.';
+            verifyBtn.textContent = '✓ Verified';
+            verifyBtn.style.background = '#28a745';
         }
 
+        // Update counters
         promptInput.addEventListener('input', function() {
             const lines = this.value.split('\n').filter(l => l.trim());
             promptCount.textContent = lines.length;
             charCount.textContent = this.value.length + ' characters';
-            generateBtn.disabled = lines.length === 0 || !apiKeyInput.value.trim();
+            generateBtn.disabled = lines.length === 0 || !apiKeyVerified;
         });
 
-        apiKeyInput.addEventListener('input', function() {
-            const lines = promptInput.value.split('\n').filter(l => l.trim());
-            generateBtn.disabled = lines.length === 0 || !this.value.trim();
-            if (this.value.trim()) {
-                localStorage.setItem('hfApiKey', this.value.trim());
-            }
-        });
-
+        // Ratio selection
         ratioCards.forEach(card => {
             card.addEventListener('click', function() {
                 ratioCards.forEach(c => c.classList.remove('active'));
@@ -644,10 +757,81 @@ Vintage red Ferrari sports car in desert landscape at golden hour sunset, dramat
             });
         });
 
-        generateBtn.addEventListener('click', async function() {
+        // Verify API Key
+        verifyBtn.addEventListener('click', async function() {
             const apiKey = apiKeyInput.value.trim();
+            
             if (!apiKey) {
-                showToast('❌ Please enter Hugging Face API token first!', 'error');
+                showToast('Error', 'Please enter API key!', 'error');
+                return;
+            }
+
+            if (!apiKey.startsWith('hf_')) {
+                showToast('Invalid Format', 'API key should start with "hf_"', 'error');
+                return;
+            }
+
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = '⏳ Verifying...';
+            apiStatus.className = 'api-status';
+            apiStatus.style.display = 'none';
+
+            try {
+                // Test API with a simple model query
+                const response = await fetch('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        inputs: 'test',
+                        parameters: {}
+                    })
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error('Invalid API key');
+                }
+
+                // Success
+                verifiedApiKey = apiKey;
+                apiKeyVerified = true;
+                localStorage.setItem('hf_api_key', apiKey);
+                localStorage.setItem('hf_api_verified', 'true');
+
+                apiStatus.className = 'api-status success';
+                apiStatus.textContent = '✓ API Key Verified Successfully! You can now generate images.';
+                verifyBtn.textContent = '✓ Verified';
+                verifyBtn.style.background = '#28a745';
+                
+                showToast('Success!', 'API key verified! Ready to generate images.', 'success');
+
+                // Enable generate button if prompts exist
+                const lines = promptInput.value.split('\n').filter(l => l.trim());
+                if (lines.length > 0) {
+                    generateBtn.disabled = false;
+                }
+
+            } catch (error) {
+                apiKeyVerified = false;
+                verifiedApiKey = '';
+                localStorage.removeItem('hf_api_key');
+                localStorage.removeItem('hf_api_verified');
+
+                apiStatus.className = 'api-status error';
+                apiStatus.textContent = '❌ Invalid API Key! Please check and try again.';
+                verifyBtn.textContent = '✗ Try Again';
+                verifyBtn.disabled = false;
+
+                showToast('Verification Failed', 'Invalid API key. Please check and try again.', 'error');
+            }
+        });
+
+        // Generate Images
+        generateBtn.addEventListener('click', async function() {
+            if (!apiKeyVerified) {
+                showToast('Error', 'Please verify API key first!', 'error');
                 return;
             }
 
@@ -660,82 +844,100 @@ Vintage red Ferrari sports car in desert landscape at golden hour sunset, dramat
             loadingOverlay.classList.add('active');
             generateBtn.disabled = true;
 
-            const model = modelSelect.value;
-            let modelEndpoint = '';
-
-            // Different API endpoints for different models
-            if (model === 'stable-diffusion') {
-                modelEndpoint = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1';
-            } else if (model === 'flux-schnell') {
-                modelEndpoint = 'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell';
-            } else {
-                modelEndpoint = 'https://api-inference.huggingface.co/models/Lykon/DreamShaper-8';
-            }
+            const apiEndpoint = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1';
 
             for (let i = 0; i < prompts.length; i++) {
-                progressText.textContent = `Generating ${i + 1} / ${prompts.length}... Please wait 20-30 sec`;
+                progressText.textContent = `Generating image ${i + 1} / ${prompts.length}... (20-30 sec each)`;
 
                 const card = createImageCard(prompts[i], i);
                 resultsGrid.appendChild(card);
 
                 try {
-                    // Real Hugging Face API call
-                    const response = await fetch(modelEndpoint, {
+                    const response = await fetch(apiEndpoint, {
                         method: 'POST',
                         headers: {
-                            'Authorization': `Bearer ${apiKey}`,
+                            'Authorization': `Bearer ${verifiedApiKey}`,
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             inputs: prompts[i],
                             parameters: {
-                                negative_prompt: "blurry, low quality, distorted, ugly",
-                                num_inference_steps: 50
+                                negative_prompt: "blurry, low quality, distorted, ugly, bad anatomy",
+                                num_inference_steps: 50,
+                                guidance_scale: 7.5
                             }
                         })
                     });
 
                     if (!response.ok) {
-                        throw new Error('API Error: ' + response.status);
+                        if (response.status === 503) {
+                            // Model loading, wait and retry
+                            await new Promise(resolve => setTimeout(resolve, 20000));
+                            
+                            const retryResponse = await fetch(apiEndpoint, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${verifiedApiKey}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    inputs: prompts[i],
+                                    parameters: {
+                                        negative_prompt: "blurry, low quality, distorted, ugly",
+                                        num_inference_steps: 50
+                                    }
+                                })
+                            });
+
+                            if (!retryResponse.ok) throw new Error('Generation failed');
+                            const blob = await retryResponse.blob();
+                            displayImage(card, blob, prompts[i], i);
+                        } else {
+                            throw new Error(`API Error: ${response.status}`);
+                        }
+                    } else {
+                        const blob = await response.blob();
+                        displayImage(card, blob, prompts[i], i);
                     }
-
-                    const blob = await response.blob();
-                    const imageUrl = URL.createObjectURL(blob);
-
-                    const imageContainer = card.querySelector('.image-container');
-                    const img = document.createElement('img');
-                    img.src = imageUrl;
-                    img.alt = prompts[i];
-                    imageContainer.innerHTML = '';
-                    imageContainer.appendChild(img);
-
-                    generatedImages.push({
-                        prompt: prompts[i],
-                        ratio: selectedRatio,
-                        blob: blob,
-                        url: imageUrl
-                    });
-
-                    resultCount.textContent = generatedImages.length;
 
                 } catch (error) {
                     console.error('Error:', error);
                     const imageContainer = card.querySelector('.image-container');
-                    imageContainer.innerHTML = `<div style="color: white; padding: 20px; text-align: center;">
-                        ❌ Generation failed!<br>
-                        Check API key or try again
-                    </div>`;
+                    imageContainer.innerHTML = `
+                        <div style="color: white; padding: 20px; text-align: center;">
+                            ❌ Generation Failed<br>
+                            <small>${error.message}</small>
+                        </div>
+                    `;
                 }
 
-                // Wait before next generation
                 await new Promise(resolve => setTimeout(resolve, 2000));
             }
 
             loadingOverlay.classList.remove('active');
             generateBtn.disabled = false;
             clearBtn.style.display = 'block';
-            showToast(`✓ Generated ${prompts.length} real AI images!`, 'success');
+            showToast('Complete!', `Successfully generated ${prompts.length} images!`, 'success');
         });
+
+        function displayImage(card, blob, prompt, index) {
+            const imageUrl = URL.createObjectURL(blob);
+            const imageContainer = card.querySelector('.image-container');
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = prompt;
+            imageContainer.innerHTML = '';
+            imageContainer.appendChild(img);
+
+            generatedImages.push({
+                prompt: prompt,
+                ratio: selectedRatio,
+                blob: blob,
+                url: imageUrl
+            });
+
+            resultCount.textContent = generatedImages.length;
+        }
 
         function createImageCard(prompt, index) {
             const card = document.createElement('div');
@@ -764,17 +966,17 @@ Vintage red Ferrari sports car in desert landscape at golden hour sunset, dramat
                 link.href = URL.createObjectURL(image.blob);
                 link.download = `ai-generated-${index + 1}.png`;
                 link.click();
-                showToast('✓ Downloaded!', 'success');
+                showToast('Downloaded!', 'Image saved successfully.', 'success');
             }
         }
 
         clearBtn.addEventListener('click', function() {
-            if (confirm('Clear all?')) {
+            if (confirm('Clear all generated images?')) {
                 resultsGrid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🎨</div>
-                        <h3>No images yet</h3>
-                        <p>Setup API key, enter prompts, and generate!</p>
+                        <h3>No images generated yet</h3>
+                        <p>Verify API key, enter prompts, and start generating!</p>
                     </div>
                 `;
                 generatedImages = [];
@@ -783,10 +985,18 @@ Vintage red Ferrari sports car in desert landscape at golden hour sunset, dramat
             }
         });
 
-        function showToast(message, type) {
+        function showToast(title, message, type) {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastTitle.textContent = title;
             toastMessage.textContent = message;
             toast.className = `toast ${type} show`;
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
         }
     </script>
 </body>
