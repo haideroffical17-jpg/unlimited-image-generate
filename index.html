@@ -492,6 +492,7 @@ An abstract painting with vibrant colors"></textarea>
         // State
         let selectedRatio = '1:1';
         let enhanceEnabled = false;
+        let generatedImages = []; // Store image data for downloading
 
         // Aspect Ratio Selection
         const ratioOptions = document.querySelectorAll('.ratio-option');
@@ -509,13 +510,13 @@ An abstract painting with vibrant colors"></textarea>
             enhanceToggle.classList.toggle('active');
         });
 
-        // Get dimensions based on aspect ratio
+        // Get dimensions based on aspect ratio - HIGHER QUALITY
         function getDimensions(ratio) {
             const dimensions = {
-                '1:1': { width: 1024, height: 1024 },
-                '16:9': { width: 1024, height: 576 },
-                '9:16': { width: 576, height: 1024 },
-                '3:4': { width: 768, height: 1024 }
+                '1:1': { width: 1536, height: 1536 },   // Increased from 1024
+                '16:9': { width: 1920, height: 1080 },  // Increased from 1024x576
+                '9:16': { width: 1080, height: 1920 },  // Increased from 576x1024
+                '3:4': { width: 1536, height: 2048 }    // Increased from 768x1024
             };
             return dimensions[ratio];
         }
@@ -536,6 +537,7 @@ An abstract painting with vibrant colors"></textarea>
 
             // Clear previous results
             resultsDiv.innerHTML = '';
+            generatedImages = []; // Clear stored images
 
             // Disable button
             generateBtn.disabled = true;
@@ -547,7 +549,15 @@ An abstract painting with vibrant colors"></textarea>
 
             // Create image cards
             prompts.forEach((prompt, index) => {
-                const card = createImageCard(prompt, dimensions, model, enhance);
+                const seed = Math.floor(Math.random() * 1000000);
+                const imageData = {
+                    prompt: prompt,
+                    url: generateImageUrl(prompt, dimensions, model, enhance, seed),
+                    seed: seed
+                };
+                generatedImages.push(imageData);
+                
+                const card = createImageCard(imageData, index);
                 resultsDiv.appendChild(card);
             });
 
@@ -560,28 +570,29 @@ An abstract painting with vibrant colors"></textarea>
             downloadAllBtn.style.display = 'block';
         });
 
+        // Generate image URL with high quality settings
+        function generateImageUrl(prompt, dimensions, model, enhance, seed) {
+            const encodedPrompt = encodeURIComponent(prompt);
+            // Added quality parameters for better images
+            return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}&quality=100`;
+        }
+
         // Create image card
-        function createImageCard(prompt, dimensions, model, enhance) {
+        function createImageCard(imageData, index) {
             const card = document.createElement('div');
             card.className = 'image-card';
+            card.dataset.index = index;
 
             const ratioClass = `ratio-${selectedRatio.replace(':', '-')}`;
-
-            // Generate unique seed for each image
-            const seed = Math.floor(Math.random() * 1000000);
-
-            // Create Pollinations.ai URL with all parameters
-            const encodedPrompt = encodeURIComponent(prompt);
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
 
             card.innerHTML = `
                 <div class="image-wrapper ${ratioClass}">
                     <div class="loading-spinner"></div>
-                    <img src="${imageUrl}" alt="${prompt}" style="display: none;">
+                    <img src="${imageData.url}" alt="${imageData.prompt}" style="display: none;">
                 </div>
                 <div class="image-info">
-                    <div class="image-prompt">${prompt}</div>
-                    <button class="download-button" onclick="downloadImage('${imageUrl}', '${prompt.replace(/'/g, "\\'")}')">Download Image</button>
+                    <div class="image-prompt">${imageData.prompt}</div>
+                    <button class="download-button" data-index="${index}">Download Image</button>
                 </div>
             `;
 
@@ -600,41 +611,56 @@ An abstract painting with vibrant colors"></textarea>
                 img.alt = 'Failed to load image';
             };
 
+            // Add click event to download button
+            const downloadBtn = card.querySelector('.download-button');
+            downloadBtn.addEventListener('click', () => {
+                downloadSingleImage(index);
+            });
+
             return card;
         }
 
-        // Download single image
-        function downloadImage(url, prompt) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${prompt.substring(0, 50).replace(/[^a-z0-9]/gi, '_')}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        // Download single image using fetch (works properly)
+        async function downloadSingleImage(index) {
+            const imageData = generatedImages[index];
+            try {
+                const response = await fetch(imageData.url);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                const filename = `${imageData.prompt.substring(0, 50).replace(/[^a-z0-9]/gi, '_')}_${imageData.seed}.png`;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Failed to download image. Please try again.');
+            }
         }
 
-        // Download all images
+        // Download all images with proper fetch method
         downloadAllBtn.addEventListener('click', async () => {
-            const images = resultsDiv.querySelectorAll('.image-wrapper img');
-            if (images.length === 0) {
+            if (generatedImages.length === 0) {
                 alert('No images to download');
                 return;
             }
 
             downloadAllBtn.disabled = true;
-            downloadAllBtn.textContent = 'Downloading...';
+            downloadAllBtn.textContent = `Downloading 0/${generatedImages.length}...`;
 
-            for (let i = 0; i < images.length; i++) {
-                const img = images[i];
-                const prompt = img.alt;
-                const url = img.src;
-                
-                await new Promise(resolve => setTimeout(resolve, 500)); // Delay between downloads
-                downloadImage(url, prompt);
+            for (let i = 0; i < generatedImages.length; i++) {
+                downloadAllBtn.textContent = `Downloading ${i + 1}/${generatedImages.length}...`;
+                await downloadSingleImage(i);
+                await new Promise(resolve => setTimeout(resolve, 800)); // Delay between downloads
             }
 
             downloadAllBtn.disabled = false;
             downloadAllBtn.textContent = 'Download All';
+            alert(`Successfully downloaded ${generatedImages.length} images!`);
         });
 
         // Clear all images
@@ -646,6 +672,7 @@ An abstract painting with vibrant colors"></textarea>
                         <div class="empty-state-text">No images generated yet</div>
                     </div>
                 `;
+                generatedImages = [];
                 clearBtn.style.display = 'none';
                 downloadAllBtn.style.display = 'none';
             }
