@@ -510,13 +510,13 @@ An abstract painting with vibrant colors"></textarea>
             enhanceToggle.classList.toggle('active');
         });
 
-        // Get dimensions - HIGH QUALITY
+        // Get dimensions - BALANCED QUALITY
         function getDimensions(ratio) {
             const dimensions = {
-                '1:1': { width: 1536, height: 1536 },
-                '16:9': { width: 1920, height: 1080 },
-                '9:16': { width: 1080, height: 1920 },
-                '3:4': { width: 1536, height: 2048 }
+                '1:1': { width: 1024, height: 1024 },
+                '16:9': { width: 1024, height: 576 },
+                '9:16': { width: 576, height: 1024 },
+                '3:4': { width: 768, height: 1024 }
             };
             return dimensions[ratio];
         }
@@ -547,10 +547,12 @@ An abstract painting with vibrant colors"></textarea>
 
             prompts.forEach((prompt, index) => {
                 const seed = Math.floor(Math.random() * 1000000);
+                const timestamp = Date.now(); // Cache busting
                 const imageData = {
                     prompt: prompt,
-                    url: generateImageUrl(prompt, dimensions, model, enhance, seed),
-                    seed: seed
+                    url: generateImageUrl(prompt, dimensions, model, enhance, seed, timestamp),
+                    seed: seed,
+                    timestamp: timestamp
                 };
                 generatedImages.push(imageData);
                 
@@ -565,13 +567,14 @@ An abstract painting with vibrant colors"></textarea>
             downloadAllBtn.style.display = 'block';
         });
 
-        // Generate image URL
-        function generateImageUrl(prompt, dimensions, model, enhance, seed) {
+        // Generate image URL with cache busting
+        function generateImageUrl(prompt, dimensions, model, enhance, seed, timestamp) {
             const encodedPrompt = encodeURIComponent(prompt);
-            return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
+            // Added timestamp for cache busting
+            return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}&nofeed=true&t=${timestamp}`;
         }
 
-        // Create image card - SIMPLE VERSION (WORKING)
+        // Create image card
         function createImageCard(imageData, index) {
             const card = document.createElement('div');
             card.className = 'image-card';
@@ -582,7 +585,7 @@ An abstract painting with vibrant colors"></textarea>
             card.innerHTML = `
                 <div class="image-wrapper ${ratioClass}">
                     <div class="loading-spinner"></div>
-                    <img src="${imageData.url}" alt="${imageData.prompt}" style="display: none;">
+                    <img data-index="${index}" alt="${imageData.prompt}" style="display: none;">
                 </div>
                 <div class="image-info">
                     <div class="image-prompt">${imageData.prompt}</div>
@@ -593,16 +596,8 @@ An abstract painting with vibrant colors"></textarea>
             const img = card.querySelector('img');
             const spinner = card.querySelector('.loading-spinner');
 
-            img.onload = () => {
-                spinner.style.display = 'none';
-                img.style.display = 'block';
-            };
-
-            img.onerror = () => {
-                spinner.style.display = 'none';
-                img.style.display = 'block';
-                img.alt = 'Failed to load image';
-            };
+            // Load image with timeout
+            loadImageWithTimeout(img, imageData.url, spinner);
 
             const downloadBtn = card.querySelector('.download-button');
             downloadBtn.addEventListener('click', () => {
@@ -612,11 +607,58 @@ An abstract painting with vibrant colors"></textarea>
             return card;
         }
 
+        // Load image with timeout and retry
+        function loadImageWithTimeout(img, url, spinner) {
+            let loadTimeout;
+            
+            const startLoad = () => {
+                img.style.display = 'none';
+                spinner.style.display = 'block';
+                
+                // Set timeout for 30 seconds
+                loadTimeout = setTimeout(() => {
+                    img.onerror = null;
+                    img.onload = null;
+                    spinner.style.display = 'none';
+                    img.alt = 'Loading timeout - Click download to retry';
+                    console.error('Image load timeout:', url);
+                }, 30000);
+                
+                img.onload = () => {
+                    clearTimeout(loadTimeout);
+                    spinner.style.display = 'none';
+                    img.style.display = 'block';
+                };
+                
+                img.onerror = () => {
+                    clearTimeout(loadTimeout);
+                    spinner.style.display = 'none';
+                    img.style.display = 'block';
+                    img.alt = 'Failed to load - Server busy, try download button';
+                    console.error('Image load error:', url);
+                };
+                
+                // Start loading
+                img.src = url;
+            };
+            
+            startLoad();
+        }
+
         // Download single image
         async function downloadSingleImage(index) {
             const imageData = generatedImages[index];
             try {
+                // Show loading state
+                const card = document.querySelector(`.image-card[data-index="${index}"]`);
+                const downloadBtn = card.querySelector('.download-button');
+                const originalText = downloadBtn.textContent;
+                downloadBtn.textContent = 'Downloading...';
+                downloadBtn.disabled = true;
+
                 const response = await fetch(imageData.url);
+                if (!response.ok) throw new Error('Download failed');
+                
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 
@@ -628,9 +670,19 @@ An abstract painting with vibrant colors"></textarea>
                 link.click();
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
+
+                // Reset button
+                downloadBtn.textContent = originalText;
+                downloadBtn.disabled = false;
             } catch (error) {
                 console.error('Download failed:', error);
                 alert('Failed to download image. Please try again.');
+                
+                // Reset button
+                const card = document.querySelector(`.image-card[data-index="${index}"]`);
+                const downloadBtn = card.querySelector('.download-button');
+                downloadBtn.textContent = 'Download Image';
+                downloadBtn.disabled = false;
             }
         }
 
@@ -644,15 +696,26 @@ An abstract painting with vibrant colors"></textarea>
             downloadAllBtn.disabled = true;
             downloadAllBtn.textContent = `Downloading 0/${generatedImages.length}...`;
 
+            let successCount = 0;
             for (let i = 0; i < generatedImages.length; i++) {
                 downloadAllBtn.textContent = `Downloading ${i + 1}/${generatedImages.length}...`;
-                await downloadSingleImage(i);
-                await new Promise(resolve => setTimeout(resolve, 800));
+                try {
+                    await downloadSingleImage(i);
+                    successCount++;
+                } catch (error) {
+                    console.error(`Failed to download image ${i + 1}:`, error);
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
 
             downloadAllBtn.disabled = false;
             downloadAllBtn.textContent = 'Download All';
-            alert(`Successfully downloaded ${generatedImages.length} images!`);
+            
+            if (successCount === generatedImages.length) {
+                alert(`✅ Successfully downloaded all ${generatedImages.length} images!`);
+            } else {
+                alert(`Downloaded ${successCount}/${generatedImages.length} images. Some failed due to server issues.`);
+            }
         });
 
         // Clear all
