@@ -1,655 +1,1130 @@
-  1	<!DOCTYPE html>
-     2	<html lang="en">
-     3	<head>
-     4	    <meta charset="UTF-8">
-     5	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     6	    <title>AI Batch Image Generator</title>
-     7	    <style>
-     8	        * {
-     9	            margin: 0;
-    10	            padding: 0;
-    11	            box-sizing: border-box;
-    12	        }
-    13	
-    14	        body {
-    15	            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    16	            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    17	            min-height: 100vh;
-    18	            padding: 20px;
-    19	            color: #333;
-    20	        }
-    21	
-    22	        .container {
-    23	            max-width: 1400px;
-    24	            margin: 0 auto;
-    25	            background: white;
-    26	            border-radius: 20px;
-    27	            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    28	            overflow: hidden;
-    29	            display: flex;
-    30	            min-height: 90vh;
-    31	        }
-    32	
-    33	        .sidebar {
-    34	            width: 400px;
-    35	            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
-    36	            padding: 30px;
-    37	            border-right: 1px solid #dee2e6;
-    38	            display: flex;
-    39	            flex-direction: column;
-    40	        }
-    41	
-    42	        .main-content {
-    43	            flex: 1;
-    44	            padding: 30px;
-    45	            overflow-y: auto;
-    46	        }
-    47	
-    48	        h1 {
-    49	            color: #667eea;
-    50	            margin-bottom: 10px;
-    51	            font-size: 28px;
-    52	        }
-    53	
-    54	        .subtitle {
-    55	            color: #6c757d;
-    56	            font-size: 14px;
-    57	            margin-bottom: 30px;
-    58	        }
-    59	
-    60	        .input-group {
-    61	            margin-bottom: 25px;
-    62	        }
-    63	
-    64	        label {
-    65	            display: block;
-    66	            margin-bottom: 8px;
-    67	            font-weight: 600;
-    68	            color: #495057;
-    69	            font-size: 14px;
-    70	        }
-    71	
-    72	        .prompt-textarea {
-    73	            width: 100%;
-    74	            min-height: 300px;
-    75	            padding: 15px;
-    76	            border: 2px solid #dee2e6;
-    77	            border-radius: 10px;
-    78	            font-size: 14px;
-    79	            font-family: 'Courier New', monospace;
-    80	            resize: vertical;
-    81	            transition: border-color 0.3s;
-    82	        }
-    83	
-    84	        .prompt-textarea:focus {
-    85	            outline: none;
-    86	            border-color: #667eea;
-    87	        }
-    88	
-    89	        .helper-text {
-    90	            font-size: 12px;
-    91	            color: #6c757d;
-    92	            margin-top: 5px;
-    93	        }
-    94	
-    95	        .aspect-ratio-group {
-    96	            display: grid;
-    97	            grid-template-columns: repeat(2, 1fr);
-    98	            gap: 10px;
-    99	            margin-bottom: 25px;
-   100	        }
-   101	
-   102	        .ratio-option {
-   103	            padding: 12px;
-   104	            border: 2px solid #dee2e6;
-   105	            border-radius: 10px;
-   106	            cursor: pointer;
-   107	            text-align: center;
-   108	            transition: all 0.3s;
-   109	            background: white;
-   110	        }
-   111	
-   112	        .ratio-option:hover {
-   113	            border-color: #667eea;
-   114	            background: #f8f9ff;
-   115	        }
-   116	
-   117	        .ratio-option.selected {
-   118	            border-color: #667eea;
-   119	            background: #667eea;
-   120	            color: white;
-   121	        }
-   122	
-   123	        .ratio-label {
-   124	            font-weight: 600;
-   125	            font-size: 14px;
-   126	        }
-   127	
-   128	        .ratio-dimensions {
-   129	            font-size: 11px;
-   130	            opacity: 0.7;
-   131	            margin-top: 3px;
-   132	        }
-   133	
-   134	        .options-group {
-   135	            margin-bottom: 25px;
-   136	        }
-   137	
-   138	        .option-row {
-   139	            display: flex;
-   140	            justify-content: space-between;
-   141	            align-items: center;
-   142	            padding: 12px;
-   143	            background: white;
-   144	            border-radius: 8px;
-   145	            margin-bottom: 10px;
-   146	        }
-   147	
-   148	        .option-label {
-   149	            font-size: 14px;
-   150	            font-weight: 500;
-   151	        }
-   152	
-   153	        select {
-   154	            padding: 8px 12px;
-   155	            border: 2px solid #dee2e6;
-   156	            border-radius: 6px;
-   157	            font-size: 14px;
-   158	            cursor: pointer;
-   159	            background: white;
-   160	        }
-   161	
-   162	        .toggle-switch {
-   163	            position: relative;
-   164	            width: 50px;
-   165	            height: 26px;
-   166	            background: #ccc;
-   167	            border-radius: 13px;
-   168	            cursor: pointer;
-   169	            transition: background 0.3s;
-   170	        }
-   171	
-   172	        .toggle-switch.active {
-   173	            background: #667eea;
-   174	        }
-   175	
-   176	        .toggle-switch::after {
-   177	            content: '';
-   178	            position: absolute;
-   179	            width: 20px;
-   180	            height: 20px;
-   181	            background: white;
-   182	            border-radius: 50%;
-   183	            top: 3px;
-   184	            left: 3px;
-   185	            transition: left 0.3s;
-   186	        }
-   187	
-   188	        .toggle-switch.active::after {
-   189	            left: 27px;
-   190	        }
-   191	
-   192	        .generate-button {
-   193	            width: 100%;
-   194	            padding: 15px;
-   195	            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-   196	            color: white;
-   197	            border: none;
-   198	            border-radius: 10px;
-   199	            font-size: 16px;
-   200	            font-weight: 600;
-   201	            cursor: pointer;
-   202	            transition: transform 0.2s, box-shadow 0.2s;
-   203	            margin-top: auto;
-   204	        }
-   205	
-   206	        .generate-button:hover {
-   207	            transform: translateY(-2px);
-   208	            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-   209	        }
-   210	
-   211	        .generate-button:active {
-   212	            transform: translateY(0);
-   213	        }
-   214	
-   215	        .generate-button:disabled {
-   216	            background: #ccc;
-   217	            cursor: not-allowed;
-   218	            transform: none;
-   219	        }
-   220	
-   221	        .results-header {
-   222	            display: flex;
-   223	            justify-content: space-between;
-   224	            align-items: center;
-   225	            margin-bottom: 20px;
-   226	        }
-   227	
-   228	        .results-title {
-   229	            font-size: 24px;
-   230	            font-weight: 600;
-   231	            color: #495057;
-   232	        }
-   233	
-   234	        .button-group {
-   235	            display: flex;
-   236	            gap: 10px;
-   237	        }
-   238	
-   239	        .clear-button, .download-all-button {
-   240	            padding: 10px 20px;
-   241	            background: #dc3545;
-   242	            color: white;
-   243	            border: none;
-   244	            border-radius: 8px;
-   245	            font-size: 14px;
-   246	            font-weight: 500;
-   247	            cursor: pointer;
-   248	            transition: background 0.3s;
-   249	            display: none;
-   250	        }
-   251	
-   252	        .download-all-button {
-   253	            background: #28a745;
-   254	        }
-   255	
-   256	        .clear-button:hover {
-   257	            background: #c82333;
-   258	        }
-   259	
-   260	        .download-all-button:hover {
-   261	            background: #218838;
-   262	        }
-   263	
-   264	        .results-grid {
-   265	            display: grid;
-   266	            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-   267	            gap: 20px;
-   268	        }
-   269	
-   270	        .image-card {
-   271	            background: #f8f9fa;
-   272	            border-radius: 12px;
-   273	            overflow: hidden;
-   274	            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-   275	            transition: transform 0.3s, box-shadow 0.3s;
-   276	        }
-   277	
-   278	        .image-card:hover {
-   279	            transform: translateY(-5px);
-   280	            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-   281	        }
-   282	
-   283	        .image-wrapper {
-   284	            width: 100%;
-   285	            background: #dee2e6;
-   286	            position: relative;
-   287	            overflow: hidden;
-   288	        }
-   289	
-   290	        .image-wrapper.ratio-1-1 {
-   291	            aspect-ratio: 1 / 1;
-   292	        }
-   293	
-   294	        .image-wrapper.ratio-16-9 {
-   295	            aspect-ratio: 16 / 9;
-   296	        }
-   297	
-   298	        .image-wrapper.ratio-9-16 {
-   299	            aspect-ratio: 9 / 16;
-   300	        }
-   301	
-   302	        .image-wrapper.ratio-3-4 {
-   303	            aspect-ratio: 3 / 4;
-   304	        }
-   305	
-   306	        .image-wrapper img {
-   307	            width: 100%;
-   308	            height: 100%;
-   309	            object-fit: cover;
-   310	        }
-   311	
-   312	        .loading-spinner {
-   313	            position: absolute;
-   314	            top: 50%;
-   315	            left: 50%;
-   316	            transform: translate(-50%, -50%);
-   317	            width: 40px;
-   318	            height: 40px;
-   319	            border: 4px solid #f3f3f3;
-   320	            border-top: 4px solid #667eea;
-   321	            border-radius: 50%;
-   322	            animation: spin 1s linear infinite;
-   323	        }
-   324	
-   325	        @keyframes spin {
-   326	            0% { transform: translate(-50%, -50%) rotate(0deg); }
-   327	            100% { transform: translate(-50%, -50%) rotate(360deg); }
-   328	        }
-   329	
-   330	        .image-info {
-   331	            padding: 15px;
-   332	        }
-   333	
-   334	        .image-prompt {
-   335	            font-size: 13px;
-   336	            color: #495057;
-   337	            margin-bottom: 10px;
-   338	            line-height: 1.4;
-   339	            display: -webkit-box;
-   340	            -webkit-line-clamp: 2;
-   341	            -webkit-box-orient: vertical;
-   342	            overflow: hidden;
-   343	        }
-   344	
-   345	        .download-button {
-   346	            width: 100%;
-   347	            padding: 10px;
-   348	            background: #667eea;
-   349	            color: white;
-   350	            border: none;
-   351	            border-radius: 6px;
-   352	            font-size: 14px;
-   353	            font-weight: 500;
-   354	            cursor: pointer;
-   355	            transition: background 0.3s;
-   356	        }
-   357	
-   358	        .download-button:hover {
-   359	            background: #5568d3;
-   360	        }
-   361	
-   362	        .empty-state {
-   363	            text-align: center;
-   364	            padding: 60px 20px;
-   365	            color: #6c757d;
-   366	        }
-   367	
-   368	        .empty-state-icon {
-   369	            font-size: 64px;
-   370	            margin-bottom: 20px;
-   371	            opacity: 0.3;
-   372	        }
-   373	
-   374	        .empty-state-text {
-   375	            font-size: 18px;
-   376	            font-weight: 500;
-   377	        }
-   378	
-   379	        @media (max-width: 1024px) {
-   380	            .container {
-   381	                flex-direction: column;
-   382	            }
-   383	
-   384	            .sidebar {
-   385	                width: 100%;
-   386	                border-right: none;
-   387	                border-bottom: 1px solid #dee2e6;
-   388	            }
-   389	
-   390	            .results-grid {
-   391	                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-   392	            }
-   393	        }
-   394	
-   395	        @media (max-width: 640px) {
-   396	            .results-grid {
-   397	                grid-template-columns: 1fr;
-   398	            }
-   399	
-   400	            .aspect-ratio-group {
-   401	                grid-template-columns: 1fr;
-   402	            }
-   403	        }
-   404	    </style>
-   405	</head>
-   406	<body>
-   407	    <div class="container">
-   408	        <div class="sidebar">
-   409	            <h1>🎨 AI Image Generator</h1>
-   410	            <p class="subtitle">Generate multiple AI images in batch</p>
-   411	
-   412	            <div class="input-group">
-   413	                <label for="prompts">Image Prompts (One per line)</label>
-   414	                <textarea 
-   415	                    id="prompts" 
-   416	                    class="prompt-textarea" 
-   417	                    placeholder="A serene mountain landscape at sunset
-   418	A futuristic city with flying cars
-   419	A cute cat wearing a wizard hat
-   420	An abstract painting with vibrant colors"></textarea>
-   421	                <div class="helper-text">Enter each prompt on a new line</div>
-   422	            </div>
-   423	
-   424	            <div class="input-group">
-   425	                <label>Aspect Ratio</label>
-   426	                <div class="aspect-ratio-group">
-   427	                    <div class="ratio-option selected" data-ratio="1:1">
-   428	                        <div class="ratio-label">Square</div>
-   429	                        <div class="ratio-dimensions">1:1</div>
-   430	                    </div>
-   431	                    <div class="ratio-option" data-ratio="16:9">
-   432	                        <div class="ratio-label">Landscape</div>
-   433	                        <div class="ratio-dimensions">16:9</div>
-   434	                    </div>
-   435	                    <div class="ratio-option" data-ratio="9:16">
-   436	                        <div class="ratio-label">Portrait</div>
-   437	                        <div class="ratio-dimensions">9:16</div>
-   438	                    </div>
-   439	                    <div class="ratio-option" data-ratio="3:4">
-   440	                        <div class="ratio-label">Photo</div>
-   441	                        <div class="ratio-dimensions">3:4</div>
-   442	                    </div>
-   443	                </div>
-   444	            </div>
-   445	
-   446	            <div class="options-group">
-   447	                <label>Generation Options</label>
-   448	                <div class="option-row">
-   449	                    <span class="option-label">Model</span>
-   450	                    <select id="model">
-   451	                        <option value="flux">Flux (Default)</option>
-   452	                        <option value="turbo">Turbo (Faster)</option>
-   453	                    </select>
-   454	                </div>
-   455	                <div class="option-row">
-   456	                    <span class="option-label">Enhance Quality</span>
-   457	                    <div class="toggle-switch" id="enhanceToggle"></div>
-   458	                </div>
-   459	            </div>
-   460	
-   461	            <button class="generate-button" id="generateBtn">Generate Images</button>
-   462	        </div>
-   463	
-   464	        <div class="main-content">
-   465	            <div class="results-header">
-   466	                <h2 class="results-title">Generated Images</h2>
-   467	                <div class="button-group">
-   468	                    <button class="download-all-button" id="downloadAllBtn">Download All</button>
-   469	                    <button class="clear-button" id="clearBtn">Clear All</button>
-   470	                </div>
-   471	            </div>
-   472	
-   473	            <div id="results">
-   474	                <div class="empty-state">
-   475	                    <div class="empty-state-icon">🖼️</div>
-   476	                    <div class="empty-state-text">No images generated yet</div>
-   477	                </div>
-   478	            </div>
-   479	        </div>
-   480	    </div>
-   481	
-   482	    <script>
-   483	        // DOM Elements
-   484	        const promptsTextarea = document.getElementById('prompts');
-   485	        const generateBtn = document.getElementById('generateBtn');
-   486	        const clearBtn = document.getElementById('clearBtn');
-   487	        const downloadAllBtn = document.getElementById('downloadAllBtn');
-   488	        const resultsDiv = document.getElementById('results');
-   489	        const modelSelect = document.getElementById('model');
-   490	        const enhanceToggle = document.getElementById('enhanceToggle');
-   491	
-   492	        // State
-   493	        let selectedRatio = '1:1';
-   494	        let enhanceEnabled = false;
-   495	
-   496	        // Aspect Ratio Selection
-   497	        const ratioOptions = document.querySelectorAll('.ratio-option');
-   498	        ratioOptions.forEach(option => {
-   499	            option.addEventListener('click', () => {
-   500	                ratioOptions.forEach(opt => opt.classList.remove('selected'));
-   501	                option.classList.add('selected');
-   502	                selectedRatio = option.dataset.ratio;
-   503	            });
-   504	        });
-   505	
-   506	        // Enhance Toggle
-   507	        enhanceToggle.addEventListener('click', () => {
-   508	            enhanceEnabled = !enhanceEnabled;
-   509	            enhanceToggle.classList.toggle('active');
-   510	        });
-   511	
-   512	        // Get dimensions based on aspect ratio
-   513	        function getDimensions(ratio) {
-   514	            const dimensions = {
-   515	                '1:1': { width: 1024, height: 1024 },
-   516	                '16:9': { width: 1024, height: 576 },
-   517	                '9:16': { width: 576, height: 1024 },
-   518	                '3:4': { width: 768, height: 1024 }
-   519	            };
-   520	            return dimensions[ratio];
-   521	        }
-   522	
-   523	        // Generate images
-   524	        generateBtn.addEventListener('click', async () => {
-   525	            const promptText = promptsTextarea.value.trim();
-   526	            if (!promptText) {
-   527	                alert('Please enter at least one prompt');
-   528	                return;
-   529	            }
-   530	
-   531	            const prompts = promptText.split('\n').filter(p => p.trim() !== '');
-   532	            if (prompts.length === 0) {
-   533	                alert('Please enter at least one valid prompt');
-   534	                return;
-   535	            }
-   536	
-   537	            // Clear previous results
-   538	            resultsDiv.innerHTML = '';
-   539	
-   540	            // Disable button
-   541	            generateBtn.disabled = true;
-   542	            generateBtn.textContent = 'Generating...';
-   543	
-   544	            const dimensions = getDimensions(selectedRatio);
-   545	            const model = modelSelect.value;
-   546	            const enhance = enhanceEnabled;
-   547	
-   548	            // Create image cards
-   549	            prompts.forEach((prompt, index) => {
-   550	                const card = createImageCard(prompt, dimensions, model, enhance);
-   551	                resultsDiv.appendChild(card);
-   552	            });
-   553	
-   554	            // Re-enable button
-   555	            generateBtn.disabled = false;
-   556	            generateBtn.textContent = 'Generate Images';
-   557	
-   558	            // Show clear and download all buttons
-   559	            clearBtn.style.display = 'block';
-   560	            downloadAllBtn.style.display = 'block';
-   561	        });
-   562	
-   563	        // Create image card
-   564	        function createImageCard(prompt, dimensions, model, enhance) {
-   565	            const card = document.createElement('div');
-   566	            card.className = 'image-card';
-   567	
-   568	            const ratioClass = `ratio-${selectedRatio.replace(':', '-')}`;
-   569	
-   570	            // Generate unique seed for each image
-   571	            const seed = Math.floor(Math.random() * 1000000);
-   572	
-   573	            // Create Pollinations.ai URL with all parameters
-   574	            const encodedPrompt = encodeURIComponent(prompt);
-   575	            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dimensions.width}&height=${dimensions.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
-   576	
-   577	            card.innerHTML = `
-   578	                <div class="image-wrapper ${ratioClass}">
-   579	                    <div class="loading-spinner"></div>
-   580	                    <img src="${imageUrl}" alt="${prompt}" style="display: none;">
-   581	                </div>
-   582	                <div class="image-info">
-   583	                    <div class="image-prompt">${prompt}</div>
-   584	                    <button class="download-button" onclick="downloadImage('${imageUrl}', '${prompt.replace(/'/g, "\\'")}')">Download Image</button>
-   585	                </div>
-   586	            `;
-   587	
-   588	            // Handle image load
-   589	            const img = card.querySelector('img');
-   590	            const spinner = card.querySelector('.loading-spinner');
-   591	
-   592	            img.onload = () => {
-   593	                spinner.style.display = 'none';
-   594	                img.style.display = 'block';
-   595	            };
-   596	
-   597	            img.onerror = () => {
-   598	                spinner.style.display = 'none';
-   599	                img.style.display = 'block';
-   600	                img.alt = 'Failed to load image';
-   601	            };
-   602	
-   603	            return card;
-   604	        }
-   605	
-   606	        // Download single image
-   607	        function downloadImage(url, prompt) {
-   608	            const link = document.createElement('a');
-   609	            link.href = url;
-   610	            link.download = `${prompt.substring(0, 50).replace(/[^a-z0-9]/gi, '_')}.png`;
-   611	            document.body.appendChild(link);
-   612	            link.click();
-   613	            document.body.removeChild(link);
-   614	        }
-   615	
-   616	        // Download all images
-   617	        downloadAllBtn.addEventListener('click', async () => {
-   618	            const images = resultsDiv.querySelectorAll('.image-wrapper img');
-   619	            if (images.length === 0) {
-   620	                alert('No images to download');
-   621	                return;
-   622	            }
-   623	
-   624	            downloadAllBtn.disabled = true;
-   625	            downloadAllBtn.textContent = 'Downloading...';
-   626	
-   627	            for (let i = 0; i < images.length; i++) {
-   628	                const img = images[i];
-   629	                const prompt = img.alt;
-   630	                const url = img.src;
-   631	                
-   632	                await new Promise(resolve => setTimeout(resolve, 500)); // Delay between downloads
-   633	                downloadImage(url, prompt);
-   634	            }
-   635	
-   636	            downloadAllBtn.disabled = false;
-   637	            downloadAllBtn.textContent = 'Download All';
-   638	        });
-   639	
-   640	        // Clear all images
-   641	        clearBtn.addEventListener('click', () => {
-   642	            if (confirm('Are you sure you want to clear all generated images?')) {
-   643	                resultsDiv.innerHTML = `
-   644	                    <div class="empty-state">
-   645	                        <div class="empty-state-icon">🖼️</div>
-   646	                        <div class="empty-state-text">No images generated yet</div>
-   647	                    </div>
-   648	                `;
-   649	                clearBtn.style.display = 'none';
-   650	                downloadAllBtn.style.display = 'none';
-   651	            }
-   652	        });
-   653	    </script>
-   654	</body>
-   655	</html>
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Batch Image Generator Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 45px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .app-header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .app-header p {
+            font-size: 20px;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 300;
+        }
+
+        .app-header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Main Layout */
+        .app-body {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 700px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #f8f9fa;
+            padding: 35px 25px;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .sidebar-section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Aspect Ratio Cards */
+        .ratio-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .ratio-card {
+            background: white;
+            border: 3px solid #e9ecef;
+            border-radius: 18px;
+            padding: 24px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ratio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .ratio-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.25);
+            border-color: #667eea;
+        }
+
+        .ratio-card.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.45);
+        }
+
+        .ratio-card.active::before {
+            opacity: 1;
+        }
+
+        .ratio-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ratio-label {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ratio-desc {
+            font-size: 12px;
+            opacity: 0.75;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Settings */
+        .settings-group {
+            margin-bottom: 22px;
+        }
+
+        .settings-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-select {
+            width: 100%;
+            padding: 14px;
+            border: 3px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #495057;
+        }
+
+        .settings-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 45px;
+            background: #fafbfc;
+            overflow-y: auto;
+        }
+
+        /* Prompt Section */
+        .prompt-section {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 35px;
+        }
+
+        .prompt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .prompt-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prompt-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
+        }
+
+        .prompt-textarea {
+            width: 100%;
+            min-height: 380px;
+            padding: 25px;
+            border: 3px solid #e9ecef;
+            border-radius: 18px;
+            font-size: 16px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            line-height: 2;
+            resize: vertical;
+            transition: all 0.3s;
+            background: #f8f9fa;
+            color: #2d3748;
+        }
+
+        .prompt-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.12);
+            background: white;
+        }
+
+        .prompt-textarea::placeholder {
+            color: #adb5bd;
+            line-height: 2;
+        }
+
+        .prompt-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 18px;
+            padding: 18px 22px;
+            background: #f8f9fa;
+            border-radius: 14px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .prompt-footer-tip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        /* Generate Button */
+        .generate-button {
+            width: 100%;
+            padding: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 20px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.45);
+            margin-top: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .generate-button:hover:not(:disabled)::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        .generate-button:hover:not(:disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.55);
+        }
+
+        .generate-button:active:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .generate-button:disabled {
+            background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .button-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .results-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #2d3748;
+        }
+
+        .results-count {
+            color: #667eea;
+            font-weight: 900;
+        }
+
+        .results-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .clear-button, .download-all-button {
+            border: none;
+            padding: 12px 26px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: white;
+        }
+
+        .clear-button {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .download-all-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .clear-button:hover, .download-all-button:hover {
+            transform: scale(1.08);
+        }
+
+        .clear-button:hover {
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.35);
+        }
+
+        .download-all-button:hover {
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.35);
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .image-card {
+            background: white;
+            border: 3px solid #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: cardFadeIn 0.6s ease;
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .image-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .image-card:hover .image-container img {
+            transform: scale(1.05);
+        }
+
+        .loading-spinner {
+            width: 55px;
+            height: 55px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .image-info {
+            padding: 20px;
+        }
+
+        .image-prompt {
+            font-size: 14px;
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .image-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .image-ratio-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 7px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .download-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .download-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.35);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 30px;
+            color: #adb5bd;
+        }
+
+        .empty-icon {
+            font-size: 90px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .empty-state h3 {
+            font-size: 26px;
+            margin-bottom: 12px;
+            color: #6c757d;
+            font-weight: 800;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            color: #adb5bd;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.88);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(12px);
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-spinner-large {
+            width: 80px;
+            height: 80px;
+            border: 6px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 28px;
+        }
+
+        .loading-text {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .loading-progress {
+            font-size: 20px;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 35px;
+            right: 35px;
+            background: white;
+            padding: 22px 30px;
+            border-radius: 14px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+            display: none;
+            align-items: center;
+            gap: 14px;
+            z-index: 10000;
+            min-width: 320px;
+            animation: toastSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(450px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        .toast.success {
+            border-left: 6px solid #28a745;
+        }
+
+        .toast.error {
+            border-left: 6px solid #dc3545;
+        }
+
+        .toast.info {
+            border-left: 6px solid #17a2b8;
+        }
+
+        .toast-icon {
+            font-size: 28px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 800;
+            margin-bottom: 5px;
+            font-size: 15px;
+            color: #2d3748;
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .app-body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .ratio-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-header h1 {
+                font-size: 36px;
+            }
+
+            .app-header p {
+                font-size: 16px;
+            }
+
+            .main-content {
+                padding: 25px;
+            }
+
+            .prompt-section,
+            .results-section {
+                padding: 25px;
+            }
+
+            .ratio-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toast {
+                right: 20px;
+                left: 20px;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Header -->
+        <div class="app-header">
+            <h1>🎨 AI Batch Image Generator</h1>
+            <p>Generate unlimited AI images • One line = One masterpiece</p>
+            <div class="badge">✨ 100% Free • No API Key Required</div>
+        </div>
+
+        <!-- Main Body -->
+        <div class="app-body">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="section-title">📐 ASPECT RATIO</div>
+                    <div class="ratio-grid">
+                        <div class="ratio-card active" data-ratio="1:1" data-width="1024" data-height="1024">
+                            <span class="ratio-icon">⬜</span>
+                            <div class="ratio-label">1:1</div>
+                            <div class="ratio-desc">Square</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="16:9" data-width="1024" data-height="576">
+                            <span class="ratio-icon">🖥️</span>
+                            <div class="ratio-label">16:9</div>
+                            <div class="ratio-desc">Landscape</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="9:16" data-width="576" data-height="1024">
+                            <span class="ratio-icon">📱</span>
+                            <div class="ratio-label">9:16</div>
+                            <div class="ratio-desc">Portrait</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="3:4" data-width="768" data-height="1024">
+                            <span class="ratio-icon">🖼️</span>
+                            <div class="ratio-label">3:4</div>
+                            <div class="ratio-desc">Portrait</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-title">⚙️ SETTINGS</div>
+                    
+                    <div class="settings-group">
+                        <label class="settings-label">AI Model</label>
+                        <select class="settings-select" id="modelSelect">
+                            <option value="flux">Flux (Best Quality)</option>
+                            <option value="turbo">Turbo (Fast)</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="settings-label">Enhancement</label>
+                        <select class="settings-select" id="enhanceSelect">
+                            <option value="true">Enhanced (Recommended)</option>
+                            <option value="false">Standard</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Prompt Section -->
+                <div class="prompt-section">
+                    <div class="prompt-header">
+                        <h2 class="prompt-title">📝 Enter Your Prompts</h2>
+                        <div class="prompt-badge">
+                            <span id="promptCount">0</span> Prompts
+                        </div>
+                    </div>
+
+                    <textarea 
+                        class="prompt-textarea" 
+                        id="promptInput" 
+                        placeholder="Enter each detailed prompt on a new line for ultra-quality results...
+
+✨ PERFECT EXAMPLES (Ready to Use):
+
+A majestic lion with golden mane standing on rocky cliff at dramatic sunset, cinematic lighting, professional wildlife photography
+
+Futuristic cyberpunk city at night with glowing neon purple and blue lights, wet reflective streets, flying cars, highly detailed
+
+Beautiful cherry blossom tree in full pink bloom, Japanese garden, spring season, soft sunlight, professional photography
+
+Cozy wooden cabin in snowy mountains during winter evening, warm lights from windows, smoke from chimney, peaceful atmosphere
+
+Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic sunset, professional automotive photography
+
+Majestic snow-capped mountain peak at sunrise, crystal clear lake reflection, alpine landscape, breathtaking vista
+
+Ancient medieval castle on hilltop surrounded by morning mist, Gothic architecture, fantasy atmosphere, highly detailed
+
+Tropical paradise beach with turquoise water, white sand, palm trees, colorful sunset sky, travel photography
+
+💡 PRO TIPS FOR PERFECT AI IMAGES:
+• Be VERY specific and descriptive
+• Add style: cinematic, professional photography, highly detailed
+• Mention lighting: golden hour, dramatic, soft, natural
+• Include mood: peaceful, dramatic, vibrant, cozy, majestic
+• Add quality markers: ultra detailed, 8k, photorealistic
+• Each line = One unique AI-generated masterpiece!"></textarea>
+
+                    <div class="prompt-footer">
+                        <span class="prompt-footer-tip">
+                            💡 More details = Better images
+                        </span>
+                        <span id="charCount">0 characters</span>
+                    </div>
+
+                    <button class="generate-button" id="generateBtn" disabled>
+                        <span class="button-text">🚀 Generate All Images</span>
+                    </button>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section">
+                    <div class="results-header">
+                        <h2 class="results-title">
+                            🖼️ Generated Images (<span class="results-count" id="resultCount">0</span>)
+                        </h2>
+                        <div class="results-buttons">
+                            <button class="download-all-button" id="downloadAllBtn" style="display: none;">
+                                📥 Download All
+                            </button>
+                            <button class="clear-button" id="clearBtn" style="display: none;">
+                                🗑️ Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="results-grid" id="resultsGrid">
+                        <div class="empty-state">
+                            <div class="empty-icon">🎨</div>
+                            <h3>No images generated yet</h3>
+                            <p>Enter your prompts above and start creating AI masterpieces!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner-large"></div>
+            <div class="loading-text">Generating AI Images...</div>
+            <div class="loading-progress" id="progressText">0 / 0</div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon"></span>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle"></div>
+            <div class="toast-message" id="toastMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const promptInput = document.getElementById('promptInput');
+        const promptCount = document.getElementById('promptCount');
+        const charCount = document.getElementById('charCount');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const resultCount = document.getElementById('resultCount');
+        const clearBtn = document.getElementById('clearBtn');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const progressText = document.getElementById('progressText');
+        const ratioCards = document.querySelectorAll('.ratio-card');
+        const modelSelect = document.getElementById('modelSelect');
+        const enhanceSelect = document.getElementById('enhanceSelect');
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toastIcon');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMessage = document.getElementById('toastMessage');
+
+        // State
+        let selectedRatio = {
+            label: '1:1',
+            width: 1024,
+            height: 1024
+        };
+        let generatedImages = [];
+
+        // Update Counters
+        promptInput.addEventListener('input', function() {
+            const text = this.value;
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+            
+            promptCount.textContent = lines.length;
+            charCount.textContent = text.length + ' characters';
+            generateBtn.disabled = lines.length === 0;
+        });
+
+        // Ratio Selection
+        ratioCards.forEach(card => {
+            card.addEventListener('click', function() {
+                ratioCards.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                selectedRatio = {
+                    label: this.dataset.ratio,
+                    width: parseInt(this.dataset.width),
+                    height: parseInt(this.dataset.height)
+                };
+            });
+        });
+
+        // Generate Images
+        generateBtn.addEventListener('click', async function() {
+            const prompts = promptInput.value.split('\n').filter(line => line.trim() !== '');
+            
+            if (prompts.length === 0) {
+                showToast('⚠️', 'Warning', 'Please enter at least one prompt!', 'error');
+                return;
+            }
+
+            // Clear previous results
+            resultsGrid.innerHTML = '';
+            generatedImages = [];
+            clearBtn.style.display = 'none';
+            downloadAllBtn.style.display = 'none';
+
+            // Show loading
+            loadingOverlay.classList.add('active');
+            generateBtn.disabled = true;
+
+            const model = modelSelect.value;
+            const enhance = enhanceSelect.value;
+
+            // Generate images
+            for (let i = 0; i < prompts.length; i++) {
+                progressText.textContent = `${i + 1} / ${prompts.length}`;
+
+                // Create card
+                const card = createImageCard(prompts[i], i);
+                resultsGrid.appendChild(card);
+
+                // Generate image using Pollinations.ai (FREE API - No key needed)
+                const encodedPrompt = encodeURIComponent(prompts[i]);
+                const seed = Date.now() + i;
+                
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
+
+                // Wait for generation (simulate realistic timing)
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // Load image
+                const imageContainer = card.querySelector('.image-container');
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = prompts[i];
+                img.loading = 'lazy';
+                
+                img.onload = function() {
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(img);
+                };
+
+                img.onerror = function() {
+                    imageContainer.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">⚠️ Generation failed<br><small>Please try again</small></div>';
+                };
+
+                generatedImages.push({
+                    prompt: prompts[i],
+                    ratio: selectedRatio.label,
+                    url: imageUrl
+                });
+
+                resultCount.textContent = generatedImages.length;
+            }
+
+            // Hide loading
+            loadingOverlay.classList.remove('active');
+            generateBtn.disabled = false;
+            clearBtn.style.display = 'block';
+            downloadAllBtn.style.display = 'block';
+
+            showToast('✅', 'Success!', `Successfully generated ${prompts.length} AI images!`, 'success');
+        });
+
+        // Create Image Card
+        function createImageCard(prompt, index) {
+            const card = document.createElement('div');
+            card.className = 'image-card';
+            card.innerHTML = `
+                <div class="image-container">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div class="image-info">
+                    <div class="image-prompt">${prompt}</div>
+                    <div class="image-meta">
+                        <span class="image-ratio-badge">${selectedRatio.label}</span>
+                        <button class="download-button" onclick="downloadImage(${index})">
+                            ⬇️ Download
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Download Single Image
+        function downloadImage(index) {
+            const image = generatedImages[index];
+            if (image) {
+                fetch(image.url)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `ai-generated-${index + 1}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                        showToast('✅', 'Downloaded!', 'Image saved successfully.', 'success');
+                    })
+                    .catch(error => {
+                        showToast('❌', 'Error', 'Failed to download image.', 'error');
+                    });
+            }
+        }
+
+        // Download All Images
+        downloadAllBtn.addEventListener('click', async function() {
+            if (generatedImages.length === 0) {
+                showToast('⚠️', 'Warning', 'No images to download!', 'error');
+                return;
+            }
+
+            downloadAllBtn.disabled = true;
+            const originalText = downloadAllBtn.textContent;
+            
+            for (let i = 0; i < generatedImages.length; i++) {
+                downloadAllBtn.textContent = `Downloading ${i + 1}/${generatedImages.length}...`;
+                await downloadImage(i);
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+
+            downloadAllBtn.textContent = originalText;
+            downloadAllBtn.disabled = false;
+            showToast('✅', 'Complete!', `Downloaded all ${generatedImages.length} images!`, 'success');
+        });
+
+        // Clear Results
+        clearBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all generated images?')) {
+                resultsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🎨</div>
+                        <h3>No images generated yet</h3>
+                        <p>Enter your prompts above and start creating AI masterpieces!</p>
+                    </div>
+                `;
+                generatedImages = [];
+                resultCount.textContent = '0';
+                clearBtn.style.display = 'none';
+                downloadAllBtn.style.display = 'none';
+                showToast('✅', 'Cleared!', 'All images have been removed.', 'success');
+            }
+        });
+
+        // Show Toast
+        function showToast(icon, title, message, type) {
+            toastIcon.textContent = icon;
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // Keyboard Shortcut (Ctrl+Enter to generate)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!generateBtn.disabled) {
+                    generateBtn.click();
+                }
+            }
+        });
+
+        // Initialize
+        promptInput.dispatchEvent(new Event('input'));
+    </script>
+</body>
+</html>
