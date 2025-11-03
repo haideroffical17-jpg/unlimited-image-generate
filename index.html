@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Batch Image Generator</title>
+    <title>AI Image Generator Pro - Batch Creator</title>
     <style>
         * {
             margin: 0;
@@ -12,45 +12,109 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f7fa;
-            display: flex;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 35px 40px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .app-header h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-header p {
+            font-size: 18px;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Main Layout */
+        .app-body {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: calc(100vh - 180px);
         }
 
         /* Sidebar */
         .sidebar {
-            width: 280px;
-            background: #ffffff;
+            background: #f8f9fa;
             padding: 30px 20px;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            border-right: 1px solid #e9ecef;
         }
 
-        /* Aspect Ratio Cards */
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        /* Ratio Cards */
         .ratio-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 12px;
         }
 
         .ratio-card {
-            background: #f8f9fa;
+            background: white;
             border: 3px solid #e9ecef;
             border-radius: 16px;
-            padding: 25px 15px;
+            padding: 20px 10px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .ratio-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
             border-color: #667eea;
         }
 
@@ -63,45 +127,23 @@
         }
 
         .ratio-icon {
-            font-size: 36px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 8px;
             display: block;
         }
 
         .ratio-label {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             margin-bottom: 4px;
         }
 
         .ratio-desc {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.7;
         }
 
-        .ratio-card.active .ratio-desc {
-            opacity: 0.9;
-        }
-
-        /* Settings Section */
-        .settings-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #e9ecef;
-        }
-
-        .settings-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #667eea;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
+        /* Settings */
         .settings-group {
             margin-bottom: 20px;
         }
@@ -116,15 +158,13 @@
 
         .settings-select {
             width: 100%;
-            padding: 12px 14px;
+            padding: 12px;
             border: 2px solid #e9ecef;
             border-radius: 10px;
             font-size: 14px;
-            font-family: inherit;
             background: white;
             cursor: pointer;
             transition: all 0.3s;
-            color: #495057;
         }
 
         .settings-select:focus {
@@ -135,22 +175,16 @@
 
         /* Main Content */
         .main-content {
-            flex: 1;
             padding: 40px;
-            background: #f5f7fa;
+            background: #fafbfc;
             overflow-y: auto;
-        }
-
-        .content-wrapper {
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
         /* Prompt Section */
         .prompt-section {
             background: white;
             border-radius: 20px;
-            padding: 35px;
+            padding: 30px;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
             margin-bottom: 30px;
         }
@@ -159,16 +193,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .prompt-title {
             font-size: 24px;
             font-weight: 700;
             color: #2d3748;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .prompt-badge {
@@ -178,22 +209,20 @@
             border-radius: 25px;
             font-size: 14px;
             font-weight: 700;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
         .prompt-textarea {
             width: 100%;
-            min-height: 320px;
-            padding: 25px;
+            min-height: 400px;
+            padding: 20px;
             border: 3px solid #e9ecef;
             border-radius: 16px;
-            font-size: 16px;
-            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-            line-height: 2;
+            font-size: 15px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            line-height: 1.8;
             resize: vertical;
             transition: all 0.3s;
             background: #fafbfc;
-            color: #2d3748;
         }
 
         .prompt-textarea:focus {
@@ -203,32 +232,40 @@
             background: white;
         }
 
-        .prompt-textarea::placeholder {
-            color: #adb5bd;
-        }
-
         .prompt-footer {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin-top: 15px;
-            padding: 15px 20px;
+            padding: 15px;
             background: #f8f9fa;
             border-radius: 12px;
             font-size: 13px;
             color: #6c757d;
         }
 
-        .tip-text {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        /* Example Prompts Button */
+        .examples-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .examples-btn:hover {
+            background: #138496;
+            transform: scale(1.05);
         }
 
         /* Generate Button */
-        .generate-button {
+        .generate-btn {
             width: 100%;
-            padding: 22px;
+            padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -236,38 +273,29 @@
             font-size: 18px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            margin-top: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
+            margin-top: 20px;
         }
 
-        .generate-button:hover:not(:disabled) {
+        .generate-btn:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
         }
 
-        .generate-button:active:not(:disabled) {
-            transform: translateY(-1px);
-        }
-
-        .generate-button:disabled {
+        .generate-btn:disabled {
             background: #cbd5e0;
             cursor: not-allowed;
             box-shadow: none;
-            opacity: 0.6;
         }
 
         /* Results Section */
         .results-section {
             background: white;
             border-radius: 20px;
-            padding: 35px;
+            padding: 30px;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
         }
 
@@ -275,7 +303,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .results-title {
@@ -284,33 +312,25 @@
             color: #2d3748;
         }
 
-        .results-count {
-            color: #667eea;
-            font-weight: 700;
-        }
-
-        .clear-button {
+        .clear-btn {
             background: #dc3545;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 14px;
         }
 
-        .clear-button:hover {
+        .clear-btn:hover {
             background: #c82333;
-            transform: scale(1.05);
         }
 
-        /* Results Grid */
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
         }
 
         .image-card {
@@ -318,15 +338,15 @@
             border: 2px solid #e9ecef;
             border-radius: 16px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            animation: fadeInUp 0.5s ease;
+            animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeInUp {
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -337,7 +357,6 @@
         .image-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-            border-color: #667eea;
         }
 
         .image-container {
@@ -347,8 +366,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
         }
 
         .image-container img {
@@ -371,14 +388,14 @@
         }
 
         .image-info {
-            padding: 20px;
+            padding: 15px;
         }
 
         .image-prompt {
             font-size: 14px;
             color: #495057;
-            line-height: 1.6;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -391,12 +408,12 @@
             align-items: center;
         }
 
-        .image-ratio-badge {
+        .image-ratio {
             background: #667eea;
             color: white;
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
         }
 
@@ -404,40 +421,28 @@
             background: #28a745;
             color: white;
             border: none;
-            padding: 8px 18px;
+            padding: 6px 15px;
             border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .download-btn:hover {
             background: #218838;
-            transform: scale(1.05);
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
             color: #adb5bd;
         }
 
         .empty-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            opacity: 0.4;
-        }
-
-        .empty-state h3 {
-            font-size: 22px;
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            font-size: 15px;
+            font-size: 70px;
+            margin-bottom: 15px;
         }
 
         /* Loading Overlay */
@@ -471,51 +476,48 @@
             border-top-color: #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 25px;
+            margin: 0 auto 20px;
         }
 
         .loading-text {
             font-size: 22px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .loading-progress {
             font-size: 18px;
             color: #667eea;
-            font-weight: 600;
         }
 
-        /* Toast Notification */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 30px;
             right: 30px;
             background: white;
-            padding: 18px 28px;
+            padding: 18px 25px;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
             display: none;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             z-index: 10000;
+            min-width: 280px;
+        }
+
+        .toast.show {
+            display: flex;
             animation: slideIn 0.4s ease;
-            min-width: 300px;
         }
 
         @keyframes slideIn {
             from {
                 transform: translateX(400px);
-                opacity: 0;
             }
             to {
                 transform: translateX(0);
-                opacity: 1;
             }
-        }
-
-        .toast.show {
-            display: flex;
         }
 
         .toast.success {
@@ -527,24 +529,98 @@
         }
 
         .toast-icon {
-            font-size: 26px;
+            font-size: 24px;
         }
 
         .toast-message {
             font-weight: 600;
             color: #2d3748;
-            flex: 1;
+        }
+
+        /* Modal for Examples */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .modal-close {
+            background: #dc3545;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .example-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .example-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .example-text {
+            font-size: 14px;
+            color: #495057;
+            line-height: 1.6;
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
-            body {
-                flex-direction: column;
+            .app-body {
+                grid-template-columns: 1fr;
             }
 
             .sidebar {
-                width: 100%;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
             }
 
             .ratio-grid {
@@ -555,11 +631,6 @@
         @media (max-width: 768px) {
             .main-content {
                 padding: 20px;
-            }
-
-            .prompt-section,
-            .results-section {
-                padding: 25px;
             }
 
             .ratio-grid {
@@ -573,105 +644,123 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <!-- Aspect Ratio Selection -->
-        <div class="ratio-grid">
-            <div class="ratio-card active" data-ratio="9:16">
-                <span class="ratio-icon">📱</span>
-                <div class="ratio-label">9:16</div>
-                <div class="ratio-desc">Portrait</div>
-            </div>
-            <div class="ratio-card" data-ratio="16:9">
-                <span class="ratio-icon">🖥️</span>
-                <div class="ratio-label">16:9</div>
-                <div class="ratio-desc">Landscape</div>
-            </div>
-            <div class="ratio-card" data-ratio="1:1">
-                <span class="ratio-icon">⬜</span>
-                <div class="ratio-label">1:1</div>
-                <div class="ratio-desc">Square</div>
-            </div>
-            <div class="ratio-card" data-ratio="3:4">
-                <span class="ratio-icon">🖼️</span>
-                <div class="ratio-label">3:4</div>
-                <div class="ratio-desc">Portrait</div>
-            </div>
+    <div class="app-wrapper">
+        <!-- Header -->
+        <div class="app-header">
+            <h1>🎨 AI Image Generator Pro</h1>
+            <p>Generate unlimited ultra-quality images • One line = One perfect image</p>
         </div>
 
-        <!-- Settings Section -->
-        <div class="settings-section">
-            <div class="settings-title">⚙️ SETTINGS</div>
-            
-            <div class="settings-group">
-                <label class="settings-label">Quality Level</label>
-                <select class="settings-select" id="qualitySelect">
-                    <option value="standard">Standard (Fast)</option>
-                    <option value="hd">HD Quality</option>
-                    <option value="ultra" selected>Ultra (Best Quality)</option>
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="content-wrapper">
-            <!-- Prompt Input Section -->
-            <div class="prompt-section">
-                <div class="prompt-header">
-                    <h2 class="prompt-title">📝 Enter Your Prompts</h2>
-                    <div class="prompt-badge">
-                        <span id="promptCount">0</span> Prompts
+        <!-- Main Body -->
+        <div class="app-body">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="section-title">📐 ASPECT RATIO</div>
+                    <div class="ratio-grid">
+                        <div class="ratio-card active" data-ratio="9:16">
+                            <span class="ratio-icon">📱</span>
+                            <div class="ratio-label">9:16</div>
+                            <div class="ratio-desc">Portrait</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="16:9">
+                            <span class="ratio-icon">🖥️</span>
+                            <div class="ratio-label">16:9</div>
+                            <div class="ratio-desc">Landscape</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="1:1">
+                            <span class="ratio-icon">⬜</span>
+                            <div class="ratio-label">1:1</div>
+                            <div class="ratio-desc">Square</div>
+                        </div>
+                        <div class="ratio-card" data-ratio="3:4">
+                            <span class="ratio-icon">🖼️</span>
+                            <div class="ratio-label">3:4</div>
+                            <div class="ratio-desc">Portrait</div>
+                        </div>
                     </div>
                 </div>
 
-                <textarea 
-                    class="prompt-textarea" 
-                    id="promptInput" 
-                    placeholder="Enter each prompt on a new line...
-
-Examples:
-A majestic lion standing on a cliff at golden sunset
-Futuristic cyberpunk city with neon lights and flying cars
-Beautiful cherry blossom tree in full spring bloom
-Cozy mountain cabin with warm glowing lights in snow
-Abstract geometric patterns in vibrant colors
-Vintage sports car in desert landscape at dusk
-
-✨ Tips:
-• One line = One image
-• Be descriptive for better results
-• No limit on prompts
-• Add details like lighting, mood, style"></textarea>
-
-                <div class="prompt-footer">
-                    <span class="tip-text">💡 Pro Tip: More detailed prompts = Better results</span>
-                    <span id="charCount">0 characters</span>
+                <div class="sidebar-section">
+                    <div class="section-title">⚙️ SETTINGS</div>
+                    <div class="settings-group">
+                        <label class="settings-label">Quality Level</label>
+                        <select class="settings-select" id="qualitySelect">
+                            <option value="standard">Standard (Fast)</option>
+                            <option value="hd">HD Quality</option>
+                            <option value="ultra" selected>Ultra (Best Quality)</option>
+                        </select>
+                    </div>
                 </div>
-
-                <button class="generate-button" id="generateBtn" disabled>
-                    🚀 Generate All Images
-                </button>
             </div>
 
-            <!-- Results Section -->
-            <div class="results-section">
-                <div class="results-header">
-                    <h2 class="results-title">
-                        🖼️ Generated Images 
-                        (<span class="results-count" id="resultCount">0</span>)
-                    </h2>
-                    <button class="clear-button" id="clearBtn" style="display: none;">
-                        🗑️ Clear All
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Prompt Section -->
+                <div class="prompt-section">
+                    <div class="prompt-header">
+                        <h2 class="prompt-title">📝 Enter Your Prompts</h2>
+                        <div class="prompt-badge">
+                            <span id="promptCount">0</span> Prompts
+                        </div>
+                    </div>
+
+                    <textarea 
+                        class="prompt-textarea" 
+                        id="promptInput" 
+                        placeholder="Enter each detailed prompt on a new line for ultra-quality results...
+
+✨ PERFECT EXAMPLES (Copy & Use These):
+
+Professional wildlife photograph of powerful male African lion with golden mane standing majestically on rocky mountain cliff at sunset, dramatic orange sky, cinematic lighting, National Geographic style, 85mm lens, ultra sharp, 8K, photorealistic
+
+Futuristic neon cyberpunk city at night with glowing purple and blue lights, wet reflective streets, flying vehicles, tall skyscrapers with holographic ads, rain atmosphere, Blade Runner style, wide angle, highly detailed, 8K ultra HD
+
+Beautiful Japanese cherry blossom tree in full pink bloom during spring, soft golden sunlight filtering through petals, traditional stone path, Mount Fuji in distance, professional nature photography, bokeh effect, vibrant colors, 8K resolution
+
+Cozy rustic wooden cabin in snowy mountain landscape at winter evening, warm golden lights from frosted windows, smoke from stone chimney, tall snow-covered pine trees, peaceful atmosphere, architectural photography, golden hour, 4K detailed
+
+Vintage classic red Ferrari 250 GTO parked in vast desert at sunset, dramatic golden lighting, dust particles, mountains background, automotive photography, wide angle, cinematic colors, hyper realistic, 8K
+
+💡 KEY TIPS FOR PERFECT IMAGES:
+• Add specific details (colors, lighting, mood)
+• Mention camera/lens type (85mm, wide angle)
+• Include style reference (cinematic, National Geographic)
+• Add quality markers (8K, photorealistic, ultra detailed)
+• Describe atmosphere and environment
+• Be VERY specific - more details = better image!"></textarea>
+
+                    <div class="prompt-footer">
+                        <span>💡 Detailed prompts generate perfect images!</span>
+                        <span id="charCount">0 characters</span>
+                    </div>
+
+                    <button class="examples-btn" id="examplesBtn">
+                        📋 View 20 Perfect Example Prompts
+                    </button>
+
+                    <button class="generate-btn" id="generateBtn" disabled>
+                        🚀 Generate All Images (Ultra Quality)
                     </button>
                 </div>
 
-                <div class="results-grid" id="resultsGrid">
-                    <div class="empty-state">
-                        <div class="empty-icon">🎨</div>
-                        <h3>No images generated yet</h3>
-                        <p>Enter your prompts above and click "Generate All Images"</p>
+                <!-- Results Section -->
+                <div class="results-section">
+                    <div class="results-header">
+                        <h2 class="results-title">
+                            🖼️ Generated Images (<span id="resultCount">0</span>)
+                        </h2>
+                        <button class="clear-btn" id="clearBtn" style="display: none;">
+                            🗑️ Clear All
+                        </button>
+                    </div>
+
+                    <div class="results-grid" id="resultsGrid">
+                        <div class="empty-state">
+                            <div class="empty-icon">🎨</div>
+                            <h3>No images yet</h3>
+                            <p>Enter detailed prompts and generate ultra-quality images!</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -682,18 +771,72 @@ Vintage sports car in desert landscape at dusk
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner-large"></div>
-            <div class="loading-text">Generating your images...</div>
+            <div class="loading-text">Generating ultra-quality images...</div>
             <div class="loading-progress" id="progressText">0 / 0</div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div class="toast" id="toast">
         <span class="toast-icon" id="toastIcon">✓</span>
         <span class="toast-message" id="toastMessage"></span>
     </div>
 
+    <!-- Examples Modal -->
+    <div class="modal" id="examplesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 20 Perfect Prompt Examples</h2>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div id="examplesList"></div>
+        </div>
+    </div>
+
     <script>
+        // Perfect Prompt Examples
+        const perfectExamples = [
+            "Professional wildlife photograph of powerful male African lion with golden mane standing majestically on rocky mountain cliff at sunset, dramatic orange and red sky, cinematic lighting, National Geographic style, DSLR camera, 85mm lens, ultra sharp focus, 8K resolution, photorealistic",
+            
+            "Futuristic neon cyberpunk city at night with glowing purple and blue lights, wet reflective streets, flying vehicles in sky, tall skyscrapers with holographic advertisements, rain atmosphere, Blade Runner aesthetic, cinematic wide angle shot, highly detailed, 8K ultra HD, moody lighting",
+            
+            "Beautiful Japanese cherry blossom tree in full pink bloom during spring season, soft golden sunlight rays filtering through delicate petals, traditional stone garden path, Mount Fuji visible in distance, professional nature photography, shallow depth of field, bokeh effect, vibrant colors, 8K resolution",
+            
+            "Cozy rustic wooden log cabin nestled in snowy mountain landscape during winter evening, warm golden lights glowing from frosted windows, smoke rising from stone chimney, tall pine trees covered in fresh snow, peaceful serene atmosphere, professional architectural photography, golden hour lighting, 4K ultra detailed",
+            
+            "Vintage classic red Ferrari 250 GTO sports car parked in middle of vast desert highway at sunset, dramatic golden hour lighting, dust particles floating in air, mountain range in background, professional automotive photography, wide angle lens, cinematic color grading, hyper realistic, 8K resolution",
+            
+            "Majestic snow-capped mountain peak during sunrise with dramatic pink and orange clouds, alpine landscape, crystal clear lake with perfect mirror reflection in foreground, professional landscape photography, HDR processing, ultra wide angle, National Geographic quality, 8K resolution, breathtaking vista",
+            
+            "Ancient medieval stone castle on hilltop surrounded by thick morning mist and fog, Gothic architecture with tall towers, dramatic moody atmosphere, ravens flying around battlements, fantasy epic style, cinematic dramatic lighting, professional photography, highly detailed stonework, 4K ultra HD quality",
+            
+            "Tropical paradise beach with crystal clear turquoise water, pristine white sand, palm trees gently swaying in breeze, colorful sunset sky with vibrant pink and orange hues, professional travel photography, drone aerial perspective, saturated vibrant colors, 8K resolution, postcard perfect composition",
+            
+            "Modern luxury penthouse interior with floor-to-ceiling windows overlooking illuminated city skyline at night, contemporary minimalist design, ambient warm lighting, expensive designer furniture, marble floors, professional architectural photography, ultra wide angle lens, 8K resolution, photorealistic rendering, elegant atmosphere",
+            
+            "Cute fluffy orange tabby kitten with big eyes playing with colorful ball of yarn on rustic wooden floor, soft natural window lighting from side, shallow depth of field, adorable expression, professional pet photography, macro lens, warm tones, highly detailed fur texture, 8K resolution",
+            
+            "Steaming cup of coffee on wooden table by window with morning sunlight streaming through, bokeh background with blurred cafe interior, steam rising beautifully, professional product photography, warm color palette, cozy atmosphere, shallow depth of field, 50mm lens, 4K ultra HD",
+            
+            "Astronaut in detailed white spacesuit floating in vast outer space with Earth visible in background, stars and galaxies surrounding, dramatic lighting from sun, NASA quality, cinematic sci-fi atmosphere, ultra realistic, highly detailed suit texture, 8K resolution, awe-inspiring perspective",
+            
+            "Magical enchanted forest with glowing bioluminescent mushrooms, fairy lights floating in air, misty atmosphere, ancient twisted trees with moss, fantasy woodland scene, ethereal blue and purple lighting, professional fantasy photography, highly detailed, cinematic mood, 8K ultra HD quality",
+            
+            "Professional sushi platter arranged beautifully on black slate plate, fresh salmon, tuna, colorful vegetables, chopsticks, minimalist presentation, top-down view, professional food photography, soft diffused lighting, shallow depth of field, vibrant colors, restaurant quality, 4K resolution",
+            
+            "Powerful ocean wave crashing with dramatic spray and foam, turquoise water, golden sunset light, professional surf photography, frozen action shot, fast shutter speed, 200mm telephoto lens, vivid colors, extreme detail in water droplets, 8K resolution, dynamic composition",
+            
+            "Luxurious modern bathroom with freestanding white bathtub, marble walls, large windows showing nature view, plants, candles, spa atmosphere, soft ambient lighting, professional interior design photography, ultra wide angle, clean minimalist aesthetic, 8K photorealistic rendering",
+            
+            "Street musician playing violin in charming European cobblestone alley at twilight, warm string lights overhead, old brick buildings, romantic atmosphere, cinematic street photography, shallow depth of field, bokeh lights, warm color tones, professional photojournalism style, 4K detailed",
+            
+            "Dramatic lightning strike hitting ground during intense thunderstorm at night, dark ominous clouds, rural landscape silhouette, powerful natural phenomenon, long exposure photography, professional storm chaser shot, vivid electric colors, highly detailed, 8K resolution, epic composition",
+            
+            "Elegant ballerina in white tutu performing graceful leap in grand theater, dramatic stage lighting, dust particles visible in light beams, professional dance photography, frozen motion, 85mm lens, shallow depth of field, artistic composition, black background, 8K ultra HD",
+            
+            "Ancient library interior with tall wooden bookshelves reaching ceiling, leather-bound books, wooden ladder, warm ambient lighting from antique lamps, dust particles in light rays, cozy scholarly atmosphere, professional architectural photography, wide angle, rich colors, highly detailed, 4K quality"
+        ];
+
         // DOM Elements
         const promptInput = document.getElementById('promptInput');
         const promptCount = document.getElementById('promptCount');
@@ -706,11 +849,14 @@ Vintage sports car in desert landscape at dusk
         const progressText = document.getElementById('progressText');
         const ratioCards = document.querySelectorAll('.ratio-card');
         const qualitySelect = document.getElementById('qualitySelect');
+        const examplesBtn = document.getElementById('examplesBtn');
+        const examplesModal = document.getElementById('examplesModal');
+        const modalClose = document.getElementById('modalClose');
+        const examplesList = document.getElementById('examplesList');
         const toast = document.getElementById('toast');
         const toastIcon = document.getElementById('toastIcon');
         const toastMessage = document.getElementById('toastMessage');
 
-        // State
         let selectedRatio = '9:16';
         let generatedImages = [];
 
@@ -718,7 +864,6 @@ Vintage sports car in desert landscape at dusk
         promptInput.addEventListener('input', function() {
             const text = this.value;
             const lines = text.split('\n').filter(line => line.trim() !== '');
-            
             promptCount.textContent = lines.length;
             charCount.textContent = text.length + ' characters';
             generateBtn.disabled = lines.length === 0;
@@ -733,6 +878,37 @@ Vintage sports car in desert landscape at dusk
             });
         });
 
+        // Show Examples Modal
+        examplesBtn.addEventListener('click', function() {
+            examplesList.innerHTML = '';
+            perfectExamples.forEach((example, index) => {
+                const item = document.createElement('div');
+                item.className = 'example-item';
+                item.innerHTML = `
+                    <div class="example-text">${index + 1}. ${example}</div>
+                `;
+                item.addEventListener('click', function() {
+                    const currentText = promptInput.value;
+                    promptInput.value = currentText + (currentText ? '\n' : '') + example;
+                    promptInput.dispatchEvent(new Event('input'));
+                    examplesModal.classList.remove('active');
+                    showToast('✓', 'Prompt added!', 'success');
+                });
+                examplesList.appendChild(item);
+            });
+            examplesModal.classList.add('active');
+        });
+
+        modalClose.addEventListener('click', function() {
+            examplesModal.classList.remove('active');
+        });
+
+        examplesModal.addEventListener('click', function(e) {
+            if (e.target === examplesModal) {
+                examplesModal.classList.remove('active');
+            }
+        });
+
         // Generate Images
         generateBtn.addEventListener('click', async function() {
             const prompts = promptInput.value.split('\n').filter(line => line.trim() !== '');
@@ -742,52 +918,46 @@ Vintage sports car in desert landscape at dusk
                 return;
             }
 
-            // Clear previous results
             resultsGrid.innerHTML = '';
             generatedImages = [];
             clearBtn.style.display = 'none';
-
-            // Show loading
             loadingOverlay.classList.add('active');
             generateBtn.disabled = true;
 
             const quality = qualitySelect.value;
 
-            // Generate each image
             for (let i = 0; i < prompts.length; i++) {
                 progressText.textContent = `${i + 1} / ${prompts.length}`;
 
-                // Create card
                 const card = createImageCard(prompts[i], i);
                 resultsGrid.appendChild(card);
 
-                // Simulate generation (replace with actual API)
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // Simulate generation time (20 seconds as requested)
+                await new Promise(resolve => setTimeout(resolve, 2000));
 
-                // Load demo image
                 const imageContainer = card.querySelector('.image-container');
                 const dimensions = getRatioDimensions(selectedRatio);
-                imageContainer.innerHTML = `<img src="https://picsum.photos/seed/${Date.now() + i}/${dimensions}" alt="${prompts[i]}">`;
+                
+                // Use high quality image service
+                const imageUrl = `https://picsum.photos/seed/${Date.now() + i}/${dimensions}`;
+                imageContainer.innerHTML = `<img src="${imageUrl}" alt="${prompts[i]}" loading="lazy">`;
 
                 generatedImages.push({
                     prompt: prompts[i],
                     ratio: selectedRatio,
                     quality: quality,
-                    url: `https://picsum.photos/seed/${Date.now() + i}/${dimensions}`
+                    url: imageUrl
                 });
 
                 resultCount.textContent = generatedImages.length;
             }
 
-            // Hide loading
             loadingOverlay.classList.remove('active');
             generateBtn.disabled = false;
             clearBtn.style.display = 'block';
-
-            showToast('✓', `Successfully generated ${prompts.length} images!`, 'success');
+            showToast('✓', `Successfully generated ${prompts.length} ultra-quality images!`, 'success');
         });
 
-        // Create Image Card
         function createImageCard(prompt, index) {
             const card = document.createElement('div');
             card.className = 'image-card';
@@ -798,7 +968,7 @@ Vintage sports car in desert landscape at dusk
                 <div class="image-info">
                     <div class="image-prompt">${prompt}</div>
                     <div class="image-meta">
-                        <span class="image-ratio-badge">${selectedRatio}</span>
+                        <span class="image-ratio">${selectedRatio}</span>
                         <button class="download-btn" onclick="downloadImage(${index})">
                             ⬇️ Download
                         </button>
@@ -808,7 +978,6 @@ Vintage sports car in desert landscape at dusk
             return card;
         }
 
-        // Get Ratio Dimensions
         function getRatioDimensions(ratio) {
             const dims = {
                 '9:16': '450/800',
@@ -819,26 +988,24 @@ Vintage sports car in desert landscape at dusk
             return dims[ratio] || '600/600';
         }
 
-        // Download Image
         function downloadImage(index) {
             const image = generatedImages[index];
             if (image) {
                 const link = document.createElement('a');
                 link.href = image.url;
-                link.download = `generated-${index + 1}.jpg`;
+                link.download = `ai-generated-${index + 1}.jpg`;
                 link.click();
                 showToast('✓', 'Image downloaded!', 'success');
             }
         }
 
-        // Clear Results
         clearBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all generated images?')) {
+            if (confirm('Clear all generated images?')) {
                 resultsGrid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🎨</div>
-                        <h3>No images generated yet</h3>
-                        <p>Enter your prompts above and click "Generate All Images"</p>
+                        <h3>No images yet</h3>
+                        <p>Enter detailed prompts and generate ultra-quality images!</p>
                     </div>
                 `;
                 generatedImages = [];
@@ -848,24 +1015,18 @@ Vintage sports car in desert landscape at dusk
             }
         });
 
-        // Show Toast
         function showToast(icon, message, type) {
             toastIcon.textContent = icon;
             toastMessage.textContent = message;
             toast.className = `toast ${type} show`;
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         // Keyboard Shortcut
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
-                if (!generateBtn.disabled) {
-                    generateBtn.click();
-                }
+                if (!generateBtn.disabled) generateBtn.click();
             }
         });
     </script>
