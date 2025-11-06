@@ -282,6 +282,11 @@
             background: #28a745;
         }
 
+        .download-all-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -367,6 +372,11 @@
             font-weight: 800;
             cursor: pointer;
             font-size: 13px;
+        }
+
+        .download-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
         }
 
         .empty-state {
@@ -514,7 +524,7 @@ Cute cat playing with yarn
                             🖼️ Generated Images (<span class="results-count" id="resultCount">0</span>)
                          </h2>
                         <div class="results-buttons">
-                            <button class="download-all-button" id="downloadAllBtn" style="display: none;">
+                            <button class="download-all-button" id="downloadAllBtn" style="display: none;" disabled>
                                 📥 Download All
                             </button>
                             <button class="clear-button" id="clearBtn" style="display: none;">
@@ -694,6 +704,7 @@ Cute cat playing with yarn
             
             loadingOverlay.classList.add('active');
             generateBtn.disabled = true;
+            downloadAllBtn.disabled = true;
 
             // Create all cards
             const cards = [];
@@ -712,11 +723,21 @@ Cute cat playing with yarn
                 if (result.success) {
                     successfulImages++;
                     successCount.textContent = successfulImages;
-                    generatedImages.push({ prompt, url: result.url, ratio: selectedRatio.label });
+                    generatedImages.push({ 
+                        prompt, 
+                        url: result.url, 
+                        ratio: selectedRatio.label,
+                        index: i 
+                    });
                 } else {
                     const container = cards[i].querySelector('.image-container');
                     container.innerHTML = '<div style="color:white;padding:20px;text-align:center;">⚠️ All APIs busy<br><small>Try again later</small></div>';
-                    generatedImages.push({ prompt, url: null, ratio: selectedRatio.label });
+                    generatedImages.push({ 
+                        prompt, 
+                        url: null, 
+                        ratio: selectedRatio.label,
+                        index: i 
+                    });
                 }
                 
                 return result;
@@ -733,6 +754,13 @@ Cute cat playing with yarn
             // ALWAYS show buttons
             clearBtn.style.display = 'block';
             downloadAllBtn.style.display = 'block';
+            
+            // Enable download all button only if there are downloadable images
+            const downloadableImages = generatedImages.filter(img => img.url);
+            downloadAllBtn.disabled = downloadableImages.length === 0;
+            if (downloadableImages.length > 0) {
+                downloadAllBtn.textContent = `📥 Download All (${downloadableImages.length})`;
+            }
         });
 
         function createImageCard(prompt, index) {
@@ -754,46 +782,90 @@ Cute cat playing with yarn
             `;
             
             const btn = card.querySelector('.download-button');
-            btn.onclick = () => downloadImage(index);
+            btn.onclick = () => downloadSingleImage(index);
             
             return card;
         }
 
-        function downloadImage(index) {
+        function downloadSingleImage(index) {
             const img = generatedImages[index];
             if (!img || !img.url) {
-                alert('Image not available');
+                alert('Image not available for download');
                 return;
             }
             
             const link = document.createElement('a');
             link.href = img.url;
-            link.download = `image-${index + 1}.png`;
+            
+            // Better filename
+            const cleanPrompt = img.prompt.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+            link.download = `ai-image-${index + 1}-${cleanPrompt}.png`;
             link.target = '_blank';
+            
+            // Force download
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
         }
 
-        downloadAllBtn.addEventListener('click', function() {
-            let downloaded = 0;
-            downloadAllBtn.textContent = 'Downloading...';
-            downloadAllBtn.disabled = true;
+        // FIXED DOWNLOAD ALL FUNCTION
+        downloadAllBtn.addEventListener('click', async function() {
+            const downloadableImages = generatedImages.filter(img => img.url);
             
-            generatedImages.forEach((img, i) => {
-                if (img.url) {
-                    setTimeout(() => {
-                        downloadImage(i);
-                        downloaded++;
-                        if (downloaded === generatedImages.filter(x => x.url).length) {
-                            downloadAllBtn.textContent = '📥 Download All';
-                            downloadAllBtn.disabled = false;
-                        }
-                    }, i * 500);
+            if (downloadableImages.length === 0) {
+                alert('No images available for download!');
+                return;
+            }
+
+            // Save original button state
+            const originalText = downloadAllBtn.textContent;
+            downloadAllBtn.textContent = `📥 Downloading... (0/${downloadableImages.length})`;
+            downloadAllBtn.disabled = true;
+
+            let downloadedCount = 0;
+
+            // Download each image one by one with proper delays
+            for (let i = 0; i < downloadableImages.length; i++) {
+                const img = downloadableImages[i];
+                
+                try {
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = img.url;
+                    
+                    // Better filename
+                    const cleanPrompt = img.prompt.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+                    link.download = `ai-image-${img.index + 1}-${cleanPrompt}.png`;
+                    link.target = '_blank';
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    downloadedCount++;
+                    downloadAllBtn.textContent = `📥 Downloading... (${downloadedCount}/${downloadableImages.length})`;
+                    
+                    // Wait before next download to avoid browser blocking
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                } catch (error) {
+                    console.error(`Failed to download image ${i + 1}:`, error);
                 }
-            });
+            }
+
+            // Reset button
+            downloadAllBtn.textContent = `📥 Download All (${downloadableImages.length})`;
+            downloadAllBtn.disabled = false;
+            
+            // Show success message
+            setTimeout(() => {
+                alert(`✅ Successfully downloaded ${downloadedCount} images!`);
+            }, 500);
         });
 
         clearBtn.addEventListener('click', function() {
-            if (confirm('Clear all images?')) {
+            if (confirm('Clear all generated images?')) {
                 resultsGrid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🎨</div>
@@ -805,9 +877,11 @@ Cute cat playing with yarn
                 resultCount.textContent = '0';
                 clearBtn.style.display = 'none';
                 downloadAllBtn.style.display = 'none';
+                downloadAllBtn.disabled = true;
             }
         });
 
+        // Initialize
         promptInput.dispatchEvent(new Event('input'));
     </script>
 </body>
