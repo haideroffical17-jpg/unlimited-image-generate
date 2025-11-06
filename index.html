@@ -598,16 +598,16 @@
 
         .loading-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.88);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(12px);
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: rgba(0, 0, 0, 0.88),
+            display: none,
+            align-items: center,
+            justify-content: center,
+            z-index: 9999,
+            backdrop-filter: blur(12px)
         }
 
         .loading-overlay.active {
@@ -965,9 +965,7 @@ Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic
             loadingOverlay.classList.add('active');
             generateBtn.disabled = true;
 
-            const model = modelSelect.value;
-            const enhance = enhanceSelect.value;
-
+            // NOTE: model/enhance UI kept as-is, but URL now simplified for reliability
             for (let i = 0; i < prompts.length; i++) {
                 progressText.textContent = `${i + 1} / ${prompts.length}`;
 
@@ -975,15 +973,16 @@ Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic
                 resultsGrid.appendChild(card);
 
                 const seed = Date.now() + i;
-                
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts[i])}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${seed}&model=${model}&nologo=true&enhance=${enhance}`;
+                const q = encodeURIComponent(prompts[i].trim());
+                const imageUrl = `https://image.pollinations.ai/prompt/${q}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${seed}`;
 
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // light jitter to avoid rate-limit
+                await new Promise(r => setTimeout(r, 1200 + Math.random()*1000));
 
                 const imageContainer = card.querySelector('.image-container');
                 
-                // TRY TO LOAD IMAGE WITH RETRY
-                await loadImageWithRetry(imageContainer, imageUrl, prompts[i], i, 3);
+                // TRY TO LOAD IMAGE WITH RETRY (now 5 retries)
+                await loadImageWithRetry(imageContainer, imageUrl, prompts[i], i, 5);
 
                 generatedImages.push({
                     prompt: prompts[i],
@@ -1011,11 +1010,11 @@ Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic
                     
                     // Generate new seed for retry
                     const newSeed = Date.now() + Math.floor(Math.random() * 10000);
-                    const model = modelSelect.value;
-                    const enhance = enhanceSelect.value;
-                    url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${newSeed}&model=${model}&nologo=true&enhance=${enhance}`;
+                    const q2 = encodeURIComponent(prompt.trim());
+                    url = `https://image.pollinations.ai/prompt/${q2}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${newSeed}`;
                     
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    // exponential backoff + jitter
+                    await new Promise(r => setTimeout(r, 800 * Math.pow(1.6, attempt) + Math.random()*400));
                 } catch (error) {
                     console.error(`Attempt ${attempt + 1} failed:`, error);
                 }
@@ -1038,6 +1037,7 @@ Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic
             return new Promise((resolve) => {
                 const img = document.createElement('img');
                 img.crossOrigin = 'anonymous';
+                img.referrerPolicy = 'no-referrer';
                 
                 const timeout = setTimeout(() => {
                     img.src = '';
@@ -1068,11 +1068,10 @@ Vintage red Ferrari sports car in vast desert landscape at golden hour, dramatic
             container.innerHTML = '<div class="loading-spinner"></div>';
             
             const newSeed = Date.now() + Math.floor(Math.random() * 10000);
-            const model = modelSelect.value;
-            const enhance = enhanceSelect.value;
-            const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${newSeed}&model=${model}&nologo=true&enhance=${enhance}`;
+            const q3 = encodeURIComponent(prompt.trim());
+            const url = `https://image.pollinations.ai/prompt/${q3}?width=${selectedRatio.width}&height=${selectedRatio.height}&seed=${newSeed}`;
             
-            await loadImageWithRetry(container, url, prompt, index, 3);
+            await loadImageWithRetry(container, url, prompt, index, 5);
         };
 
         function createImageCard(prompt, index) {
