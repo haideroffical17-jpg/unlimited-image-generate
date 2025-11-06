@@ -787,6 +787,7 @@ Cute cat playing with yarn
             return card;
         }
 
+        // FIXED DOWNLOAD FUNCTION - Direct download karega
         function downloadSingleImage(index) {
             const img = generatedImages[index];
             if (!img || !img.url) {
@@ -794,21 +795,60 @@ Cute cat playing with yarn
                 return;
             }
             
-            const link = document.createElement('a');
-            link.href = img.url;
+            // Create a temporary canvas to convert image to blob
+            const imageElement = document.querySelectorAll('.image-container img')[index];
+            if (!imageElement) {
+                // Fallback: Use fetch to get the image
+                fetch(img.url)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = getFileName(img.prompt, index);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    })
+                    .catch(() => {
+                        // Final fallback: Open in new tab
+                        window.open(img.url, '_blank');
+                    });
+                return;
+            }
+
+            // Method 1: Use canvas to convert to blob for direct download
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = imageElement.naturalWidth;
+            canvas.height = imageElement.naturalHeight;
             
-            // Better filename
-            const cleanPrompt = img.prompt.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
-            link.download = `ai-image-${index + 1}-${cleanPrompt}.png`;
-            link.target = '_blank';
+            ctx.drawImage(imageElement, 0, 0);
             
-            // Force download
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = getFileName(img.prompt, index);
+                link.style.display = 'none';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Clean up
+                URL.revokeObjectURL(url);
+            }, 'image/png');
         }
 
-        // FIXED DOWNLOAD ALL FUNCTION
+        // Helper function for filename
+        function getFileName(prompt, index) {
+            const cleanPrompt = prompt.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20);
+            return `ai_image_${index + 1}_${cleanPrompt}.png`;
+        }
+
+        // FIXED DOWNLOAD ALL FUNCTION - Direct download karega
         downloadAllBtn.addEventListener('click', async function() {
             const downloadableImages = generatedImages.filter(img => img.url);
             
@@ -829,25 +869,20 @@ Cute cat playing with yarn
                 const img = downloadableImages[i];
                 
                 try {
-                    // Create download link
-                    const link = document.createElement('a');
-                    link.href = img.url;
-                    
-                    // Better filename
-                    const cleanPrompt = img.prompt.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
-                    link.download = `ai-image-${img.index + 1}-${cleanPrompt}.png`;
-                    link.target = '_blank';
-                    
-                    // Trigger download
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    // Use the same download function for consistency
+                    await new Promise((resolve) => {
+                        setTimeout(() => {
+                            // Simulate click on individual download button
+                            const downloadBtn = document.querySelector(`.download-button[data-index="${img.index}"]`);
+                            if (downloadBtn) {
+                                downloadBtn.click();
+                            }
+                            resolve();
+                        }, 1000); // 1 second delay between downloads
+                    });
                     
                     downloadedCount++;
                     downloadAllBtn.textContent = `📥 Downloading... (${downloadedCount}/${downloadableImages.length})`;
-                    
-                    // Wait before next download to avoid browser blocking
-                    await new Promise(resolve => setTimeout(resolve, 800));
                     
                 } catch (error) {
                     console.error(`Failed to download image ${i + 1}:`, error);
