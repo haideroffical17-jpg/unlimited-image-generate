@@ -679,11 +679,15 @@ Cozy cabin in snowy mountains
             loadingOverlay.classList.add('active');
             generateBtn.disabled = true;
 
+            // Create all cards first (all visible with loading spinners)
             for (let i = 0; i < prompts.length; i++) {
-                progressText.textContent = `${i + 1} / ${prompts.length}`;
-
                 const card = createImageCard(prompts[i], i);
                 resultsGrid.appendChild(card);
+            }
+
+            // Now generate images ONE BY ONE sequentially
+            for (let i = 0; i < prompts.length; i++) {
+                progressText.textContent = `${i + 1} / ${prompts.length}`;
 
                 const result = await generateImageWithFailover(
                     prompts[i],
@@ -725,32 +729,64 @@ Cozy cabin in snowy mountains
                     <div class="image-prompt">${prompt}</div>
                     <div class="image-meta">
                         <span class="image-ratio-badge">${selectedRatio.label}</span>
-                        <button class="download-button" onclick="downloadImage(${index})">
+                        <button class="download-button" data-index="${index}">
                             ⬇️ Download
                         </button>
                     </div>
                 </div>
             `;
+            
+            // Add click event to download button
+            const downloadBtn = card.querySelector('.download-button');
+            downloadBtn.addEventListener('click', function() {
+                downloadImage(parseInt(this.dataset.index));
+            });
+            
             return card;
         }
 
         async function downloadImage(index) {
             const image = generatedImages[index];
-            if (!image || !image.url) return;
+            if (!image || !image.url) {
+                alert('Image not available for download');
+                return;
+            }
 
             try {
-                const response = await fetch(image.url);
+                // Method 1: Try direct download with CORS proxy
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(image.url)}`;
+                
+                const response = await fetch(proxyUrl, {
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+                
+                if (!response.ok) throw new Error('Download failed');
+                
                 const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
+                
+                // Create download link
+                const downloadUrl = URL.createObjectURL(blob);
                 const link = document.createElement('a');
-                link.href = url;
-                link.download = `ai-image-${index + 1}.png`;
+                link.href = downloadUrl;
+                link.download = `ai-image-${index + 1}-${Date.now()}.png`;
+                link.style.display = 'none';
                 document.body.appendChild(link);
                 link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(downloadUrl);
+                }, 100);
+                
             } catch (error) {
-                alert('Download failed. Please try again.');
+                // Method 2: Fallback - open in new tab
+                console.error('Direct download failed:', error);
+                const newWindow = window.open(image.url, '_blank');
+                if (!newWindow) {
+                    alert('Please allow popups to download images. Or right-click the image and select "Save image as..."');
+                }
             }
         }
 
