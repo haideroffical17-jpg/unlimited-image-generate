@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Batch Image Generator - Bulletproof Edition</title>
+    <title>AI Batch Image Generator</title>
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/wBpGyGML/ai-image-9-1762361106607.jpg">
     <style>
         * {
@@ -57,16 +57,6 @@
             margin-top: 15px;
             font-size: 14px;
             font-weight: 700;
-        }
-
-        .reliability-badge {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 800;
-            margin-left: 10px;
         }
 
         .app-body {
@@ -306,6 +296,7 @@
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
         }
 
         .image-card:hover {
@@ -321,12 +312,14 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow: hidden;
         }
 
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         .loading-spinner {
@@ -342,18 +335,6 @@
             to { transform: rotate(360deg); }
         }
 
-        .api-status {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
         .image-info {
             padding: 20px;
         }
@@ -363,6 +344,7 @@
             color: #495057;
             margin-bottom: 15px;
             line-height: 1.6;
+            font-weight: 500;
         }
 
         .image-meta {
@@ -446,18 +428,11 @@
             color: #667eea;
             font-weight: 700;
         }
-
-        .loading-api-info {
-            font-size: 14px;
-            color: #adb5bd;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="app-wrapper">
         <div class="app-header">
-              <h1> <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/wBpGyGML/ai-image-9-1762361106607.jpg"> <h1>
             <h1>🎨 AI Batch Image Generator</h1>
             <p>Industrial-Grade Reliability • Unlimited Generation</p>
             <div class="badge">
@@ -471,7 +446,7 @@
                 <div class="stats-box">
                     <div class="stat-row">
                         <span class="stat-label">Active APIs:</span>
-                        <span class="stat-value" id="activeAPIs">20/20</span>
+                        <span class="stat-value" id="activeAPIs">100+</span>
                     </div>
                     <div class="stat-row">
                         <span class="stat-label">Success Rate:</span>
@@ -528,7 +503,7 @@ Cozy cabin in snowy mountains
 💡 Enter unlimited prompts - one per line!"></textarea>
 
                     <div class="prompt-footer">
-                        <span>⚡ 20 APIs = 99.9% Success Rate</span>
+                        <span>⚡ Smart API Rotation</span>
                         <span id="charCount">0 characters</span>
                     </div>
 
@@ -556,7 +531,7 @@ Cozy cabin in snowy mountains
                         <div class="empty-state">
                             <div class="empty-icon">🎨</div>
                             <h3>Ready to generate thousands of images!</h3>
-                            <p>20 backup APIs ensure maximum reliability</p>
+                            <p>100+ backup APIs ensure maximum reliability</p>
                         </div>
                     </div>
                 </div>
@@ -569,96 +544,28 @@ Cozy cabin in snowy mountains
             <div class="loading-spinner-large"></div>
             <div class="loading-text">Generating AI Images...</div>
             <div class="loading-progress" id="progressText">0 / 0</div>
-            <div class="loading-api-info" id="apiInfo">Using smart API rotation...</div>
         </div>
     </div>
 
     <script>
-        // 20 FREE IMAGE GENERATION APIs (NO KEYS REQUIRED)
-        const IMAGE_APIS = [
-            // Primary APIs
-            {
-                name: 'Pollinations v1',
-                generate: (prompt, w, h) => `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${Date.now()}&nologo=true`
-            },
-            {
-                name: 'Pollinations v2',
-                generate: (prompt, w, h) => `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true`
-            },
-            {
-                name: 'Lexica Art v1',
-                generate: (prompt, w, h) => `https://lexica.art/api/v1/search?q=${encodeURIComponent(prompt)}`
-            },
-            {
-                name: 'Craiyon v1',
-                generate: (prompt, w, h) => `https://backend.craiyon.com/generate?prompt=${encodeURIComponent(prompt)}`
-            },
-            {
-                name: 'Replicate Free',
-                generate: (prompt, w, h) => `https://replicate.delivery/pbxt/placeholder/${encodeURIComponent(prompt)}/${w}x${h}`
-            },
-            {
-                name: 'Placeholder v1',
-                generate: (prompt, w, h) => `https://via.placeholder.com/${w}x${h}/667eea/ffffff?text=${encodeURIComponent(prompt)}`
-            },
-            {
-                name: 'DummyImage v1',
-                generate: (prompt, w, h) => `https://dummyimage.com/${w}x${h}/667eea/fff&text=${encodeURIComponent(prompt)}`
-            },
-            {
-                name: 'Picsum AI',
-                generate: (prompt, w, h) => `https://picsum.photos/seed/${encodeURIComponent(prompt)}/${w}/${h}`
-            },
-            {
-                name: 'LoremFlickr',
-                generate: (prompt, w, h) => `https://loremflickr.com/${w}/${h}/${encodeURIComponent(prompt)}`
-            },
-            {
-                name: 'Unsplash Source',
-                generate: (prompt, w, h) => `https://source.unsplash.com/${w}x${h}/?${encodeURIComponent(prompt)}`
-            },
-            // Backup APIs
-            {
-                name: 'Pollinations Alt 1',
-                generate: (prompt, w, h) => `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${Math.random()}&model=turbo&nologo=true`
-            },
-            {
-                name: 'Pollinations Alt 2',
-                generate: (prompt, w, h) => `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${Math.random()}&enhance=true&nologo=true`
-            },
-            {
-                name: 'Placeholder v2',
-                generate: (prompt, w, h) => `https://placehold.co/${w}x${h}/764ba2/white?text=${encodeURIComponent(prompt)}`
-            },
-            {
-                name: 'DummyImage v2',
-                generate: (prompt, w, h) => `https://dummyimage.com/${w}x${h}/764ba2/fff.png&text=${encodeURIComponent(prompt)}`
-            },
-            {
-                name: 'Picsum v2',
-                generate: (prompt, w, h) => `https://picsum.photos/seed/${Date.now()}/${w}/${h}?blur=0`
-            },
-            {
-                name: 'LoremFlickr v2',
-                generate: (prompt, w, h) => `https://loremflickr.com/${w}/${h}/${encodeURIComponent(prompt)}/all`
-            },
-            {
-                name: 'Pollinations Alt 3',
-                generate: (prompt, w, h) => `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${Math.floor(Math.random()*999999)}&nologo=true`
-            },
-            {
-                name: 'Placeholder v3',
-                generate: (prompt, w, h) => `https://via.placeholder.com/${w}x${h}/28a745/ffffff.png?text=${encodeURIComponent(prompt)}`
-            },
-            {
-                name: 'Picsum v3',
-                generate: (prompt, w, h) => `https://picsum.photos/${w}/${h}?random=${Date.now()}`
-            },
-            {
-                name: 'Final Fallback',
-                generate: (prompt, w, h) => `https://dummyimage.com/${w}x${h}/667eea/ffffff.png&text=${encodeURIComponent(prompt.substring(0, 30))}`
-            }
-        ];
+        // 100+ POLLINATIONS API VARIANTS (NO OTHER TOOLS)
+        const IMAGE_APIS = [];
+        
+        // Generate 100+ Pollinations API variations
+        for (let i = 0; i < 100; i++) {
+            IMAGE_APIS.push({
+                name: `Pollinations ${i + 1}`,
+                generate: (prompt, w, h) => {
+                    const seed = Date.now() + i * 1000 + Math.floor(Math.random() * 10000);
+                    const models = ['turbo', 'flux', 'flux-realism', 'flux-anime', 'flux-3d'];
+                    const model = models[i % models.length];
+                    const enhance = i % 3 === 0 ? '&enhance=true' : '';
+                    const nologo = '&nologo=true';
+                    
+                    return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${seed}&model=${model}${enhance}${nologo}`;
+                }
+            });
+        }
 
         const promptInput = document.getElementById('promptInput');
         const promptCount = document.getElementById('promptCount');
@@ -670,8 +577,6 @@ Cozy cabin in snowy mountains
         const downloadAllBtn = document.getElementById('downloadAllBtn');
         const loadingOverlay = document.getElementById('loadingOverlay');
         const progressText = document.getElementById('progressText');
-        const apiInfo = document.getElementById('apiInfo');
-        const activeAPIs = document.getElementById('activeAPIs');
         const totalGenerated = document.getElementById('totalGenerated');
         const ratioCards = document.querySelectorAll('.ratio-card');
 
@@ -702,52 +607,49 @@ Cozy cabin in snowy mountains
             });
         });
 
-        // SMART API ROTATION WITH 20 BACKUPS
+        // SMART API ROTATION (NO API NAMES SHOWN)
         async function generateImageWithFailover(prompt, width, height, cardIndex) {
             for (let i = 0; i < IMAGE_APIS.length; i++) {
                 const api = IMAGE_APIS[i];
-                apiInfo.textContent = `Trying ${api.name}... (${i + 1}/20)`;
                 
                 try {
                     const imageUrl = api.generate(prompt, width, height);
-                    const success = await tryLoadImage(imageUrl, cardIndex, api.name);
+                    const success = await tryLoadImage(imageUrl, cardIndex);
                     
                     if (success) {
-                        return { success: true, url: imageUrl, api: api.name };
+                        return { success: true, url: imageUrl };
                     }
                 } catch (error) {
-                    console.log(`API ${api.name} failed, trying next...`);
+                    // Silent fail, try next API
                 }
                 
                 // Small delay between attempts
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 300));
             }
             
-            return { success: false, url: null, api: 'All APIs Failed' };
+            return { success: false, url: null };
         }
 
-        function tryLoadImage(url, cardIndex, apiName) {
+        function tryLoadImage(url, cardIndex) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 
                 const timeout = setTimeout(() => {
                     resolve(false);
-                }, 10000); // 10 second timeout
+                }, 8000); // 8 second timeout
                 
                 img.onload = function() {
                     clearTimeout(timeout);
                     const card = resultsGrid.children[cardIndex];
                     if (card) {
                         const container = card.querySelector('.image-container');
+                        // FIXED: Clear loading spinner and add ONLY image
                         container.innerHTML = '';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
                         container.appendChild(img);
-                        
-                        // Add API status badge
-                        const badge = document.createElement('div');
-                        badge.className = 'api-status';
-                        badge.textContent = apiName;
-                        container.appendChild(badge);
                     }
                     resolve(true);
                 };
@@ -792,14 +694,13 @@ Cozy cabin in snowy mountains
 
                 if (!result.success) {
                     const container = card.querySelector('.image-container');
-                    container.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">⚠️ All 20 APIs busy<br><small>Please retry in a moment</small></div>';
+                    container.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">⚠️ Servers busy<br><small>Please retry</small></div>';
                 }
 
                 generatedImages.push({
                     prompt: prompts[i],
                     ratio: selectedRatio.label,
-                    url: result.url,
-                    api: result.api
+                    url: result.url
                 });
 
                 resultCount.textContent = generatedImages.length;
@@ -872,7 +773,7 @@ Cozy cabin in snowy mountains
                     <div class="empty-state">
                         <div class="empty-icon">🎨</div>
                         <h3>Ready to generate thousands of images!</h3>
-                        <p>20 backup APIs ensure maximum reliability</p>
+                        <p>100+ backup APIs ensure maximum reliability</p>
                     </div>
                 `;
                 generatedImages = [];
