@@ -996,5 +996,160 @@ Cute cat playing with yarn
 </footer>
   </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Batch Image Generator</title>
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/wBpGyGML/ai-image-9-1762361106607.jpg" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #fafbfc;
+      color: #2d3748;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    header h1 { font-size: 40px; margin: 0; }
+    header p { font-size: 18px; opacity: 0.9; }
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    section {
+      display: none;
+      animation: fade 0.6s ease;
+    }
+    section.active { display: block; }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    nav {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #667eea;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    nav a:hover { text-decoration: underline; }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #764ba2;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      font-size: 16px;
+      background: #f9f9f9;
+      border-top: 1px solid #ddd;
+    }
+    footer a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #333;
+    }
+    footer a:hover { color: #667eea; }
+    footer p {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎨 AI Batch Image Generator</h1>
+    <p>Generate multiple AI images — simple, fast, and creative.</p>
+  </header>
+
+  <main>
+    <nav>
+      <a onclick="showSection('about')">About</a> |
+      <a onclick="showSection('privacy')">Privacy Policy</a> |
+      <a onclick="showSection('contact')">Contact</a>
+    </nav>
+
+    <section id="about" class="active">
+      <h2>About</h2>
+      <p><strong>AI Batch Image Generator</strong> is a simple web app that lets you generate multiple AI images from text prompts in one click. Each line becomes a new image — fast, efficient, and creative.</p>
+      <p>Our mission is to make AI creativity accessible to everyone, empowering creators with tools that make visual imagination effortless.</p>
+    </section>
+
+    <section id="privacy">
+      <h2>Privacy Policy</h2>
+      <p>We respect your privacy. This website does not collect personal data, store prompts, or use tracking cookies.</p>
+      <p>Your prompts are processed only for generating images via external AI services, which may have their own policies. We do not sell or share your data with third parties.</p>
+      <p>By using this site, you agree that any generated content is temporary and not stored on our servers.</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>If you have questions or feedback, fill out the form below.</p>
+      <form action="https://formsubmit.co/youremail@example.com" method="POST">
+        <input type="hidden" name="_captcha" value="false">
+        <label>Your Name:</label>
+        <input type="text" name="name" required>
+        <label>Your Email:</label>
+        <input type="email" name="email" required>
+        <label>Your Message:</label>
+        <textarea name="message" rows="6" required></textarea>
+        <button type="submit">Send Message</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <a onclick="showSection('about')">About</a> |
+    <a onclick="showSection('privacy')">Privacy Policy</a> |
+    <a onclick="showSection('contact')">Contact</a>
+    <p>© 2025 AI Batch Image Generator. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
 
 
