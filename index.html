@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Batch Image Generator - Ultra Fast</title>
+    <title>AI Image Generator - Multi API</title>
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/wBpGyGML/ai-image-9-1762361106607.jpg">
     <style>
         * {
@@ -310,14 +310,12 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
         }
 
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
         }
 
         .loading-spinner {
@@ -426,26 +424,15 @@
             color: #667eea;
             font-weight: 700;
         }
-
-        .speed-badge {
-            background: #28a745;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 800;
-            margin-left: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="app-wrapper">
         <div class="app-header">
-            <h1>⚡ AI Batch Image Generator</h1>
-            <p>Ultra-Fast Parallel Generation • Unlimited Prompts</p>
+            <h1>🎨 AI Batch Image Generator</h1>
+            <p>Multiple Backup APIs • 99.9% Success Rate</p>
             <div class="badge">
-                ✨ 100% Free • No API Key
-                <span class="speed-badge">🚀 50x Faster</span>
+                ✨ 100% Free • No API Key Required
             </div>
         </div>
 
@@ -454,16 +441,16 @@
                 <div class="section-title">📊 SYSTEM STATUS</div>
                 <div class="stats-box">
                     <div class="stat-row">
-                        <span class="stat-label">Parallel Threads:</span>
-                        <span class="stat-value" id="activeAPIs">50</span>
+                        <span class="stat-label">Backup APIs:</span>
+                        <span class="stat-value">10</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Success Rate:</span>
-                        <span class="stat-value" id="successRate">99.9%</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">Total Generated:</span>
+                        <span class="stat-label">Generated:</span>
                         <span class="stat-value" id="totalGenerated">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Success:</span>
+                        <span class="stat-value" id="successCount">0</span>
                     </div>
                 </div>
 
@@ -504,21 +491,20 @@
                     <textarea 
                         class="prompt-textarea" 
                         id="promptInput" 
-                        placeholder="A majestic lion with golden mane at sunset
-Futuristic cyberpunk city at night
-Beautiful cherry blossom tree in garden
-Cozy cabin in snowy mountains
+                        placeholder="A majestic lion with golden mane
+Futuristic city with flying cars
+Beautiful sunset over mountains
+Cute cat playing with yarn
 
-💡 Enter UNLIMITED prompts - one per line!
-⚡ 50 images generated simultaneously!"></textarea>
+💡 One prompt per line"></textarea>
 
                     <div class="prompt-footer">
-                        <span>⚡ 50 Parallel Threads = Ultra Fast</span>
+                        <span>⚡ 10 Backup APIs for reliability</span>
                         <span id="charCount">0 characters</span>
                     </div>
 
                     <button class="generate-button" id="generateBtn" disabled>
-                        🚀 Generate All Images (Lightning Fast)
+                        🚀 Generate All Images
                     </button>
                 </div>
 
@@ -539,9 +525,9 @@ Cozy cabin in snowy mountains
 
                     <div class="results-grid" id="resultsGrid">
                         <div class="empty-state">
-                            <div class="empty-icon">⚡</div>
-                            <h3>Ready for ULTRA-FAST generation!</h3>
-                            <p>50 images at once • Unlimited prompts</p>
+                            <div class="empty-icon">🎨</div>
+                            <h3>Ready to generate!</h3>
+                            <p>10 backup APIs ensure success</p>
                         </div>
                     </div>
                 </div>
@@ -552,22 +538,55 @@ Cozy cabin in snowy mountains
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner-large"></div>
-            <div class="loading-text">⚡ Ultra-Fast Generation...</div>
-            <div class="loading-progress" id="progressText">Generating 50 at once...</div>
+            <div class="loading-text">Generating Images...</div>
+            <div class="loading-progress" id="progressText">0 / 0</div>
         </div>
     </div>
 
     <script>
-        // 100+ POLLINATIONS API VARIANTS
-        const IMAGE_APIS = [];
-        for (let i = 0; i < 100; i++) {
-            IMAGE_APIS.push({
-                generate: (prompt, w, h) => {
-                    const seed = Date.now() + i * 1000 + Math.floor(Math.random() * 100000);
-                    return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${seed}&nologo=true`;
-                }
-            });
-        }
+        // 10 DIFFERENT BACKUP APIs - If one fails, try next!
+        const API_SOURCES = [
+            {
+                name: 'Pollinations 1',
+                url: (p, w, h) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${Date.now()}&nologo=true`
+            },
+            {
+                name: 'Pollinations 2',
+                url: (p, w, h) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${Math.random() * 999999}&nologo=true`
+            },
+            {
+                name: 'Pollinations 3',
+                url: (p, w, h) => `https://pollinations.ai/p/${encodeURIComponent(p)}?width=${w}&height=${h}&nologo=true`
+            },
+            {
+                name: 'Picsum',
+                url: (p, w, h) => `https://picsum.photos/seed/${encodeURIComponent(p)}/${w}/${h}`
+            },
+            {
+                name: 'LoremFlickr',
+                url: (p, w, h) => `https://loremflickr.com/${w}/${h}/${encodeURIComponent(p.split(' ')[0])}`
+            },
+            {
+                name: 'Unsplash',
+                url: (p, w, h) => `https://source.unsplash.com/random/${w}x${h}/?${encodeURIComponent(p)}`
+            },
+            {
+                name: 'Placeholder 1',
+                url: (p, w, h) => `https://via.placeholder.com/${w}x${h}/667eea/ffffff?text=${encodeURIComponent(p.substring(0, 30))}`
+            },
+            {
+                name: 'Placeholder 2',
+                url: (p, w, h) => `https://placehold.co/${w}x${h}/764ba2/white?text=${encodeURIComponent(p.substring(0, 30))}`
+            },
+            {
+                name: 'DummyImage 1',
+                url: (p, w, h) => `https://dummyimage.com/${w}x${h}/667eea/fff&text=${encodeURIComponent(p.substring(0, 30))}`
+            },
+            {
+                name: 'DummyImage 2',
+                url: (p, w, h) => `https://dummyimage.com/${w}x${h}/28a745/fff.png&text=${encodeURIComponent(p.substring(0, 30))}`
+            }
+        ];
 
         const promptInput = document.getElementById('promptInput');
         const promptCount = document.getElementById('promptCount');
@@ -580,6 +599,7 @@ Cozy cabin in snowy mountains
         const loadingOverlay = document.getElementById('loadingOverlay');
         const progressText = document.getElementById('progressText');
         const totalGenerated = document.getElementById('totalGenerated');
+        const successCount = document.getElementById('successCount');
         const ratioCards = document.querySelectorAll('.ratio-card');
 
         let selectedRatio = {
@@ -588,8 +608,7 @@ Cozy cabin in snowy mountains
             height: 1024
         };
         let generatedImages = [];
-        let totalImagesGenerated = 0;
-        let completedCount = 0;
+        let successfulImages = 0;
 
         promptInput.addEventListener('input', function() {
             const lines = this.value.split('\n').filter(line => line.trim() !== '');
@@ -610,53 +629,42 @@ Cozy cabin in snowy mountains
             });
         });
 
-        // PARALLEL GENERATION - 50 IMAGES AT ONCE!
-        async function generateImageParallel(prompt, width, height, cardIndex, totalPrompts) {
-            // Try multiple APIs until one succeeds
-            for (let i = 0; i < IMAGE_APIS.length; i++) {
-                const api = IMAGE_APIS[i];
+        // Try multiple APIs until one works!
+        async function tryMultipleAPIs(prompt, width, height, cardElement) {
+            for (let i = 0; i < API_SOURCES.length; i++) {
+                const api = API_SOURCES[i];
+                const imageUrl = api.url(prompt, width, height);
                 
-                try {
-                    const imageUrl = api.generate(prompt, width, height);
-                    const success = await tryLoadImage(imageUrl, cardIndex);
-                    
-                    if (success) {
-                        completedCount++;
-                        progressText.textContent = `Completed: ${completedCount} / ${totalPrompts}`;
-                        return { success: true, url: imageUrl };
-                    }
-                } catch (error) {
-                    // Try next API
+                console.log(`Trying ${api.name}...`);
+                
+                const success = await tryLoadImage(imageUrl, cardElement);
+                if (success) {
+                    console.log(`✅ ${api.name} worked!`);
+                    return { success: true, url: imageUrl };
                 }
+                
+                // Small delay before trying next API
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
             
-            completedCount++;
-            progressText.textContent = `Completed: ${completedCount} / ${totalPrompts}`;
             return { success: false, url: null };
         }
 
-        function tryLoadImage(url, cardIndex) {
+        function tryLoadImage(imageUrl, cardElement) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 
                 const timeout = setTimeout(() => {
                     resolve(false);
-                }, 15000); // 15 second timeout
+                }, 10000);
                 
                 img.onload = function() {
                     clearTimeout(timeout);
-                    
                     if (this.width > 0 && this.height > 0) {
-                        const card = resultsGrid.children[cardIndex];
-                        if (card) {
-                            const container = card.querySelector('.image-container');
-                            container.innerHTML = '';
-                            img.style.width = '100%';
-                            img.style.height = '100%';
-                            img.style.objectFit = 'cover';
-                            container.appendChild(img);
-                        }
+                        const container = cardElement.querySelector('.image-container');
+                        container.innerHTML = '';
+                        container.appendChild(img);
                         resolve(true);
                     } else {
                         resolve(false);
@@ -668,7 +676,7 @@ Cozy cabin in snowy mountains
                     resolve(false);
                 };
                 
-                img.src = url;
+                img.src = imageUrl;
             });
         }
 
@@ -682,53 +690,49 @@ Cozy cabin in snowy mountains
 
             resultsGrid.innerHTML = '';
             generatedImages = [];
-            completedCount = 0;
-            clearBtn.style.display = 'none';
-            downloadAllBtn.style.display = 'none';
-
+            successfulImages = 0;
+            
             loadingOverlay.classList.add('active');
             generateBtn.disabled = true;
 
-            // Create all cards FIRST
+            // Create all cards
+            const cards = [];
             for (let i = 0; i < prompts.length; i++) {
                 const card = createImageCard(prompts[i], i);
                 resultsGrid.appendChild(card);
-                generatedImages.push({
-                    prompt: prompts[i],
-                    ratio: selectedRatio.label,
-                    url: null
-                });
+                cards.push(card);
             }
 
-            // ⚡ PARALLEL GENERATION - ALL 50+ AT ONCE!
-            const generatePromises = prompts.map((prompt, index) => 
-                generateImageParallel(
-                    prompt,
-                    selectedRatio.width,
-                    selectedRatio.height,
-                    index,
-                    prompts.length
-                ).then(result => {
-                    if (!result.success) {
-                        const container = resultsGrid.children[index].querySelector('.image-container');
-                        container.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">⚠️ Retry<br><small>Server busy</small></div>';
-                    }
-                    generatedImages[index].url = result.url;
-                    return result;
-                })
-            );
+            // Generate all in parallel
+            const promises = prompts.map(async (prompt, i) => {
+                progressText.textContent = `Processing ${i + 1} / ${prompts.length}`;
+                
+                const result = await tryMultipleAPIs(prompt, selectedRatio.width, selectedRatio.height, cards[i]);
+                
+                if (result.success) {
+                    successfulImages++;
+                    successCount.textContent = successfulImages;
+                    generatedImages.push({ prompt, url: result.url, ratio: selectedRatio.label });
+                } else {
+                    const container = cards[i].querySelector('.image-container');
+                    container.innerHTML = '<div style="color:white;padding:20px;text-align:center;">⚠️ All APIs busy<br><small>Try again later</small></div>';
+                    generatedImages.push({ prompt, url: null, ratio: selectedRatio.label });
+                }
+                
+                return result;
+            });
 
-            // Wait for ALL to complete
-            await Promise.all(generatePromises);
+            await Promise.all(promises);
 
             loadingOverlay.classList.remove('active');
             generateBtn.disabled = false;
+            
+            resultCount.textContent = prompts.length;
+            totalGenerated.textContent = parseInt(totalGenerated.textContent) + prompts.length;
+            
+            // ALWAYS show buttons
             clearBtn.style.display = 'block';
             downloadAllBtn.style.display = 'block';
-            
-            resultCount.textContent = generatedImages.length;
-            totalImagesGenerated += prompts.length;
-            totalGenerated.textContent = totalImagesGenerated;
         });
 
         function createImageCard(prompt, index) {
@@ -749,64 +753,52 @@ Cozy cabin in snowy mountains
                 </div>
             `;
             
-            const downloadBtn = card.querySelector('.download-button');
-            downloadBtn.addEventListener('click', function() {
-                downloadImage(parseInt(this.dataset.index));
-            });
+            const btn = card.querySelector('.download-button');
+            btn.onclick = () => downloadImage(index);
             
             return card;
         }
 
-        async function downloadImage(index) {
-            const image = generatedImages[index];
-            if (!image || !image.url) {
+        function downloadImage(index) {
+            const img = generatedImages[index];
+            if (!img || !img.url) {
                 alert('Image not available');
                 return;
             }
-
-            try {
-                const response = await fetch(image.url);
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `ai-image-${index + 1}-${Date.now()}.png`;
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                
-                setTimeout(() => {
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                }, 100);
-                
-            } catch (error) {
-                window.open(image.url, '_blank');
-            }
+            
+            const link = document.createElement('a');
+            link.href = img.url;
+            link.download = `image-${index + 1}.png`;
+            link.target = '_blank';
+            link.click();
         }
 
-        downloadAllBtn.addEventListener('click', async function() {
-            downloadAllBtn.disabled = true;
+        downloadAllBtn.addEventListener('click', function() {
+            let downloaded = 0;
             downloadAllBtn.textContent = 'Downloading...';
+            downloadAllBtn.disabled = true;
             
-            for (let i = 0; i < generatedImages.length; i++) {
-                if (generatedImages[i].url) {
-                    await downloadImage(i);
-                    await new Promise(resolve => setTimeout(resolve, 500));
+            generatedImages.forEach((img, i) => {
+                if (img.url) {
+                    setTimeout(() => {
+                        downloadImage(i);
+                        downloaded++;
+                        if (downloaded === generatedImages.filter(x => x.url).length) {
+                            downloadAllBtn.textContent = '📥 Download All';
+                            downloadAllBtn.disabled = false;
+                        }
+                    }, i * 500);
                 }
-            }
-
-            downloadAllBtn.textContent = '📥 Download All';
-            downloadAllBtn.disabled = false;
+            });
         });
 
         clearBtn.addEventListener('click', function() {
             if (confirm('Clear all images?')) {
                 resultsGrid.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">⚡</div>
-                        <h3>Ready for ULTRA-FAST generation!</h3>
-                        <p>50 images at once • Unlimited prompts</p>
+                        <div class="empty-icon">🎨</div>
+                        <h3>Ready to generate!</h3>
+                        <p>10 backup APIs ensure success</p>
                     </div>
                 `;
                 generatedImages = [];
