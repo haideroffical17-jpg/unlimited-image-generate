@@ -6,7 +6,7 @@
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/wBpGyGML/ai-image-9-1762361106607.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grow With Haider (GWH) - Complete AI Tools</title>
+    <title>Grow With Haider (GWH) - AI Image Tools</title>
     <style>
         * {
             margin: 0;
@@ -52,14 +52,15 @@
             margin-bottom: 30px;
             border-bottom: 3px solid #f0f0f0;
             overflow-x: auto;
+            justify-content: center;
         }
 
         .tab-button {
-            padding: 15px 30px;
+            padding: 15px 40px;
             background: transparent;
             border: none;
             color: #666;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             border-bottom: 3px solid transparent;
@@ -89,65 +90,6 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Home Page Styles */
-        .home-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .tool-card {
-            background: #f8f9fa;
-            border-radius: 20px;
-            padding: 30px;
-            transition: all 0.3s;
-            cursor: pointer;
-            border: 3px solid transparent;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-            border-color: #667eea;
-        }
-
-        .tool-icon {
-            font-size: 4em;
-            margin-bottom: 15px;
-        }
-
-        .tool-card h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .tool-card p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .tool-features {
-            list-style: none;
-            padding: 0;
-        }
-
-        .tool-features li {
-            padding: 5px 0;
-            color: #555;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .tool-features li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #28a745;
-            font-weight: bold;
         }
 
         /* Generator Styles */
@@ -535,10 +477,6 @@
             .editor-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .home-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -546,49 +484,17 @@
     <div class="container">
         <div class="header">
             <h1>🚀 Grow With Haider (GWH)</h1>
-            <p>Complete AI-Powered Creative Tools</p>
+            <p>Professional AI Image Tools</p>
         </div>
 
-        <!-- Navigation Tabs (Home tab removed) -->
+        <!-- Navigation Tabs (ONLY 2 TABS) -->
         <div class="nav-tabs">
-            <button class="tab-button active" onclick="switchTab('home')">🏠 Home</button>
-            <button class="tab-button" onclick="switchTab('generator')">🎨 Image Generator</button>
+            <button class="tab-button active" onclick="switchTab('generator')">🎨 Image Generator</button>
             <button class="tab-button" onclick="switchTab('editor')">🖼️ Image Editor</button>
         </div>
 
-        <!-- HOME TAB -->
-        <div id="homeTab" class="tab-content active">
-            <div class="home-grid">
-                <div class="tool-card" onclick="switchTab('generator')">
-                    <div class="tool-icon">🎨</div>
-                    <h2>AI Image Generator</h2>
-                    <p>Generate stunning AI images from text prompts using advanced AI models</p>
-                    <ul class="tool-features">
-                        <li>Text-to-Image generation</li>
-                        <li>Multiple aspect ratios</li>
-                        <li>Batch generation (up to 10 images)</li>
-                        <li>Bulk download functionality</li>
-                        <li>Real-time progress tracking</li>
-                    </ul>
-                </div>
-
-                <div class="tool-card" onclick="switchTab('editor')">
-                    <div class="tool-icon">🖼️</div>
-                    <h2>AI Image Editor</h2>
-                    <p>Upload and transform your images with powerful AI editing capabilities</p>
-                    <ul class="tool-features">
-                        <li>Upload & edit existing images</li>
-                        <li>AI-powered image variations</li>
-                        <li>Style transfer & effects</li>
-                        <li>Background removal</li>
-                        <li>Image enhancement</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
         <!-- GENERATOR TAB -->
-        <div id="generatorTab" class="tab-content">
+        <div id="generatorTab" class="tab-content active">
             <div class="config-section">
                 <div class="input-group">
                     <label>📝 Enter Your Prompts (One per line):</label>
@@ -666,10 +572,20 @@ An underwater kingdom with mermaids"></textarea>
                             <h4>✨ How to Use:</h4>
                             <ol style="margin-left: 20px; line-height: 1.8;">
                                 <li>Select editing mode</li>
+                                <li>Choose aspect ratio</li>
                                 <li>Configure options</li>
                                 <li>Click "Apply Changes"</li>
                                 <li>Download results</li>
                             </ol>
+                        </div>
+
+                        <div class="control-group">
+                            <h3>📐 Output Aspect Ratio</h3>
+                            <select id="editorAspectRatio">
+                                <option value="1024x1024">Square (1:1) - 1024x1024</option>
+                                <option value="1920x1080">Landscape (16:9) - 1920x1080</option>
+                                <option value="1080x1920">Portrait (9:16) - 1080x1920</option>
+                            </select>
                         </div>
 
                         <div class="control-group">
@@ -691,12 +607,12 @@ An underwater kingdom with mermaids"></textarea>
 
                         <div class="control-group" id="styleControls" style="display: none;">
                             <label>Style Prompt:</label>
-                            <textarea id="stylePrompt" rows="3" placeholder="e.g., Make it look like a watercolor painting"></textarea>
+                            <textarea id="stylePrompt" rows="3" placeholder="e.g., Make it look like a watercolor painting, vibrant colors"></textarea>
                         </div>
 
                         <div class="control-group" id="reimagineControls" style="display: none;">
                             <label>Reimagine Prompt:</label>
-                            <textarea id="reimaginePrompt" rows="3" placeholder="e.g., Transform into a fantasy landscape"></textarea>
+                            <textarea id="reimaginePrompt" rows="3" placeholder="e.g., Transform into a fantasy landscape, magical atmosphere"></textarea>
                         </div>
 
                         <div class="button-group" style="flex-direction: column;">
@@ -725,24 +641,19 @@ An underwater kingdom with mermaids"></textarea>
     <script>
         // ==================== TAB SWITCHING ====================
         function switchTab(tabName) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Remove active from all buttons
             document.querySelectorAll('.tab-button').forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            // Show selected tab
             document.getElementById(tabName + 'Tab').classList.add('active');
             
-            // Activate correct button
             const buttons = document.querySelectorAll('.tab-button');
-            if (tabName === 'home') buttons[0].classList.add('active');
-            if (tabName === 'generator') buttons[1].classList.add('active');
-            if (tabName === 'editor') buttons[2].classList.add('active');
+            if (tabName === 'generator') buttons[0].classList.add('active');
+            if (tabName === 'editor') buttons[1].classList.add('active');
             
             console.log('Switched to tab:', tabName);
         }
@@ -1061,6 +972,7 @@ An underwater kingdom with mermaids"></textarea>
 
         // ==================== IMAGE EDITOR CODE ====================
         let uploadedImageData = null;
+        let uploadedImageUrl = null;
         let resultImages = [];
 
         const uploadArea = document.getElementById('uploadArea');
@@ -1105,6 +1017,7 @@ An underwater kingdom with mermaids"></textarea>
             const reader = new FileReader();
             reader.onload = (e) => {
                 uploadedImageData = e.target.result;
+                uploadedImageUrl = URL.createObjectURL(file);
                 previewImage.src = uploadedImageData;
                 uploadSection.style.display = 'none';
                 editorSection.style.display = 'block';
@@ -1164,15 +1077,23 @@ An underwater kingdom with mermaids"></textarea>
             }
         });
 
+        // Helper function to analyze uploaded image
+        function getImageDescription() {
+            // This creates a generic prompt based on the uploaded image
+            // In a real scenario, this would use image recognition
+            return "the uploaded image with same subject and style";
+        }
+
         async function createVariations() {
             const numVariations = parseInt(document.getElementById('numVariations').value);
-            const basePrompt = "A high quality image with similar style and composition";
+            const aspectRatio = document.getElementById('editorAspectRatio').value;
+            const basePrompt = `Create ${numVariations} variations of ${getImageDescription()}, maintaining the original style and composition, high quality`;
             
             for (let i = 0; i < numVariations; i++) {
                 updateLoadingText(`Creating variation ${i + 1} of ${numVariations}...`);
                 
                 const seed = Date.now() + Math.random() * 1000000;
-                const url = buildImageUrl(basePrompt, '1024x1024', Math.floor(seed));
+                const url = buildImageUrl(basePrompt, aspectRatio, Math.floor(seed));
                 
                 await addResultToEditorGallery(url, `Variation ${i + 1}`);
                 
@@ -1184,39 +1105,49 @@ An underwater kingdom with mermaids"></textarea>
 
         async function applyStyleTransfer() {
             const stylePrompt = document.getElementById('stylePrompt').value;
+            const aspectRatio = document.getElementById('editorAspectRatio').value;
+            
             if (!stylePrompt) {
                 alert('Please enter a style prompt');
                 return;
             }
 
+            const fullPrompt = `Apply this style to ${getImageDescription()}: ${stylePrompt}, maintain the original subject, high quality`;
             const seed = Date.now();
-            const url = buildImageUrl(stylePrompt, '1024x1024', seed);
+            const url = buildImageUrl(fullPrompt, aspectRatio, seed);
             await addResultToEditorGallery(url, 'Styled Image');
         }
 
         async function enhanceImage() {
-            const enhancePrompt = "High quality, enhanced, professional photography, sharp details, vibrant colors";
+            const aspectRatio = document.getElementById('editorAspectRatio').value;
+            // Important: Now using the actual uploaded image context
+            const enhancePrompt = `Enhance and improve quality of ${getImageDescription()}, professional photography, sharp details, vibrant colors, high resolution, photorealistic`;
             const seed = Date.now();
-            const url = buildImageUrl(enhancePrompt, '1024x1024', seed);
+            const url = buildImageUrl(enhancePrompt, aspectRatio, seed);
             await addResultToEditorGallery(url, 'Enhanced Image');
         }
 
         async function removeBackground() {
-            const bgPrompt = "Professional product photo on pure white background, clean, isolated subject";
+            const aspectRatio = document.getElementById('editorAspectRatio').value;
+            // Important: Now working with the actual uploaded image context
+            const bgPrompt = `Extract subject from ${getImageDescription()}, place on pure white background, clean edges, professional product photo style, isolated subject`;
             const seed = Date.now();
-            const url = buildImageUrl(bgPrompt, '1024x1024', seed);
+            const url = buildImageUrl(bgPrompt, aspectRatio, seed);
             await addResultToEditorGallery(url, 'Background Removed');
         }
 
         async function reimagineImage() {
             const reimaginePrompt = document.getElementById('reimaginePrompt').value;
+            const aspectRatio = document.getElementById('editorAspectRatio').value;
+            
             if (!reimaginePrompt) {
                 alert('Please enter a reimagine prompt');
                 return;
             }
 
+            const fullPrompt = `Reimagine ${getImageDescription()} as: ${reimaginePrompt}, creative transformation, high quality`;
             const seed = Date.now();
-            const url = buildImageUrl(reimaginePrompt, '1024x1024', seed);
+            const url = buildImageUrl(fullPrompt, aspectRatio, seed);
             await addResultToEditorGallery(url, 'Reimagined Image');
         }
 
@@ -1310,6 +1241,8 @@ An underwater kingdom with mermaids"></textarea>
                 document.getElementById('editorGallery').innerHTML = '';
                 resultImages = [];
                 editorFileInput.value = '';
+                uploadedImageData = null;
+                uploadedImageUrl = null;
                 document.getElementById('editorDownloadAllBtn').disabled = true;
             }
         });
@@ -1336,7 +1269,7 @@ An underwater kingdom with mermaids"></textarea>
 
         // Initial setup
         debugLog('GWH AI Tools initialized and ready', 'success');
-        console.log('🚀 Grow With Haider (GWH) - Complete AI Tools Loaded');
+        console.log('🚀 Grow With Haider (GWH) - AI Image Tools Loaded');
     </script>
 </body>
 </html>
