@@ -638,6 +638,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
         }
 
         thead {
@@ -812,7 +813,7 @@
                 <p id="pageSubtitle">Professional AI Image & Prompt Tools</p>
             </div>
 
-            <!-- Navigation Tabs (3 TABS) -->
+            <!-- Navigation Tabs -->
             <div class="nav-tabs" id="mainTabs">
                 <button class="tab-button active" onclick="switchMainTab('generator')">🎨 Image Generator</button>
                 <button class="tab-button" onclick="switchMainTab('editor')">🖼️ AI Reimagine</button>
@@ -869,7 +870,7 @@ A cute robot learning to paint"></textarea>
                 <div class="gallery" id="gallery"></div>
             </div>
 
-            <!-- TAB 2: AI REIMAGINE (ONLY ONE MODE) -->
+            <!-- TAB 2: AI REIMAGINE -->
             <div id="editorTab" class="tab-content">
                 <div class="upload-section" id="uploadSection">
                     <div class="upload-area" id="uploadArea">
@@ -1041,7 +1042,7 @@ Outside, the city was bustling with people."></textarea>
                         </div>
                         <div style="background: white; padding: 20px; border-radius: 10px;">
                             <h3 style="color: #667eea; margin-bottom: 10px;">🌐 Platform Info</h3>
-                            <p><strong>Version:</strong> 1.0.3 (Simple)</p>
+                            <p><strong>Version:</strong> 1.0.4 (Fixed)</p>
                             <p><strong>API:</strong> Pollinations.ai</p>
                         </div>
                     </div>
@@ -1073,6 +1074,9 @@ Outside, the city was bustling with people."></textarea>
         let shouldStop = false;
         let s2pGeneratedPrompts = [];
         let allUsers = [];
+
+        // Reserved usernames (case-insensitive)
+        const RESERVED_USERNAMES = ['growwithhaider', 'admin', 'administrator', 'root'];
 
         // ==================== INITIALIZATION ====================
         window.addEventListener('DOMContentLoaded', () => {
@@ -1132,6 +1136,7 @@ Outside, the city was bustling with people."></textarea>
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
 
+            // Admin login check
             if (username === 'GrowWithHaider' && password === 'HaiderAli369') {
                 currentUser = {
                     username: username,
@@ -1140,11 +1145,12 @@ Outside, the city was bustling with people."></textarea>
                     loginTime: new Date().toISOString()
                 };
                 localStorage.setItem('gwh_current_user', JSON.stringify(currentUser));
-                showSuccess('loginSuccess', 'Admin login successful!');
+                showSuccess('loginSuccess', '✅ Admin login successful!');
                 setTimeout(showMainApp, 1000);
                 return;
             }
 
+            // Regular user login
             const users = JSON.parse(localStorage.getItem('gwh_users') || '[]');
             const user = users.find(u => u.username === username && u.password === password);
 
@@ -1156,10 +1162,10 @@ Outside, the city was bustling with people."></textarea>
                     loginTime: new Date().toISOString()
                 };
                 localStorage.setItem('gwh_current_user', JSON.stringify(currentUser));
-                showSuccess('loginSuccess', 'Login successful!');
+                showSuccess('loginSuccess', '✅ Login successful!');
                 setTimeout(showMainApp, 1000);
             } else {
-                showError('loginError', 'Invalid username or password');
+                showError('loginError', '❌ Invalid username or password');
             }
         }
 
@@ -1172,33 +1178,52 @@ Outside, the city was bustling with people."></textarea>
             const password = document.getElementById('signupPassword').value;
             const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
+            // ✅ FIX 1: Username length validation
             if (username.length < 3) {
-                showError('signupError', 'Username must be at least 3 characters');
+                showError('signupError', '❌ Username must be at least 3 characters');
                 return;
             }
 
+            // ✅ FIX 2: Password validation
             if (password.length < 6) {
-                showError('signupError', 'Password must be at least 6 characters');
+                showError('signupError', '❌ Password must be at least 6 characters');
                 return;
             }
 
+            // ✅ FIX 3: Password match validation
             if (password !== confirmPassword) {
-                showError('signupError', 'Passwords do not match');
+                showError('signupError', '❌ Passwords do not match');
                 return;
             }
 
+            // ✅ FIX 4: Check if username is reserved (case-insensitive)
+            const usernameLower = username.toLowerCase();
+            if (RESERVED_USERNAMES.includes(usernameLower)) {
+                showError('signupError', '❌ This username is reserved. Please choose another one.');
+                return;
+            }
+
+            // Get existing users
             const users = JSON.parse(localStorage.getItem('gwh_users') || '[]');
             
-            if (users.some(u => u.username === username)) {
-                showError('signupError', 'Username already exists');
+            // ✅ FIX 5: Check for duplicate username (case-insensitive)
+            const usernameExists = users.some(u => u.username.toLowerCase() === usernameLower);
+            
+            if (usernameExists) {
+                showError('signupError', '❌ Username already exists. Please choose a different username.');
                 return;
             }
 
-            if (users.some(u => u.email === email)) {
-                showError('signupError', 'Email already registered');
+            // ✅ FIX 6: Check for duplicate email (case-insensitive)
+            const emailLower = email.toLowerCase();
+            const emailExists = users.some(u => u.email.toLowerCase() === emailLower);
+            
+            if (emailExists) {
+                showError('signupError', '❌ Email already registered. Please use a different email.');
                 return;
             }
 
+            // Add new user
             users.push({
                 username: username,
                 email: email,
@@ -1207,8 +1232,9 @@ Outside, the city was bustling with people."></textarea>
             });
 
             localStorage.setItem('gwh_users', JSON.stringify(users));
-            showSuccess('signupSuccess', 'Account created! You can now login.');
+            showSuccess('signupSuccess', '✅ Account created successfully! You can now login.');
             
+            // Clear form
             document.getElementById('signupUsername').value = '';
             document.getElementById('signupEmail').value = '';
             document.getElementById('signupPassword').value = '';
@@ -1232,12 +1258,25 @@ Outside, the city was bustling with people."></textarea>
         }
 
         function showAdminPanel() {
+            // Hide main tabs
             document.getElementById('mainTabs').style.display = 'none';
-            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            
+            // Hide all tab contents except admin panel
+            document.getElementById('generatorTab').style.display = 'none';
+            document.getElementById('editorTab').style.display = 'none';
+            document.getElementById('scriptToPromptTab').style.display = 'none';
+            
+            // Show admin panel
             document.getElementById('adminPanel').style.display = 'block';
+            
+            // Update header
             document.getElementById('pageTitle').textContent = '👑 Admin Control Panel';
             document.getElementById('pageSubtitle').textContent = 'Manage users and system settings';
+            
+            // Hide channel promo
             document.querySelector('.channel-promo').style.display = 'none';
+            
+            // ✅ FIX 7: Load users and update stats immediately
             loadUsers();
             updateStats();
         }
@@ -1452,7 +1491,7 @@ Outside, the city was bustling with people."></textarea>
             }
         }
 
-        // ==================== AI REIMAGINE (ONLY MODE) ====================
+        // ==================== AI REIMAGINE ====================
         let uploadedImageData = null;
 
         document.getElementById('uploadArea').addEventListener('click', () => {
@@ -1666,28 +1705,39 @@ Outside, the city was bustling with people."></textarea>
         });
 
         // ==================== ADMIN PANEL ====================
+        // ✅ FIX 8: Improved loadUsers function
         function loadUsers() {
             const users = JSON.parse(localStorage.getItem('gwh_users') || '[]');
             allUsers = users;
+            console.log('Loading users:', users.length); // Debug log
             renderUsers(users);
         }
 
+        // ✅ FIX 9: Improved renderUsers function
         function renderUsers(users) {
             const tbody = document.getElementById('userTableBody');
             const emptyState = document.getElementById('emptyState');
+            const userTable = document.getElementById('userTable');
+
+            // Clear existing content
+            tbody.innerHTML = '';
 
             if (users.length === 0) {
-                tbody.innerHTML = '';
+                userTable.style.display = 'none';
                 emptyState.style.display = 'block';
                 return;
             }
 
+            userTable.style.display = 'table';
             emptyState.style.display = 'none';
-            tbody.innerHTML = '';
 
             users.forEach((user, index) => {
                 const row = document.createElement('tr');
-                const joinDate = new Date(user.createdAt).toLocaleDateString();
+                const joinDate = new Date(user.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
                 
                 row.innerHTML = `
                     <td>${index + 1}</td>
@@ -1696,7 +1746,7 @@ Outside, the city was bustling with people."></textarea>
                     <td><span class="badge badge-user">User</span></td>
                     <td>${joinDate}</td>
                     <td>
-                        <button class="btn-small btn-danger" onclick="deleteUser('${user.username}')">🗑️ Delete</button>
+                        <button class="btn-small btn-danger" onclick="deleteUser('${user.username.replace(/'/g, "\\'")}')">🗑️ Delete</button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -1704,13 +1754,19 @@ Outside, the city was bustling with people."></textarea>
         }
 
         function deleteUser(username) {
-            if (confirm(`Delete user "${username}"?`)) {
+            if (confirm(`Delete user "${username}"? This action cannot be undone.`)) {
                 let users = JSON.parse(localStorage.getItem('gwh_users') || '[]');
+                const initialLength = users.length;
                 users = users.filter(u => u.username !== username);
-                localStorage.setItem('gwh_users', JSON.stringify(users));
-                loadUsers();
-                updateStats();
-                alert(`User "${username}" deleted!`);
+                
+                if (users.length < initialLength) {
+                    localStorage.setItem('gwh_users', JSON.stringify(users));
+                    loadUsers();
+                    updateStats();
+                    alert(`✅ User "${username}" has been deleted successfully!`);
+                } else {
+                    alert(`❌ User "${username}" not found!`);
+                }
             }
         }
 
@@ -1727,13 +1783,15 @@ Outside, the city was bustling with people."></textarea>
             renderUsers(filtered);
         }
 
+        // ✅ FIX 10: Improved updateStats function
         function updateStats() {
             const users = JSON.parse(localStorage.getItem('gwh_users') || '[]');
             document.getElementById('totalUsers').textContent = users.length;
 
+            // Calculate active users (logged in today)
             const today = new Date().toDateString();
-            const loginDate = new Date(currentUser.loginTime).toDateString();
-            document.getElementById('activeUsers').textContent = (loginDate === today) ? 1 : 0;
+            const activeCount = currentUser && new Date(currentUser.loginTime).toDateString() === today ? 1 : 0;
+            document.getElementById('activeUsers').textContent = activeCount;
         }
 
         // ==================== UTILITY FUNCTIONS ====================
@@ -1752,9 +1810,10 @@ Outside, the city was bustling with people."></textarea>
         document.getElementById('clearBtn').addEventListener('click', clearGallery);
         document.getElementById('downloadAllBtn').addEventListener('click', downloadAllImages);
 
-        console.log('🚀 GWH Platform v1.0.3 (Simple) Loaded');
-        console.log('✅ 3 Tools: Image Generator, AI Reimagine, Script-to-Prompt');
-        console.log('✅ WhatsApp Channel Integrated');
+        console.log('🚀 GWH Platform v1.0.4 (FIXED) Loaded');
+        console.log('✅ Admin Panel: Live User Display Fixed');
+        console.log('✅ Duplicate Username: Prevention Added');
+        console.log('✅ Reserved Usernames:', RESERVED_USERNAMES);
     </script>
 </body>
 </html>
