@@ -699,7 +699,7 @@
             <div class="hero-section">
                 <h1>🚀 Grow With Haider</h1>
                 <p>Professional AI Image Tools Platform</p>
-                <p style="font-size: 1.1em; opacity: 0.9;">Create stunning AI images, edit photos with AI, and convert stories to visual prompts.</p>
+                <p style="font-size: 1.1em; opacity: 0.9;">Create stunning AI images, transform photos with AI, and convert stories to visual prompts.</p>
 
                 <div class="features">
                     <div class="feature-card">
@@ -707,8 +707,8 @@
                         <p>Create unlimited AI images with advanced models</p>
                     </div>
                     <div class="feature-card">
-                        <h3>🖼️ Image Editor</h3>
-                        <p>Transform and enhance your images with AI</p>
+                        <h3>🖼️ AI Reimagine</h3>
+                        <p>Transform your images with AI creativity</p>
                     </div>
                     <div class="feature-card">
                         <h3>📝 Script-to-Prompt</h3>
@@ -812,10 +812,10 @@
                 <p id="pageSubtitle">Professional AI Image & Prompt Tools</p>
             </div>
 
-            <!-- Navigation Tabs (3 TABS ONLY) -->
+            <!-- Navigation Tabs (3 TABS) -->
             <div class="nav-tabs" id="mainTabs">
                 <button class="tab-button active" onclick="switchMainTab('generator')">🎨 Image Generator</button>
-                <button class="tab-button" onclick="switchMainTab('editor')">🖼️ Image Editor</button>
+                <button class="tab-button" onclick="switchMainTab('editor')">🖼️ AI Reimagine</button>
                 <button class="tab-button" onclick="switchMainTab('scriptToPrompt')">📝 Script-to-Prompt</button>
             </div>
 
@@ -869,7 +869,7 @@ A cute robot learning to paint"></textarea>
                 <div class="gallery" id="gallery"></div>
             </div>
 
-            <!-- TAB 2: IMAGE EDITOR (4 MODES - NO BACKGROUND REMOVE) -->
+            <!-- TAB 2: AI REIMAGINE (ONLY ONE MODE) -->
             <div id="editorTab" class="tab-content">
                 <div class="upload-section" id="uploadSection">
                     <div class="upload-area" id="uploadArea">
@@ -888,14 +888,8 @@ A cute robot learning to paint"></textarea>
 
                         <div class="controls-area">
                             <div class="info-box">
-                                <h4>✨ How to Use:</h4>
-                                <ol style="margin-left: 20px; line-height: 1.8;">
-                                    <li>Select editing mode</li>
-                                    <li>Choose aspect ratio</li>
-                                    <li>Configure options</li>
-                                    <li>Click "Apply Changes"</li>
-                                    <li>Download results</li>
-                                </ol>
+                                <h4>✨ AI Reimagine Tool</h4>
+                                <p style="line-height: 1.8;">Upload your image and describe how you want AI to transform it. The AI will create a completely new version based on your creative vision!</p>
                             </div>
 
                             <div class="form-group">
@@ -908,32 +902,16 @@ A cute robot learning to paint"></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label>🎨 Editing Mode</label>
-                                <select id="editMode">
-                                    <option value="variation">Create Variations</option>
-                                    <option value="style">Style Transfer</option>
-                                    <option value="enhance">Enhance Quality</option>
-                                    <option value="reimagine">AI Reimagine</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group" id="variationControls">
-                                <label>Number of Variations:</label>
-                                <input type="number" id="numVariations" min="1" max="5" value="3">
-                            </div>
-
-                            <div class="form-group" id="styleControls" style="display: none;">
-                                <label>Style Prompt:</label>
-                                <textarea id="stylePrompt" rows="3" placeholder="e.g., Make it look like a watercolor painting"></textarea>
-                            </div>
-
-                            <div class="form-group" id="reimagineControls" style="display: none;">
-                                <label>Reimagine Prompt:</label>
-                                <textarea id="reimaginePrompt" rows="3" placeholder="e.g., Transform into a fantasy landscape"></textarea>
+                                <label>✨ Reimagine Prompt:</label>
+                                <textarea id="reimaginePrompt" rows="5" placeholder="Example:
+Transform into a fantasy landscape with magical atmosphere
+Make it cyberpunk style with neon lights
+Turn it into a watercolor painting with soft colors
+Reimagine as a futuristic city scene"></textarea>
                             </div>
 
                             <div class="button-group" style="flex-direction: column;">
-                                <button class="btn-primary" id="applyBtn">✨ Apply Changes</button>
+                                <button class="btn-primary" id="applyBtn">✨ Reimagine Image</button>
                                 <button class="btn-success" id="editorDownloadAllBtn" disabled>📥 Download All</button>
                                 <button class="btn-secondary" id="clearResultsBtn">🗑️ Clear Results</button>
                                 <button class="btn-danger" id="newImageBtn">🔄 New Image</button>
@@ -1063,7 +1041,7 @@ Outside, the city was bustling with people."></textarea>
                         </div>
                         <div style="background: white; padding: 20px; border-radius: 10px;">
                             <h3 style="color: #667eea; margin-bottom: 10px;">🌐 Platform Info</h3>
-                            <p><strong>Version:</strong> 1.0.2 (Clean)</p>
+                            <p><strong>Version:</strong> 1.0.3 (Simple)</p>
                             <p><strong>API:</strong> Pollinations.ai</p>
                         </div>
                     </div>
@@ -1474,7 +1452,7 @@ Outside, the city was bustling with people."></textarea>
             }
         }
 
-        // ==================== IMAGE EDITOR (4 MODES) ====================
+        // ==================== AI REIMAGINE (ONLY MODE) ====================
         let uploadedImageData = null;
 
         document.getElementById('uploadArea').addEventListener('click', () => {
@@ -1502,26 +1480,11 @@ Outside, the city was bustling with people."></textarea>
             reader.readAsDataURL(file);
         }
 
-        document.getElementById('editMode').addEventListener('change', () => {
-            document.getElementById('variationControls').style.display = 'none';
-            document.getElementById('styleControls').style.display = 'none';
-            document.getElementById('reimagineControls').style.display = 'none';
-
-            const mode = document.getElementById('editMode').value;
-            if (mode === 'variation') document.getElementById('variationControls').style.display = 'block';
-            if (mode === 'style') document.getElementById('styleControls').style.display = 'block';
-            if (mode === 'reimagine') document.getElementById('reimagineControls').style.display = 'block';
-        });
-
         document.getElementById('applyBtn').addEventListener('click', async () => {
-            const mode = document.getElementById('editMode').value;
-            showLoading('Processing...');
+            showLoading('Reimagining your image...');
 
             try {
-                if (mode === 'variation') await createVariations();
-                if (mode === 'style') await applyStyleTransfer();
-                if (mode === 'enhance') await enhanceImage();
-                if (mode === 'reimagine') await reimagineImage();
+                await reimagineImage();
                 document.getElementById('editorDownloadAllBtn').disabled = false;
             } catch (error) {
                 alert('Error: ' + error.message);
@@ -1530,48 +1493,16 @@ Outside, the city was bustling with people."></textarea>
             }
         });
 
-        async function createVariations() {
-            const num = parseInt(document.getElementById('numVariations').value);
-            const aspectRatio = document.getElementById('editorAspectRatio').value;
-            const prompt = 'Create variations of the uploaded image, same style, high quality';
-            
-            for (let i = 0; i < num; i++) {
-                updateLoadingText(`Creating variation ${i + 1}...`);
-                const seed = Date.now() + Math.random() * 1000000;
-                const url = buildImageUrl(prompt, aspectRatio, Math.floor(seed));
-                await addResultToEditorGallery(url, `Variation ${i + 1}`);
-                if (i < num - 1) await new Promise(resolve => setTimeout(resolve, 2000));
-            }
-        }
-
-        async function applyStyleTransfer() {
-            const stylePrompt = document.getElementById('stylePrompt').value;
-            if (!stylePrompt) {
-                alert('Please enter a style prompt');
-                return;
-            }
-            const aspectRatio = document.getElementById('editorAspectRatio').value;
-            const prompt = `Apply style to uploaded image: ${stylePrompt}, high quality`;
-            const url = buildImageUrl(prompt, aspectRatio, Date.now());
-            await addResultToEditorGallery(url, 'Styled Image');
-        }
-
-        async function enhanceImage() {
-            const aspectRatio = document.getElementById('editorAspectRatio').value;
-            const prompt = 'Enhance the uploaded image, professional photography, sharp details';
-            const url = buildImageUrl(prompt, aspectRatio, Date.now());
-            await addResultToEditorGallery(url, 'Enhanced');
-        }
-
         async function reimagineImage() {
-            const reimaginePrompt = document.getElementById('reimaginePrompt').value;
+            const reimaginePrompt = document.getElementById('reimaginePrompt').value.trim();
             if (!reimaginePrompt) {
-                alert('Please enter a reimagine prompt');
-                return;
+                alert('Please enter a reimagine prompt!');
+                throw new Error('Empty prompt');
             }
             const aspectRatio = document.getElementById('editorAspectRatio').value;
-            const prompt = `Reimagine uploaded image as: ${reimaginePrompt}`;
-            const url = buildImageUrl(prompt, aspectRatio, Date.now());
+            const prompt = `Reimagine the uploaded image as: ${reimaginePrompt}, creative transformation, high quality, detailed`;
+            const seed = Date.now();
+            const url = buildImageUrl(prompt, aspectRatio, seed);
             await addResultToEditorGallery(url, 'Reimagined');
         }
 
@@ -1815,20 +1746,15 @@ Outside, the city was bustling with people."></textarea>
             document.getElementById('loadingOverlay').classList.remove('active');
         }
 
-        function updateLoadingText(text) {
-            document.getElementById('loadingText').textContent = text;
-        }
-
         // ==================== EVENT LISTENERS ====================
         document.getElementById('generateBtn').addEventListener('click', startGeneration);
         document.getElementById('stopBtn').addEventListener('click', stopGeneration);
         document.getElementById('clearBtn').addEventListener('click', clearGallery);
         document.getElementById('downloadAllBtn').addEventListener('click', downloadAllImages);
 
-        console.log('🚀 GWH Platform v1.0.2 (Clean Version) Loaded');
-        console.log('✅ 3 Tools: Generator, Editor (4 modes), Script-to-Prompt');
-        console.log('✅ WhatsApp Channel Link Added');
-        console.log('❌ Removed: Image-to-Prompt, Background Remove');
+        console.log('🚀 GWH Platform v1.0.3 (Simple) Loaded');
+        console.log('✅ 3 Tools: Image Generator, AI Reimagine, Script-to-Prompt');
+        console.log('✅ WhatsApp Channel Integrated');
     </script>
 </body>
 </html>
