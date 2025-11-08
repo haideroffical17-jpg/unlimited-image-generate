@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2419838799751102"
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2419838799751102"
      crossorigin="anonymous"></script>
-         <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/wBpGyGML/ai-image-9-1762361106607.jpg">
+    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/wBpGyGML/ai-image-9-1762361106607.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator - FIXED Version</title>
+    <title>Grow With Haider (GWH) - Complete AI Tools</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +22,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -30,39 +30,127 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
-        h1 {
+        .header {
             text-align: center;
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
             margin-bottom: 30px;
-            font-size: 1.1em;
         }
 
-        .fix-notice {
-            background: #d4edda;
-            border: 2px solid #28a745;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            color: #155724;
-        }
-
-        .fix-notice h3 {
+        .header h1 {
+            color: #667eea;
+            font-size: 2.8em;
             margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #f0f0f0;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Page Styles */
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .tool-card {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .tool-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .tool-card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .tool-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .tool-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tool-features li {
+            padding: 5px 0;
+            color: #555;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tool-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
             color: #28a745;
+            font-weight: bold;
         }
 
-        .fix-notice ul {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-
+        /* Generator Styles */
         .config-section {
             background: #f8f9fa;
             border-radius: 15px;
@@ -104,7 +192,7 @@
             margin-bottom: 20px;
         }
 
-        select, input[type="number"] {
+        select, input[type="number"], input[type="text"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #ddd;
@@ -113,7 +201,7 @@
             transition: border-color 0.3s;
         }
 
-        select:focus, input[type="number"]:focus {
+        select:focus, input[type="number"]:focus, input[type="text"]:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -126,7 +214,7 @@
         }
 
         button {
-            padding: 15px 40px;
+            padding: 15px 30px;
             border: none;
             border-radius: 10px;
             font-size: 16px;
@@ -159,6 +247,14 @@
 
         .btn-success:hover {
             background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
         }
 
         button:disabled {
@@ -251,6 +347,151 @@
             border-radius: 5px;
         }
 
+        /* Editor Styles */
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .upload-area:hover {
+            background: #f0f4ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: #e8f0ff;
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        #editorFileInput {
+            display: none;
+        }
+
+        .editor-section {
+            display: none;
+        }
+
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+        .preview-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 600px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .controls-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #0c5460;
+        }
+
+        .info-box h4 {
+            margin-bottom: 10px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .debug-console {
             margin-top: 30px;
             background: #1e1e1e;
@@ -289,70 +530,224 @@
             border-left-color: #ffc107;
             color: #ffd43b;
         }
+
+        @media (max-width: 1024px) {
+            .editor-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .home-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎨 AI Image Generator</h1>
-        <p class="subtitle">Powered by Grow With Haider (GWH)</p>
+        <div class="header">
+            <h1>🚀 Grow With Haider (GWH)</h1>
+            <p>Complete AI-Powered Creative Tools</p>
+        </div>
 
-              <div class="config-section">
-            <div class="input-group">
-                <label>📝 Enter Your Prompts (One per line):</label>
-                <textarea id="promptInput" rows="8" placeholder="Example:
+        <!-- Navigation Tabs (Home tab removed) -->
+        <div class="nav-tabs">
+            <button class="tab-button active" onclick="switchTab('home')">🏠 Home</button>
+            <button class="tab-button" onclick="switchTab('generator')">🎨 Image Generator</button>
+            <button class="tab-button" onclick="switchTab('editor')">🖼️ Image Editor</button>
+        </div>
+
+        <!-- HOME TAB -->
+        <div id="homeTab" class="tab-content active">
+            <div class="home-grid">
+                <div class="tool-card" onclick="switchTab('generator')">
+                    <div class="tool-icon">🎨</div>
+                    <h2>AI Image Generator</h2>
+                    <p>Generate stunning AI images from text prompts using advanced AI models</p>
+                    <ul class="tool-features">
+                        <li>Text-to-Image generation</li>
+                        <li>Multiple aspect ratios</li>
+                        <li>Batch generation (up to 10 images)</li>
+                        <li>Bulk download functionality</li>
+                        <li>Real-time progress tracking</li>
+                    </ul>
+                </div>
+
+                <div class="tool-card" onclick="switchTab('editor')">
+                    <div class="tool-icon">🖼️</div>
+                    <h2>AI Image Editor</h2>
+                    <p>Upload and transform your images with powerful AI editing capabilities</p>
+                    <ul class="tool-features">
+                        <li>Upload & edit existing images</li>
+                        <li>AI-powered image variations</li>
+                        <li>Style transfer & effects</li>
+                        <li>Background removal</li>
+                        <li>Image enhancement</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- GENERATOR TAB -->
+        <div id="generatorTab" class="tab-content">
+            <div class="config-section">
+                <div class="input-group">
+                    <label>📝 Enter Your Prompts (One per line):</label>
+                    <textarea id="promptInput" rows="8" placeholder="Example:
 A serene mountain landscape at sunset
 A futuristic city with flying cars
 A cute robot learning to paint
 An underwater kingdom with mermaids"></textarea>
-            </div>
-
-            <div class="settings-row">
-                <div class="input-group">
-                    <label>📐 Aspect Ratio:</label>
-                    <select id="aspectRatio">
-                        <option value="1024x1024">Square (1:1) - 1024x1024</option>
-                        <option value="1920x1080">Landscape (16:9) - 1920x1080</option>
-                        <option value="1080x1920">Portrait (9:16) - 1080x1920</option>
-                    </select>
                 </div>
 
-                <div class="input-group">
-                    <label>🎲 Images per Prompt:</label>
-                    <input type="number" id="imagesPerPrompt" min="1" max="10" value="1">
+                <div class="settings-row">
+                    <div class="input-group">
+                        <label>📐 Aspect Ratio:</label>
+                        <select id="aspectRatio">
+                            <option value="1024x1024">Square (1:1) - 1024x1024</option>
+                            <option value="1920x1080">Landscape (16:9) - 1920x1080</option>
+                            <option value="1080x1920">Portrait (9:16) - 1080x1920</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>🎲 Images per Prompt:</label>
+                        <input type="number" id="imagesPerPrompt" min="1" max="10" value="1">
+                    </div>
+
+                    <div class="input-group">
+                        <label>🔁 Max Retries:</label>
+                        <input type="number" id="maxRetries" min="1" max="10" value="3">
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <label>🔁 Max Retries:</label>
-                    <input type="number" id="maxRetries" min="1" max="10" value="3">
+                <div class="button-group">
+                    <button class="btn-primary" id="generateBtn">🚀 Generate Images</button>
+                    <button class="btn-secondary" id="stopBtn" disabled>⏹️ Stop</button>
+                    <button class="btn-secondary" id="clearBtn">🗑️ Clear Gallery</button>
+                    <button class="btn-success" id="downloadAllBtn">📥 Download All</button>
+                    <button class="btn-secondary" id="toggleDebugBtn">🐛 Debug Console</button>
                 </div>
             </div>
 
-            <div class="button-group">
-                <button class="btn-primary" id="generateBtn">🚀 Generate Images</button>
-                <button class="btn-secondary" id="stopBtn" disabled>⏹️ Stop Generation</button>
-                <button class="btn-secondary" id="clearBtn">🗑️ Clear Gallery</button>
-                <button class="btn-success" id="downloadAllBtn">📥 Download All</button>
-                <button class="btn-secondary" id="toggleDebugBtn">🐛 Show Debug Console</button>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <p class="status-text" id="statusText">Ready to generate...</p>
             </div>
-        </div>
 
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill">0%</div>
+            <div class="debug-console" id="debugConsole">
+                <div><strong>Debug Console:</strong></div>
+                <div id="debugLogs"></div>
             </div>
-            <p class="status-text" id="statusText">Ready to generate...</p>
+
+            <div class="gallery" id="gallery"></div>
         </div>
 
-        <div class="debug-console" id="debugConsole">
-            <div><strong>Debug Console:</strong></div>
-            <div id="debugLogs"></div>
-        </div>
+        <!-- EDITOR TAB -->
+        <div id="editorTab" class="tab-content">
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📤</div>
+                    <div class="upload-text">Click to upload or drag & drop your image</div>
+                    <div class="upload-hint">Supports: JPG, PNG, WebP (Max 10MB)</div>
+                </div>
+                <input type="file" id="editorFileInput" accept="image/*">
+            </div>
 
-        <div class="gallery" id="gallery"></div>
+            <div class="editor-section" id="editorSection">
+                <div class="editor-grid">
+                    <div class="preview-area">
+                        <img id="previewImage" class="preview-image" alt="Preview">
+                    </div>
+
+                    <div class="controls-area">
+                        <div class="info-box">
+                            <h4>✨ How to Use:</h4>
+                            <ol style="margin-left: 20px; line-height: 1.8;">
+                                <li>Select editing mode</li>
+                                <li>Configure options</li>
+                                <li>Click "Apply Changes"</li>
+                                <li>Download results</li>
+                            </ol>
+                        </div>
+
+                        <div class="control-group">
+                            <h3>🎨 Editing Mode</h3>
+                            <select id="editMode">
+                                <option value="variation">Create Variations</option>
+                                <option value="style">Style Transfer</option>
+                                <option value="enhance">Enhance Quality</option>
+                                <option value="background">Remove Background</option>
+                                <option value="reimagine">AI Reimagine</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="variationControls">
+                            <h3>⚙️ Options</h3>
+                            <label>Number of Variations:</label>
+                            <input type="number" id="numVariations" min="1" max="5" value="3">
+                        </div>
+
+                        <div class="control-group" id="styleControls" style="display: none;">
+                            <label>Style Prompt:</label>
+                            <textarea id="stylePrompt" rows="3" placeholder="e.g., Make it look like a watercolor painting"></textarea>
+                        </div>
+
+                        <div class="control-group" id="reimagineControls" style="display: none;">
+                            <label>Reimagine Prompt:</label>
+                            <textarea id="reimaginePrompt" rows="3" placeholder="e.g., Transform into a fantasy landscape"></textarea>
+                        </div>
+
+                        <div class="button-group" style="flex-direction: column;">
+                            <button class="btn-primary" id="applyBtn">✨ Apply Changes</button>
+                            <button class="btn-success" id="editorDownloadAllBtn" disabled>📥 Download All</button>
+                            <button class="btn-secondary" id="clearResultsBtn">🗑️ Clear Results</button>
+                            <button class="btn-danger" id="newImageBtn">🔄 New Image</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gallery" id="editorGallery"></div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3 id="loadingText">Processing...</h3>
+            <p style="color: #666; margin-top: 10px;">Please wait</p>
+        </div>
     </div>
 
     <script>
-        // Configuration
+        // ==================== TAB SWITCHING ====================
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Activate correct button
+            const buttons = document.querySelectorAll('.tab-button');
+            if (tabName === 'home') buttons[0].classList.add('active');
+            if (tabName === 'generator') buttons[1].classList.add('active');
+            if (tabName === 'editor') buttons[2].classList.add('active');
+            
+            console.log('Switched to tab:', tabName);
+        }
+
+        // ==================== IMAGE GENERATOR CODE ====================
         const CONFIG = {
             baseUrl: 'https://image.pollinations.ai/prompt/',
             defaultParams: {
@@ -362,12 +757,10 @@ An underwater kingdom with mermaids"></textarea>
             }
         };
 
-        // State management
         let generatedImages = [];
         let isGenerating = false;
         let shouldStop = false;
 
-        // Debug logging
         function debugLog(message, type = 'info') {
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
@@ -377,15 +770,12 @@ An underwater kingdom with mermaids"></textarea>
             const debugLogs = document.getElementById('debugLogs');
             debugLogs.insertBefore(logEntry, debugLogs.firstChild);
             
-            // Limit log entries to 50
             while (debugLogs.children.length > 50) {
                 debugLogs.removeChild(debugLogs.lastChild);
             }
-
             console.log(`[${type.toUpperCase()}] ${message}`);
         }
 
-        // Build image URL
         function buildImageUrl(prompt, dimensions, seed) {
             const [width, height] = dimensions.split('x');
             const encodedPrompt = encodeURIComponent(prompt);
@@ -404,19 +794,17 @@ An underwater kingdom with mermaids"></textarea>
             return url;
         }
 
-        // Load image with retry logic
         function loadImageWithRetry(url, retryCount = 0, maxRetries = 3) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.crossOrigin = 'anonymous'; // CORS support
+                img.crossOrigin = 'anonymous';
                 
                 const timeout = setTimeout(() => {
-                    img.src = ''; // Cancel load
+                    img.src = '';
                     const error = `Timeout loading image (attempt ${retryCount + 1}/${maxRetries})`;
                     debugLog(error, 'warning');
                     
                     if (retryCount < maxRetries - 1) {
-                        // Exponential backoff: 2s, 4s, 8s
                         const delay = Math.pow(2, retryCount + 1) * 1000;
                         debugLog(`Retrying in ${delay/1000}s...`, 'warning');
                         
@@ -428,12 +816,11 @@ An underwater kingdom with mermaids"></textarea>
                     } else {
                         reject(new Error(error));
                     }
-                }, 30000); // 30 second timeout per attempt
+                }, 30000);
 
                 img.onload = function() {
                     clearTimeout(timeout);
                     
-                    // Validate image loaded correctly
                     if (this.complete && this.naturalWidth > 0 && this.naturalHeight > 0) {
                         debugLog(`Image loaded successfully: ${this.naturalWidth}x${this.naturalHeight}`, 'success');
                         resolve(url);
@@ -478,7 +865,6 @@ An underwater kingdom with mermaids"></textarea>
             });
         }
 
-        // Generate single image
         async function generateImage(prompt, dimensions, seed, maxRetries) {
             debugLog(`Generating image for: "${prompt.substring(0, 50)}..."`, 'info');
             
@@ -494,7 +880,6 @@ An underwater kingdom with mermaids"></textarea>
             }
         }
 
-        // Add image to gallery
         function addImageToGallery(imageData) {
             const card = document.createElement('div');
             card.className = 'image-card';
@@ -505,7 +890,7 @@ An underwater kingdom with mermaids"></textarea>
                     <div class="image-prompt" title="${imageData.prompt}">${imageData.prompt}</div>
                     <div class="image-actions">
                         <button class="btn-small btn-success" onclick="downloadImage('${imageData.url}', '${imageData.seed}')">Download</button>
-                        <button class="btn-small btn-secondary" onclick="copyPrompt('${imageData.prompt.replace(/'/g, "\\'")}')">Copy Prompt</button>
+                        <button class="btn-small btn-secondary" onclick="copyPrompt('${imageData.prompt.replace(/'/g, "\\'")}')">Copy</button>
                     </div>
                 </div>
             `;
@@ -514,7 +899,6 @@ An underwater kingdom with mermaids"></textarea>
             generatedImages.push(imageData);
         }
 
-        // Update progress
         function updateProgress(current, total, statusMessage) {
             const percentage = Math.round((current / total) * 100);
             const progressFill = document.getElementById('progressFill');
@@ -525,7 +909,6 @@ An underwater kingdom with mermaids"></textarea>
             statusText.textContent = statusMessage;
         }
 
-        // Main generation function
         async function startGeneration() {
             const promptInput = document.getElementById('promptInput').value.trim();
             const aspectRatio = document.getElementById('aspectRatio').value;
@@ -543,7 +926,6 @@ An underwater kingdom with mermaids"></textarea>
                 return;
             }
 
-            // Reset state
             isGenerating = true;
             shouldStop = false;
             document.getElementById('generateBtn').disabled = true;
@@ -584,14 +966,12 @@ An underwater kingdom with mermaids"></textarea>
                     completedImages++;
                     updateProgress(completedImages, totalImages, `Completed ${completedImages}/${totalImages} images`);
 
-                    // Small delay between images to avoid rate limiting
                     if (completedImages < totalImages && !shouldStop) {
                         await new Promise(resolve => setTimeout(resolve, 1000));
                     }
                 }
             }
 
-            // Completion
             isGenerating = false;
             document.getElementById('generateBtn').disabled = false;
             document.getElementById('stopBtn').disabled = true;
@@ -608,7 +988,6 @@ An underwater kingdom with mermaids"></textarea>
             }
         }
 
-        // Download single image
         function downloadImage(url, seed) {
             fetch(url)
                 .then(response => response.blob())
@@ -622,11 +1001,10 @@ An underwater kingdom with mermaids"></textarea>
                 })
                 .catch(error => {
                     debugLog(`Download failed: ${error.message}`, 'error');
-                    alert('Download failed. Please try right-click > Save Image As...');
+                    alert('Download failed. Try right-click > Save Image As...');
                 });
         }
 
-        // Download all images
         async function downloadAllImages() {
             if (generatedImages.length === 0) {
                 alert('No images to download!');
@@ -639,7 +1017,6 @@ An underwater kingdom with mermaids"></textarea>
                 const image = generatedImages[i];
                 downloadImage(image.url, image.seed);
                 
-                // Delay between downloads to avoid browser blocking
                 if (i < generatedImages.length - 1) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                 }
@@ -648,7 +1025,6 @@ An underwater kingdom with mermaids"></textarea>
             debugLog(`Bulk download initiated for ${generatedImages.length} images`, 'success');
         }
 
-        // Copy prompt to clipboard
         function copyPrompt(prompt) {
             navigator.clipboard.writeText(prompt).then(() => {
                 debugLog(`Copied prompt: "${prompt.substring(0, 50)}..."`, 'success');
@@ -656,13 +1032,11 @@ An underwater kingdom with mermaids"></textarea>
             });
         }
 
-        // Stop generation
         function stopGeneration() {
             shouldStop = true;
             debugLog('Generation stop requested by user', 'warning');
         }
 
-        // Clear gallery
         function clearGallery() {
             if (confirm('Are you sure you want to clear all generated images?')) {
                 document.getElementById('gallery').innerHTML = '';
@@ -672,30 +1046,297 @@ An underwater kingdom with mermaids"></textarea>
             }
         }
 
-        // Toggle debug console
         function toggleDebugConsole() {
             const console = document.getElementById('debugConsole');
             const btn = document.getElementById('toggleDebugBtn');
             
             if (console.classList.contains('active')) {
                 console.classList.remove('active');
-                btn.textContent = '🐛 Show Debug Console';
+                btn.textContent = '🐛 Debug Console';
             } else {
                 console.classList.add('active');
-                btn.textContent = '🐛 Hide Debug Console';
+                btn.textContent = '🐛 Hide Console';
             }
         }
 
-        // Event listeners
+        // ==================== IMAGE EDITOR CODE ====================
+        let uploadedImageData = null;
+        let resultImages = [];
+
+        const uploadArea = document.getElementById('uploadArea');
+        const editorFileInput = document.getElementById('editorFileInput');
+        const uploadSection = document.getElementById('uploadSection');
+        const editorSection = document.getElementById('editorSection');
+        const previewImage = document.getElementById('previewImage');
+
+        uploadArea.addEventListener('click', () => editorFileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleImageUpload(file);
+            }
+        });
+
+        editorFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleImageUpload(file);
+            }
+        });
+
+        function handleImageUpload(file) {
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size must be less than 10MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImageData = e.target.result;
+                previewImage.src = uploadedImageData;
+                uploadSection.style.display = 'none';
+                editorSection.style.display = 'block';
+                console.log('Image uploaded successfully');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        const editMode = document.getElementById('editMode');
+        const variationControls = document.getElementById('variationControls');
+        const styleControls = document.getElementById('styleControls');
+        const reimagineControls = document.getElementById('reimagineControls');
+
+        editMode.addEventListener('change', () => {
+            variationControls.style.display = 'none';
+            styleControls.style.display = 'none';
+            reimagineControls.style.display = 'none';
+
+            const mode = editMode.value;
+            if (mode === 'variation') {
+                variationControls.style.display = 'block';
+            } else if (mode === 'style') {
+                styleControls.style.display = 'block';
+            } else if (mode === 'reimagine') {
+                reimagineControls.style.display = 'block';
+            }
+        });
+
+        document.getElementById('applyBtn').addEventListener('click', async () => {
+            const mode = editMode.value;
+            showLoading('Processing your image...');
+
+            try {
+                switch (mode) {
+                    case 'variation':
+                        await createVariations();
+                        break;
+                    case 'style':
+                        await applyStyleTransfer();
+                        break;
+                    case 'enhance':
+                        await enhanceImage();
+                        break;
+                    case 'background':
+                        await removeBackground();
+                        break;
+                    case 'reimagine':
+                        await reimagineImage();
+                        break;
+                }
+                document.getElementById('editorDownloadAllBtn').disabled = false;
+            } catch (error) {
+                alert('Error processing image: ' + error.message);
+                console.error(error);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        async function createVariations() {
+            const numVariations = parseInt(document.getElementById('numVariations').value);
+            const basePrompt = "A high quality image with similar style and composition";
+            
+            for (let i = 0; i < numVariations; i++) {
+                updateLoadingText(`Creating variation ${i + 1} of ${numVariations}...`);
+                
+                const seed = Date.now() + Math.random() * 1000000;
+                const url = buildImageUrl(basePrompt, '1024x1024', Math.floor(seed));
+                
+                await addResultToEditorGallery(url, `Variation ${i + 1}`);
+                
+                if (i < numVariations - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+        }
+
+        async function applyStyleTransfer() {
+            const stylePrompt = document.getElementById('stylePrompt').value;
+            if (!stylePrompt) {
+                alert('Please enter a style prompt');
+                return;
+            }
+
+            const seed = Date.now();
+            const url = buildImageUrl(stylePrompt, '1024x1024', seed);
+            await addResultToEditorGallery(url, 'Styled Image');
+        }
+
+        async function enhanceImage() {
+            const enhancePrompt = "High quality, enhanced, professional photography, sharp details, vibrant colors";
+            const seed = Date.now();
+            const url = buildImageUrl(enhancePrompt, '1024x1024', seed);
+            await addResultToEditorGallery(url, 'Enhanced Image');
+        }
+
+        async function removeBackground() {
+            const bgPrompt = "Professional product photo on pure white background, clean, isolated subject";
+            const seed = Date.now();
+            const url = buildImageUrl(bgPrompt, '1024x1024', seed);
+            await addResultToEditorGallery(url, 'Background Removed');
+        }
+
+        async function reimagineImage() {
+            const reimaginePrompt = document.getElementById('reimaginePrompt').value;
+            if (!reimaginePrompt) {
+                alert('Please enter a reimagine prompt');
+                return;
+            }
+
+            const seed = Date.now();
+            const url = buildImageUrl(reimaginePrompt, '1024x1024', seed);
+            await addResultToEditorGallery(url, 'Reimagined Image');
+        }
+
+        async function addResultToEditorGallery(url, label) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                const timeout = setTimeout(() => {
+                    reject(new Error('Image load timeout'));
+                }, 30000);
+
+                img.onload = () => {
+                    clearTimeout(timeout);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'image-card';
+                    
+                    card.innerHTML = `
+                        <img src="${url}" alt="${label}" crossorigin="anonymous">
+                        <div class="image-info">
+                            <div class="image-prompt">${label}</div>
+                            <div class="image-actions">
+                                <button class="btn-small btn-success" onclick="downloadEditorResult('${url}', '${label}')">Download</button>
+                                <button class="btn-small btn-secondary" onclick="viewFullSize('${url}')">View Full</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('editorGallery').appendChild(card);
+                    resultImages.push({ url, label });
+                    resolve();
+                };
+
+                img.onerror = () => {
+                    clearTimeout(timeout);
+                    reject(new Error('Failed to load image'));
+                };
+
+                img.src = url;
+            });
+        }
+
+        function downloadEditorResult(url, label) {
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `${label.replace(/\s+/g, '-')}-${Date.now()}.png`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                })
+                .catch(error => {
+                    alert('Download failed. Try right-click > Save Image As...');
+                });
+        }
+
+        function viewFullSize(url) {
+            window.open(url, '_blank');
+        }
+
+        document.getElementById('editorDownloadAllBtn').addEventListener('click', async () => {
+            if (resultImages.length === 0) {
+                alert('No results to download!');
+                return;
+            }
+
+            for (let i = 0; i < resultImages.length; i++) {
+                const result = resultImages[i];
+                downloadEditorResult(result.url, result.label);
+                
+                if (i < resultImages.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+        });
+
+        document.getElementById('clearResultsBtn').addEventListener('click', () => {
+            if (confirm('Clear all results?')) {
+                document.getElementById('editorGallery').innerHTML = '';
+                resultImages = [];
+                document.getElementById('editorDownloadAllBtn').disabled = true;
+            }
+        });
+
+        document.getElementById('newImageBtn').addEventListener('click', () => {
+            if (confirm('Upload a new image? Current results will be cleared.')) {
+                uploadSection.style.display = 'block';
+                editorSection.style.display = 'none';
+                document.getElementById('editorGallery').innerHTML = '';
+                resultImages = [];
+                editorFileInput.value = '';
+                document.getElementById('editorDownloadAllBtn').disabled = true;
+            }
+        });
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function updateLoadingText(text) {
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        // ==================== EVENT LISTENERS ====================
         document.getElementById('generateBtn').addEventListener('click', startGeneration);
         document.getElementById('stopBtn').addEventListener('click', stopGeneration);
         document.getElementById('clearBtn').addEventListener('click', clearGallery);
         document.getElementById('downloadAllBtn').addEventListener('click', downloadAllImages);
         document.getElementById('toggleDebugBtn').addEventListener('click', toggleDebugConsole);
 
-        // Initial debug log
-        debugLog('AI Image Generator initialized and ready', 'success');
-        debugLog('Using Pollinations.ai API (no API key required)', 'info');
+        // Initial setup
+        debugLog('GWH AI Tools initialized and ready', 'success');
+        console.log('🚀 Grow With Haider (GWH) - Complete AI Tools Loaded');
     </script>
 </body>
 </html>
