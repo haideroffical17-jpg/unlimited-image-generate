@@ -65,10 +65,6 @@
             border: 1px solid #1a1a1a;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .image-card.enhancing {
-            border-color: #ff9900;
-            box-shadow: 0 0 15px rgba(255, 153, 0, 0.1);
-        }
         .image-card.done {
             border-color: #00ff88;
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
@@ -137,7 +133,7 @@
                 </p>
             </form>
             
-            <div id="auth-error" class="text-red-500 text-xs text-center mt-4 hidden font-mono"></div>
+            <div id="auth-error" class="text-red-500 text-xs text-center mt-4 hidden font-mono bg-red-900/20 p-2 rounded border border-red-500/20"></div>
         </div>
     </div>
 
@@ -184,12 +180,17 @@
                             LIVE FEED
                         </span>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[10px] text-gray-500 font-mono uppercase tracking-widest">Refresh Rate</p>
-                        <p class="text-xs text-[#00ff88] font-bold font-mono flex items-center justify-end gap-2">
-                            <span id="refresh-spinner" class="w-3 h-3 border-2 border-[#00ff88] border-t-transparent rounded-full animate-spin"></span>
-                            1000ms (Realtime)
-                        </p>
+                    <div class="text-right flex items-center gap-4">
+                        <button onclick="window.resetAdminStats()" class="text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-3 py-1 rounded uppercase tracking-wider border border-red-400/50 shadow-lg shadow-red-900/20">
+                            Reset Counters
+                        </button>
+                        <div>
+                            <p class="text-[10px] text-gray-500 font-mono uppercase tracking-widest">Refresh Rate</p>
+                            <p class="text-xs text-[#00ff88] font-bold font-mono flex items-center justify-end gap-2">
+                                <span id="refresh-spinner" class="w-3 h-3 border-2 border-[#00ff88] border-t-transparent rounded-full animate-spin"></span>
+                                1000ms
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -221,7 +222,7 @@
                             <svg class="w-4 h-4 text-[#00ff88] opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         </div>
                         <h3 class="text-5xl font-black text-white mt-4 tracking-tighter" id="stat-generated">0</h3>
-                        <p class="text-[10px] text-[#00ff88] mt-2 font-mono">▲ Lifetime 2K Output</p>
+                        <p class="text-[10px] text-[#00ff88] mt-2 font-mono">▲ Lifetime HQ Output</p>
                     </div>
                     
                     <!-- Stat Card 2 -->
@@ -278,25 +279,22 @@
                         </div>
                         <textarea id="promptInput" rows="10" 
                             class="studio-input w-full rounded-none border-l-2 border-l-[#00ff88] p-4 text-sm font-mono leading-relaxed resize-none focus:bg-[#080808]"
-                            placeholder="Enter prompts for batch generation...&#10;System locked to 2K Quality Pipeline."></textarea>
+                            placeholder="Enter prompts for batch generation...&#10;Fast & High Quality Output."></textarea>
                     </div>
 
                     <div class="bg-[#0a0a0a] p-5 border border-gray-800 space-y-4">
                         <div class="flex items-center justify-between">
                             <div>
-                                <span class="text-sm font-bold text-gray-200 block">Balanced Engine</span>
-                                <span class="text-[10px] text-gray-500">Auto-Enhance Active</span>
+                                <span class="text-sm font-bold text-gray-200 block">Standard Engine</span>
+                                <span class="text-[10px] text-gray-500">Fast Generation + Quality</span>
                             </div>
-                            <div class="flex gap-1">
-                                <div class="h-2 w-2 rounded-full bg-[#00ff88] animate-pulse"></div>
-                                <div class="h-2 w-2 rounded-full bg-[#ff9900] animate-pulse delay-75"></div>
-                            </div>
+                            <div class="h-2 w-2 rounded-full bg-[#00ff88] animate-pulse"></div>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-[10px] text-gray-500 font-mono">
                             <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> 1. Generate</div>
-                            <div class="flex items-center gap-2"><span class="text-[#ff9900]">●</span> 2. Auto-Enhance</div>
+                            <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> HQ Quality</div>
                             <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> Locked Seed</div>
-                            <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> 2K Final</div>
+                            <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> Guaranteed</div>
                         </div>
                     </div>
 
@@ -309,9 +307,9 @@
                         </select>
                     </div>
 
-                    <button onclick="startAutoPipeline()" id="genBtn"
+                    <button onclick="startBatch()" id="genBtn"
                         class="studio-btn w-full py-5 font-black text-sm tracking-widest flex items-center justify-center gap-3">
-                        <span>START PIPELINE</span>
+                        <span>START BATCH</span>
                         <div id="btnSpinner" class="hidden w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                     </button>
 
@@ -330,8 +328,8 @@
                     </div>
 
                     <button onclick="downloadAll()" id="downloadBtn" 
-                        class="w-full py-4 bg-[#111] hover:bg-[#1a1a1a] text-gray-400 hover:text-white text-xs font-bold uppercase tracking-widest transition hidden border border-gray-800">
-                        Download ZIP (2K)
+                        class="w-full py-4 bg-[#111] hover:bg-[#1a1a1a] text-gray-400 hover:text-white text-xs font-bold uppercase tracking-widest transition hidden border border-gray-800 hidden">
+                        Download ZIP (All)
                     </button>
 
                     <!-- NEW WHATSAPP LINK -->
@@ -351,7 +349,7 @@
                 
                 <div id="imageGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
                     <div id="emptyState" class="col-span-full h-96 flex flex-col items-center justify-center border border-dashed border-gray-900 text-gray-800">
-                        <p class="font-mono text-xs tracking-widest">READY FOR PIPELINE...</p>
+                        <p class="font-mono text-xs tracking-widest">READY...</p>
                     </div>
                 </div>
             </div>
@@ -488,6 +486,24 @@
             }
         }
 
+        // Reset Stats Logic
+        window.resetAdminStats = async () => {
+            if(!confirm("Are you sure you want to RESET all counters to 0? This cannot be undone.")) return;
+            
+            const statsRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_stats', 'summary');
+            try {
+                await setDoc(statsRef, {
+                    totalGenerated: 0,
+                    totalFailed: 0,
+                    totalUsers: 0,
+                    pendingJobs: 0
+                });
+                alert("All stats reset to 0.");
+            } catch(e) {
+                alert("Reset Failed: " + e.message);
+            }
+        };
+
         // Exposed Actions
         window.postAnnouncement = async () => {
             const input = document.getElementById('admin-announcement-input');
@@ -517,7 +533,7 @@
             } catch (e) {}
         };
 
-        // Auth Forms
+        // Form Handlers
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -571,8 +587,7 @@
         let generatedItems = [];
         let isProcessing = false;
 
-        const BASE_TAGS = "(masterpiece), (best quality), (detailed)";
-        const ENHANCE_TAGS = "(masterpiece), (best quality), (2k resolution), (QHD), (sharp focus:1.4), (highly detailed:1.3), (clean lines), (smooth texture), (noise free:1.5), (grain free:1.5), (clear photography), high fidelity, 8k uhd, dslr";
+        const BASE_TAGS = "(masterpiece), (best quality), (detailed), (high resolution), (sharp focus)";
         const NEGATIVE_PROMPT = "blur, blurry, haze, noise, grain, grit, dots, distortion, low quality, jpeg artifacts, compression artifacts, dirty, messy, out of focus";
 
         document.getElementById('promptInput').addEventListener('input', function(e) {
@@ -580,7 +595,7 @@
             document.getElementById('lineCount').innerText = `${lines} Ready`;
         });
 
-        async function startAutoPipeline() {
+        async function startBatch() {
             if (isProcessing) return;
             const input = document.getElementById('promptInput').value;
             const prompts = input.split('\n').filter(line => line.trim() !== '');
@@ -592,6 +607,7 @@
             // Auto Clear
             generatedItems = [];
             document.getElementById('imageGrid').innerHTML = '';
+            document.getElementById('downloadBtn').classList.add('hidden'); // Reset download button
 
             const ratio = document.getElementById('ratioSelect').value;
             let width, height;
@@ -618,97 +634,63 @@
                 createSlot(generatedItems[i].id, generatedItems[i].prompt, i + 1);
             }
 
-            // BALANCED PIPELINE LOOP
+            // FAST BATCH LOOP
             for (let i = 0; i < prompts.length; i++) {
                 const item = generatedItems[i];
                 
-                updateProgress(i, prompts.length, "GENERATING BASE...");
+                updateProgress(i, prompts.length, "GENERATING...");
                 updateSlotStatus(item.id, "GENERATING...", "text-[#00ff88]");
                 updateLog(`Pipeline Active: Item ${i+1}`);
                 
-                // Stats: Job Started
                 if(window.updateStats) window.updateStats('start');
 
                 try {
-                    // Stagger slightly (1.5s) - Balanced speed
                     if(i > 0) await new Promise(r => setTimeout(r, 1500));
                     
+                    // INFINITE RETRY LOGIC FOR BASE
                     const baseBlob = await generateBaseImage(item.prompt, item.width, item.height, item.seed);
                     const baseUrl = URL.createObjectURL(baseBlob);
                     
-                    renderImage(item.id, baseUrl, item.prompt, i, false);
+                    // Store
+                    item.blob = baseBlob;
+                    item.finalUrl = baseUrl;
+                    item.status = 'done';
+
+                    // Render as Final
+                    renderImage(item.id, baseUrl, item.prompt, i, true); // true = final state
                     
-                    // Fire Auto-Enhance
-                    triggerAutoEnhance(item, i);
+                    if(window.updateStats) window.updateStats('success');
+                    
+                    // Activate Download Button immediately on first success
+                    document.getElementById('downloadBtn').classList.remove('hidden');
+                    
+                    checkAllDone();
 
                 } catch (e) {
-                    console.error(e);
-                    updateSlotStatus(item.id, "RETRYING...", "text-yellow-400");
-                    try {
-                        await new Promise(r => setTimeout(r, 2000));
-                        const baseBlob = await generateBaseImage(item.prompt, item.width, item.height, item.seed);
-                        const baseUrl = URL.createObjectURL(baseBlob);
-                        renderImage(item.id, baseUrl, item.prompt, i, false);
-                        triggerAutoEnhance(item, i);
-                    } catch(err) {
-                        updateSlotStatus(item.id, "FAILED", "text-red-500");
-                        if(window.updateStats) window.updateStats('fail');
-                    }
+                    console.error("Critical failure should not happen here due to infinite retry logic");
                 }
             }
             
-            updateLog("All Generations Queued. Enhancing...");
+            updateLog("Batch Complete.");
         }
 
-        async function generateBaseImage(prompt, w, h, seed) {
+        async function generateBaseImage(prompt, w, h, seed, attempts = 0) {
             const finalPrompt = `${prompt}, ${BASE_TAGS} | negative_prompt: ${NEGATIVE_PROMPT}`;
             const encodedPrompt = encodeURIComponent(finalPrompt);
             const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${w}&height=${h}&nologo=true&model=flux&enhance=false&seed=${seed}&t=${Date.now()}`;
             
-            const response = await fetch(url);
-            if (!response.ok) throw new Error("Gen Failed");
-            return await response.blob();
-        }
-
-        async function triggerAutoEnhance(item, index) {
-            const slot = document.getElementById(item.id);
-            if(slot) {
-                slot.classList.add('enhancing');
-                updateSlotStatus(item.id, "AUTO-ENHANCING TO 2K...", "text-[#ff9900]");
-                const spinner = slot.querySelector('.loading-overlay');
-                if(spinner) spinner.classList.remove('hidden');
-            }
-
             try {
-                await new Promise(r => setTimeout(r, 1000));
-
-                const finalPrompt = `${item.prompt}, ${ENHANCE_TAGS} | negative_prompt: ${NEGATIVE_PROMPT}`;
-                const encodedPrompt = encodeURIComponent(finalPrompt);
-                
-                const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${item.width}&height=${item.height}&nologo=true&model=flux&enhance=true&seed=${item.seed}&t=${Date.now()}`;
-
                 const response = await fetch(url);
-                if (!response.ok) throw new Error("Enhance Failed");
+                if (!response.ok) throw new Error("Gen Failed");
                 const blob = await response.blob();
-                
-                if(blob.size < 5000) throw new Error("File too small");
-
-                const objectUrl = URL.createObjectURL(blob);
-                
-                item.blob = blob;
-                item.finalUrl = objectUrl;
-                item.status = 'done';
-
-                renderImage(item.id, objectUrl, item.prompt, index, true);
-                
-                // Stats: Success
-                if(window.updateStats) window.updateStats('success');
-                
-                checkAllDone();
-
+                if (blob.size < 4000) throw new Error("File too small");
+                return blob;
             } catch (e) {
-                console.error("Enhance error", e);
-                setTimeout(() => triggerAutoEnhance(item, index), 3000);
+                // Infinite Retry with Backoff
+                const delay = Math.min((attempts + 1) * 2000, 10000); 
+                console.warn(`Base Gen Retry ${attempts+1} after ${delay}ms`);
+                await new Promise(r => setTimeout(r, delay));
+                return generateBaseImage(prompt, w, h, seed, attempts + 1);
             }
         }
 
@@ -741,7 +723,7 @@
             grid.prepend(div);
         }
 
-        function renderImage(id, url, prompt, idx, isEnhanced) {
+        function renderImage(id, url, prompt, idx, isFinal) {
             const slot = document.getElementById(id);
             if (!slot) return;
             
@@ -751,15 +733,16 @@
             const spinner = slot.querySelector('.loading-overlay');
             if(spinner) spinner.classList.add('hidden');
 
-            if(isEnhanced) {
+            if(isFinal) {
                 slot.classList.remove('enhancing');
                 slot.classList.add('done');
-                updateSlotStatus(id, "2K FINISHED", "text-[#00ff88]");
+                
+                updateSlotStatus(id, "HQ FINISHED", "text-[#00ff88]");
                 
                 if(!slot.querySelector('.badge')) {
                     const badge = document.createElement('div');
-                    badge.className = "badge absolute bottom-2 right-2 bg-black/70 px-2 py-1 border border-[#00ff88]/30 rounded z-30";
-                    badge.innerHTML = `<span class="text-[9px] text-[#00ff88] font-bold tracking-widest">QHD</span>`;
+                    badge.className = `badge absolute bottom-2 right-2 bg-black/70 px-2 py-1 border border-[#00ff88]/30 rounded z-30`;
+                    badge.innerHTML = `<span class="text-[9px] font-bold tracking-widest text-[#00ff88]">HQ</span>`;
                     slot.appendChild(badge);
                 }
 
@@ -770,7 +753,7 @@
                         <p class="text-[10px] text-gray-300 font-mono px-4 text-center line-clamp-2">${prompt}</p>
                         <div class="flex gap-3">
                             <button onclick="window.open('${url}', '_blank')" class="bg-[#00ff88] text-black text-[10px] px-4 py-2 font-bold uppercase tracking-wider hover:bg-white transition rounded-full">Zoom</button>
-                            <a href="${url}" download="ProGen_2K_${idx}.png" class="border border-white text-white text-[10px] px-4 py-2 font-bold uppercase tracking-wider hover:bg-white hover:text-black transition rounded-full">Save</a>
+                            <a href="${url}" download="ProGen_${idx}.png" class="border border-white text-white text-[10px] px-4 py-2 font-bold uppercase tracking-wider hover:bg-white hover:text-black transition rounded-full">Save</a>
                         </div>
                     `;
                     slot.appendChild(actions);
@@ -803,14 +786,13 @@
             btn.disabled = processing;
             processing ? spinner.classList.remove('hidden') : spinner.classList.add('hidden');
             processing ? progress.classList.remove('hidden') : null;
-            !processing ? download.classList.remove('hidden') : download.classList.add('hidden');
             
             if(processing) {
                 btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.querySelector('span').innerText = "PIPELINE RUNNING...";
+                btn.querySelector('span').innerText = "GENERATING...";
             } else {
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.querySelector('span').innerText = "START PIPELINE";
+                btn.querySelector('span').innerText = "START BATCH";
             }
         }
 
@@ -829,30 +811,43 @@
             if(isProcessing) return;
             document.getElementById('imageGrid').innerHTML = `
                 <div id="emptyState" class="col-span-full h-96 flex flex-col items-center justify-center border border-dashed border-gray-900 text-gray-800">
-                    <p class="font-mono text-xs tracking-widest">READY FOR PIPELINE...</p>
+                    <p class="font-mono text-xs tracking-widest">READY...</p>
                 </div>
             `;
             generatedItems = [];
             toggleUI(false);
             document.getElementById('progressArea').classList.add('hidden');
+            document.getElementById('downloadBtn').classList.add('hidden');
         }
 
         async function downloadAll() {
-            if (generatedItems.length === 0) return;
+            // Check if any item has a blob
+            const hasData = generatedItems.some(i => i.blob);
+            if (!hasData) return;
+            
             const btn = document.getElementById('downloadBtn');
             const oldText = btn.innerText;
             btn.innerText = "ZIPPING...";
             btn.disabled = true;
 
             const zip = new JSZip();
-            const folder = zip.folder("ProGen_2K_Enhanced");
+            const folder = zip.folder("ProGen_Images");
             
+            let count = 0;
             generatedItems.forEach((i, idx) => {
-                if(i.blob) folder.file(`ProGen_2K_${idx+1}.png`, i.blob);
+                // Download anything that has a blob
+                if(i.blob) {
+                    folder.file(`ProGen_${idx+1}.png`, i.blob);
+                    count++;
+                }
             });
             
-            const content = await zip.generateAsync({type:"blob"});
-            saveAs(content, "ProGen_2K_Auto.zip");
+            if (count > 0) {
+                const content = await zip.generateAsync({type:"blob"});
+                saveAs(content, "ProGen_Batch_Output.zip");
+            } else {
+                alert("Nothing ready to download yet.");
+            }
             
             btn.innerText = oldText;
             btn.disabled = false;
