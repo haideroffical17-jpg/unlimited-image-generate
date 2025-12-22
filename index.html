@@ -3,854 +3,597 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProGen Studio & Admin</title>
+    <title>VIP Studio Pro - Multi-Tool Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Client-side Libraries (No API needed) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <style>
-        body { 
-            font-family: 'Space Grotesk', sans-serif; 
-            background-color: #000; 
-            color: #fff; 
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
         
-        .studio-input {
-            background: #0f0f0f;
-            border: 1px solid #333;
-            color: #fff;
-            transition: all 0.2s;
-        }
-        .studio-input:focus {
-            border-color: #00ff88;
-            outline: none;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        :root {
+            --premium-blue: #6366f1;
+            --premium-purple: #a855f7;
+            --bg-dark: #020205;
         }
 
-        .studio-btn {
-            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
-            color: #000;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-        }
-        .studio-btn:hover {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
-        }
-
-        .admin-card {
-            background: #111;
-            border: 1px solid #333;
-            padding: 20px;
-            border-radius: 12px;
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
             position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-        
-        /* Flash animation for updates */
-        @keyframes highlightUpdate {
-            0% { background-color: rgba(0, 255, 136, 0.2); border-color: #00ff88; }
-            100% { background-color: #111; border-color: #333; }
-        }
-        .flash-update {
-            animation: highlightUpdate 1s ease-out;
         }
 
-        .image-card {
-            background: #050505;
-            border: 1px solid #1a1a1a;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .image-card.done {
-            border-color: #00ff88;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        /* Ambient Background Glows */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%;
+            right: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
         }
 
-        .progress-fill { transition: width 0.3s ease; }
-        
-        /* Auth Styles */
-        .glass-panel {
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .premium-card {
+            background: linear-gradient(145deg, rgba(25, 25, 35, 0.9), rgba(10, 10, 20, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(24px);
         }
-        .hidden-app { display: none !important; }
-        
-        /* Live Indicator Pulse */
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 255, 136, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+
+        .tab-btn {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.5;
         }
-        .live-dot {
-            animation: pulse-green 1.5s infinite;
+
+        .tab-btn.active {
+            color: var(--premium-blue);
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+            opacity: 1;
         }
+
+        .glow-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5);
+        }
+
+        .glow-button:hover {
+            box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .waveform-bar {
+            background: linear-gradient(to top, var(--premium-blue), var(--premium-purple));
+            border-radius: 4px;
+        }
+
+        audio {
+            filter: invert(100%) hue-rotate(180deg) brightness(1.5);
+            height: 38px;
+            width: 100%;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            height: 4px;
+            border-radius: 10px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+
+        /* BRANDING ANIMATION */
+        @keyframes float {
+            0% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 0px rgba(99, 102, 241, 0)); }
+            50% { transform: translateY(-8px) scale(1.02); filter: drop-shadow(0 5px 15px rgba(99, 102, 241, 0.4)); }
+            100% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 0px rgba(99, 102, 241, 0)); }
+        }
+
+        .powered-by {
+            animation: float 4s ease-in-out infinite;
+            background: linear-gradient(90deg, #94a3b8, #6366f1, #a855f7, #94a3b8);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            display: inline-block;
+        }
+
+        .loader-ring {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(99, 102, 241, 0.1);
+            border-top: 4px solid var(--premium-blue);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen relative overflow-x-hidden">
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8 pt-10">
 
-    <!-- AUTHENTICATION OVERLAY -->
-    <div id="auth-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
-        <div class="glass-panel p-8 rounded-2xl w-full max-w-md shadow-[0_0_50px_rgba(0,255,136,0.1)] border border-[#00ff88]/20">
-            <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold tracking-tighter text-white">PRO<span class="text-[#00ff88]">GEN</span></h1>
-                <p class="text-xs text-gray-500 uppercase tracking-widest mt-2">Member Access</p>
+    <!-- Header & Navigation -->
+    <div class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/20">
+                <i data-lucide="shield-check" class="text-white w-8 h-8"></i>
             </div>
-
-            <!-- Login Form -->
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="text-xs text-gray-400 uppercase font-bold ml-1">Email</label>
-                    <input type="email" id="login-email" class="studio-input w-full rounded-lg p-3 mt-1" placeholder="user@progen.com" required>
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 uppercase font-bold ml-1">Password</label>
-                    <input type="password" id="login-password" class="studio-input w-full rounded-lg p-3 mt-1" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="studio-btn w-full py-3 rounded-lg mt-4">Login</button>
-                <p class="text-center text-xs text-gray-500 mt-4 cursor-pointer hover:text-white" onclick="toggleAuthMode()">
-                    New User? <span class="text-[#00ff88] underline">Sign Up Here</span>
-                </p>
-            </form>
-
-            <!-- Signup Form (Hidden) -->
-            <form id="signup-form" class="space-y-4 hidden">
-                <div>
-                    <label class="text-xs text-gray-400 uppercase font-bold ml-1">New Email</label>
-                    <input type="email" id="signup-email" class="studio-input w-full rounded-lg p-3 mt-1" placeholder="new@progen.com" required>
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 uppercase font-bold ml-1">Set Password</label>
-                    <input type="password" id="signup-password" class="studio-input w-full rounded-lg p-3 mt-1" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="studio-btn w-full py-3 rounded-lg mt-4 bg-gradient-to-r from-blue-500 to-cyan-500 border-none text-white">Create Account</button>
-                <p class="text-center text-xs text-gray-500 mt-4 cursor-pointer hover:text-white" onclick="toggleAuthMode()">
-                    Already have access? <span class="text-[#00ff88] underline">Login Here</span>
-                </p>
-            </form>
-            
-            <div id="auth-error" class="text-red-500 text-xs text-center mt-4 hidden font-mono bg-red-900/20 p-2 rounded border border-red-500/20"></div>
+            <div>
+                <h1 class="text-4xl font-black tracking-tighter text-white">VIP STUDIO <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">PRO</span></h1>
+                <p class="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em]">Multi-Tool Premium Hub</p>
+            </div>
+        </div>
+        
+        <div class="flex bg-white/5 backdrop-blur-xl rounded-2xl p-1.5 border border-white/10 overflow-x-auto max-w-full no-scrollbar">
+            <button id="tabAudio" class="tab-btn active px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="mic-2" class="w-4 h-4"></i> Audio
+            </button>
+            <button id="tabPdf" class="tab-btn px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="file-text" class="w-4 h-4"></i> PDF
+            </button>
+            <button id="tabImage" class="tab-btn px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="image" class="w-4 h-4"></i> Images
+            </button>
+            <button id="tabSecurity" class="tab-btn px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="shield-ellipsis" class="w-4 h-4"></i> Security
+            </button>
+            <button id="tabUtility" class="tab-btn px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="box" class="w-4 h-4"></i> Utility
+            </button>
         </div>
     </div>
 
-    <!-- MAIN APP (Protected) -->
-    <div id="main-app" class="hidden-app min-h-screen p-4 md:p-8 opacity-0 transition-opacity duration-1000">
-        
-        <!-- Live Announcement Banner (Hidden by default) -->
-        <div id="announcement-banner" class="hidden mb-6 bg-gradient-to-r from-[#00ff88]/20 to-blue-600/20 border border-[#00ff88]/30 p-4 rounded-xl flex items-center justify-center gap-3 animate-pulse shadow-[0_0_30px_rgba(0,255,136,0.1)]">
-            <span class="text-xl">📢</span>
-            <span id="announcement-text" class="text-sm md:text-base font-bold text-white tracking-wide font-mono"></span>
-        </div>
+    <!-- MAIN SECTIONS -->
+    <div class="w-full max-w-6xl flex-grow">
 
-        <!-- Navbar -->
-        <nav class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
-            <div class="flex items-center gap-3">
-                <h1 class="text-2xl font-bold tracking-tighter text-white">PRO<span class="text-[#00ff88]">GEN</span></h1>
-                <span class="px-2 py-0.5 bg-[#00ff88]/10 text-[#00ff88] border border-[#00ff88]/30 rounded text-[10px] font-bold tracking-widest uppercase">Studio</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <!-- Admin Stats Button (Hidden by default) -->
-                <button id="admin-stats-btn" onclick="toggleAdminPanel()" class="hidden text-xs text-[#00ff88] hover:text-white uppercase font-bold tracking-widest border border-[#00ff88]/50 px-4 py-2 rounded hover:bg-[#00ff88]/20 transition flex items-center gap-2">
-                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                    Live Stats
-                </button>
-                
-                <span id="user-email-display" class="text-xs text-gray-500 font-mono hidden md:block"></span>
-                <button onclick="handleLogout()" class="text-xs text-red-400 hover:text-white uppercase font-bold tracking-widest border border-red-900/50 px-4 py-2 rounded hover:bg-red-900/50 transition">
-                    Logout
-                </button>
-            </div>
-        </nav>
-
-        <!-- ADMIN DASHBOARD (Overlay) -->
-        <div id="admin-dashboard" class="hidden fixed inset-0 z-40 bg-black/95 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
-            <div class="bg-[#0a0a0a] border border-[#333] w-full max-w-5xl rounded-2xl p-8 relative shadow-2xl my-auto">
-                <button onclick="toggleAdminPanel()" class="absolute top-4 right-4 text-gray-500 hover:text-white">✕ Close</button>
-                
-                <!-- Live Header -->
-                <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 pb-4 border-b border-gray-800">
-                    <div class="flex items-center gap-3">
-                        <h2 class="text-3xl font-bold text-white tracking-tight">System Monitor</h2>
-                        <span class="px-3 py-1 bg-[#00ff88]/10 text-[#00ff88] border border-[#00ff88]/30 rounded-full text-[10px] font-bold flex items-center gap-2">
-                            <span class="w-2 h-2 bg-[#00ff88] rounded-full live-dot"></span>
-                            LIVE FEED
-                        </span>
-                    </div>
-                    <div class="text-right flex items-center gap-4">
-                        <button onclick="window.resetAdminStats()" class="text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-3 py-1 rounded uppercase tracking-wider border border-red-400/50 shadow-lg shadow-red-900/20">
-                            Reset Counters
-                        </button>
-                        <div>
-                            <p class="text-[10px] text-gray-500 font-mono uppercase tracking-widest">Refresh Rate</p>
-                            <p class="text-xs text-[#00ff88] font-bold font-mono flex items-center justify-end gap-2">
-                                <span id="refresh-spinner" class="w-3 h-3 border-2 border-[#00ff88] border-t-transparent rounded-full animate-spin"></span>
-                                1000ms
-                            </p>
-                        </div>
-                    </div>
+        <!-- 1. AUDIO SECTION -->
+        <section id="audioSection" class="space-y-8 animate-in fade-in duration-700">
+            <div class="premium-card rounded-[4rem] p-10 md:p-16 text-center border-t border-white/10">
+                <div id="audioDrop" class="border-2 border-dashed border-white/5 rounded-[3rem] p-24 hover:bg-white/5 cursor-pointer transition-all group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <input type="file" id="audioInput" accept="audio/*,video/*" class="hidden">
+                    <i data-lucide="music-4" class="w-20 h-20 text-indigo-400 mx-auto mb-8 group-hover:scale-110 transition-transform duration-500"></i>
+                    <h2 class="text-3xl font-bold text-white">Audio ya Video Select Karein</h2>
+                    <p class="text-slate-500 mt-3 text-lg font-medium">Gap cutting ya Video se High-Quality audio nikalne ke liye.</p>
                 </div>
 
-                <!-- Announcement Manager -->
-                <div class="mb-8 bg-[#111] border border-[#333] p-6 rounded-xl">
-                    <h3 class="text-white font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-widest border-b border-gray-800 pb-2">
-                        <span>📢</span> Live Announcement Center
-                    </h3>
-                    <div class="flex flex-col md:flex-row gap-4">
-                        <input type="text" id="admin-announcement-input" class="studio-input w-full rounded-lg p-3 text-sm font-mono" placeholder="Write a message for all users (e.g. Server Maintenance in 10 mins)...">
-                        <div class="flex gap-2">
-                            <button onclick="window.postAnnouncement()" class="bg-[#00ff88] text-black font-bold px-6 rounded-lg hover:bg-white transition uppercase text-xs tracking-widest whitespace-nowrap shadow-[0_0_15px_rgba(0,255,136,0.3)]">
-                                Post Live
-                            </button>
-                            <button onclick="window.deleteAnnouncement()" class="bg-red-500/10 text-red-500 border border-red-500/50 font-bold px-6 rounded-lg hover:bg-red-500 hover:text-white transition uppercase text-xs tracking-widest whitespace-nowrap">
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-[10px] text-gray-500 mt-2 ml-1">Current Active Message: <span id="admin-current-msg" class="text-[#00ff88] font-mono">None</span></p>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Stat Card 1 -->
-                    <div class="admin-card group" id="card-generated">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs text-gray-500 uppercase tracking-widest font-bold">Total Generated</p>
-                            <svg class="w-4 h-4 text-[#00ff88] opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <h3 class="text-5xl font-black text-white mt-4 tracking-tighter" id="stat-generated">0</h3>
-                        <p class="text-[10px] text-[#00ff88] mt-2 font-mono">▲ Lifetime HQ Output</p>
-                    </div>
-                    
-                    <!-- Stat Card 2 -->
-                    <div class="admin-card border-[#ff9900]/20 group" id="card-pending">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs text-gray-500 uppercase tracking-widest font-bold text-[#ff9900]">Live Pending</p>
-                            <svg class="w-4 h-4 text-[#ff9900] opacity-50 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        </div>
-                        <h3 class="text-5xl font-black text-white mt-4 tracking-tighter" id="stat-pending">0</h3>
-                        <p class="text-[10px] text-[#ff9900] mt-2 font-mono">● Currently Processing</p>
-                    </div>
-
-                    <!-- Stat Card 3 -->
-                    <div class="admin-card group" id="card-users">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs text-gray-500 uppercase tracking-widest font-bold">Total Members</p>
-                            <svg class="w-4 h-4 text-blue-400 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        </div>
-                        <h3 class="text-5xl font-black text-white mt-4 tracking-tighter" id="stat-users">0</h3>
-                        <p class="text-[10px] text-blue-400 mt-2 font-mono">● Active Accounts</p>
-                    </div>
-
-                    <!-- Stat Card 4 -->
-                    <div class="admin-card border-red-900/20 group" id="card-failed">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs text-gray-500 uppercase tracking-widest font-bold text-red-500">Failed Jobs</p>
-                            <svg class="w-4 h-4 text-red-500 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <h3 class="text-5xl font-black text-white mt-4 tracking-tighter" id="stat-failed">0</h3>
-                        <p class="text-[10px] text-red-500 mt-2 font-mono">▼ System Errors</p>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-gray-800 flex justify-between items-center">
-                    <p class="text-xs text-gray-600 font-mono flex items-center gap-2">
-                        System Status: <span class="text-[#00ff88]">OPERATIONAL</span>
-                    </p>
-                    <p class="text-[10px] text-gray-700 font-mono" id="last-update-time">Last Sync: Just now</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            <!-- Sidebar -->
-            <div class="lg:col-span-3 space-y-6">
-                
-                <!-- Controls -->
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-end">
-                            <label class="text-xs font-bold text-gray-500 uppercase">Batch Prompts</label>
-                            <span id="lineCount" class="text-[#00ff88] text-xs font-mono font-bold">0 Ready</span>
-                        </div>
-                        <textarea id="promptInput" rows="10" 
-                            class="studio-input w-full rounded-none border-l-2 border-l-[#00ff88] p-4 text-sm font-mono leading-relaxed resize-none focus:bg-[#080808]"
-                            placeholder="Enter prompts for batch generation...&#10;Fast & High Quality Output."></textarea>
-                    </div>
-
-                    <div class="bg-[#0a0a0a] p-5 border border-gray-800 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-sm font-bold text-gray-200 block">Standard Engine</span>
-                                <span class="text-[10px] text-gray-500">Fast Generation + Quality</span>
+                <div id="audioEditor" class="hidden space-y-12 mt-12 animate-in slide-in-from-bottom-4 duration-700">
+                    <div id="visualizer" class="h-40 w-full bg-black/60 rounded-[2.5rem] flex items-center justify-center gap-1.5 px-10 shadow-inner"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+                        <div class="space-y-6">
+                            <div class="flex justify-between items-center px-2">
+                                <label class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-indigo-400"></i> Sensitivity</label>
+                                <span id="sensVal" class="bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-lg font-mono text-sm">-45dB</span>
                             </div>
-                            <div class="h-2 w-2 rounded-full bg-[#00ff88] animate-pulse"></div>
+                            <input type="range" id="threshold" min="-70" max="-20" value="-45" class="w-full">
                         </div>
-                        <div class="grid grid-cols-2 gap-2 text-[10px] text-gray-500 font-mono">
-                            <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> 1. Generate</div>
-                            <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> HQ Quality</div>
-                            <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> Locked Seed</div>
-                            <div class="flex items-center gap-2"><span class="text-[#00ff88]">●</span> Guaranteed</div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-gray-500 uppercase">Dimensions</label>
-                        <select id="ratioSelect" class="studio-input w-full rounded-none p-3 text-sm font-mono">
-                            <option value="landscape">Landscape (2560x1440)</option>
-                            <option value="portrait">Portrait (1440x2560)</option>
-                            <option value="square">Square (2048x2048)</option>
-                        </select>
-                    </div>
-
-                    <button onclick="startBatch()" id="genBtn"
-                        class="studio-btn w-full py-5 font-black text-sm tracking-widest flex items-center justify-center gap-3">
-                        <span>START BATCH</span>
-                        <div id="btnSpinner" class="hidden w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                    </button>
-
-                    <!-- Status Panel -->
-                    <div id="progressArea" class="hidden space-y-2">
-                        <div class="flex justify-between text-[10px] text-gray-500 font-mono">
-                            <span id="statusText">IDLE</span>
-                            <span id="progressText">0%</span>
-                        </div>
-                        <div class="w-full bg-[#111] h-1">
-                            <div id="progressBar" class="progress-fill bg-[#00ff88] h-full w-0 shadow-[0_0_15px_#00ff88]"></div>
-                        </div>
-                        <div class="text-[9px] text-gray-600 font-mono text-center pt-1" id="logText">
-                            System Ready
+                        <div class="space-y-6">
+                            <div class="flex justify-between items-center px-2">
+                                <label class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><i data-lucide="volume-2" class="w-4 h-4 text-purple-400"></i> Master Volume</label>
+                                <span id="gainVal" class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-lg font-mono text-sm">100%</span>
+                            </div>
+                            <input type="range" id="gain" min="100" max="400" step="10" value="100" class="w-full">
                         </div>
                     </div>
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <button id="processAudio" class="glow-button flex-1 py-7 rounded-[2rem] font-black text-2xl text-white tracking-tighter">RENDER VIP AUDIO</button>
+                        <button id="extractAudio" class="bg-white/5 border border-white/10 flex-1 py-7 rounded-[2rem] font-black text-2xl text-indigo-400 hover:bg-white/10 transition-all tracking-tighter">EXTRACT MP3 ONLY</button>
+                    </div>
+                </div>
 
-                    <button onclick="downloadAll()" id="downloadBtn" 
-                        class="w-full py-4 bg-[#111] hover:bg-[#1a1a1a] text-gray-400 hover:text-white text-xs font-bold uppercase tracking-widest transition hidden border border-gray-800 hidden">
-                        Download ZIP (All)
-                    </button>
-
-                    <!-- NEW WHATSAPP LINK -->
-                    <a href="https://whatsapp.com/channel/0029VbBoEt19cDDiTAk69X2L" target="_blank" class="block w-full py-4 mt-4 text-center bg-[#25D366]/20 hover:bg-[#25D366]/30 text-[#25D366] border border-[#25D366]/50 rounded-lg text-xs font-bold uppercase tracking-widest transition flex items-center justify-center gap-2">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.024.558 1.922.768 2.813.769 3.18 0 5.767-2.587 5.768-5.766.001-3.185-2.588-5.771-5.769-5.771zm0 2.9c1.593 0 2.889 1.296 2.889 2.889 0 1.591-1.296 2.889-2.889 2.889-1.591 0-2.889-1.298-2.889-2.889 0-1.593 1.298-2.889 2.889-2.889zm-8.844-2.883c2.322-2.322 5.482-3.601 8.844-3.601 6.892 0 12.5 5.608 12.5 12.5s-5.608 12.5-12.5 12.5c-2.196 0-4.309-.569-6.196-1.636l-5.835 1.53 1.562-5.684c-1.197-2.072-1.829-4.434-1.829-6.841 0-3.238 1.139-6.234 3.454-8.768z"/></svg>
-                        Join Channel for More Tools & Updates
+                <div id="audioResults" class="hidden mt-12 space-y-10 animate-in zoom-in-95 duration-500">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="p-8 bg-white/5 rounded-[2.5rem] text-left border border-white/5">
+                            <p class="text-[10px] font-black text-slate-500 mb-5 uppercase tracking-[0.3em]">Before (Source)</p>
+                            <audio id="playerBefore" controls></audio>
+                        </div>
+                        <div class="p-8 bg-indigo-500/5 rounded-[2.5rem] text-left border border-indigo-500/20 shadow-lg shadow-indigo-500/5">
+                            <p class="text-[10px] font-black text-indigo-400 mb-5 uppercase tracking-[0.3em]">After (Studio Mastered)</p>
+                            <audio id="playerAfter" controls></audio>
+                        </div>
+                    </div>
+                    <a id="audioDownload" href="#" class="glow-button inline-flex px-16 py-6 rounded-2xl text-white font-black text-xl items-center gap-4 transition-transform hover:scale-105">
+                        <i data-lucide="download"></i> DOWNLOAD WAV
                     </a>
                 </div>
             </div>
+        </section>
 
-            <!-- Gallery -->
-            <div class="lg:col-span-9 flex flex-col h-full">
-                <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-900">
-                    <h2 class="text-xl font-light text-gray-400">YOUR <span class="text-white font-bold">GALLERY</span></h2>
-                    <button onclick="clearGallery()" class="text-[10px] text-gray-600 hover:text-[#00ff88] transition font-mono uppercase tracking-widest">Clear Workspace</button>
+        <!-- 2. PDF SECTION -->
+        <section id="pdfSection" class="hidden space-y-8 animate-in fade-in duration-700">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="premium-card rounded-[3.5rem] p-12 space-y-8 border-t border-white/5">
+                    <div class="flex items-center gap-4"><div class="p-3 bg-indigo-500/20 rounded-2xl text-indigo-400"><i data-lucide="file-plus"></i></div><h3 class="text-2xl font-bold">Image to PDF</h3></div>
+                    <div onclick="document.getElementById('imgToPdfInput').click()" class="border-2 border-dashed border-white/5 rounded-3xl p-12 text-center hover:bg-white/5 cursor-pointer transition-all">
+                        <input type="file" id="imgToPdfInput" accept="image/*" multiple class="hidden">
+                        <i data-lucide="plus" class="w-10 h-10 text-slate-600 mx-auto mb-4"></i>
+                        <p class="text-sm text-slate-500 font-medium">Select Multiple Images</p>
+                        <p id="imgSelectedLabel" class="text-indigo-400 font-bold mt-3 hidden"></p>
+                    </div>
+                    <button id="btnImgToPdf" class="w-full py-5 rounded-2xl font-black bg-white/5 text-slate-600 transition-all" disabled>GENERATE PDF</button>
                 </div>
-                
-                <div id="imageGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
-                    <div id="emptyState" class="col-span-full h-96 flex flex-col items-center justify-center border border-dashed border-gray-900 text-gray-800">
-                        <p class="font-mono text-xs tracking-widest">READY...</p>
+                <div class="premium-card rounded-[3.5rem] p-12 space-y-8 border-t border-white/5">
+                    <div class="flex items-center gap-4"><div class="p-3 bg-purple-500/20 rounded-2xl text-purple-400"><i data-lucide="file-image"></i></div><h3 class="text-2xl font-bold">PDF to PNG</h3></div>
+                    <div onclick="document.getElementById('pdfInput').click()" class="border-2 border-dashed border-white/5 rounded-3xl p-12 text-center hover:bg-white/5 cursor-pointer transition-all">
+                        <input type="file" id="pdfInput" accept="application/pdf" class="hidden">
+                        <i data-lucide="file-up" class="w-10 h-10 text-slate-600 mx-auto mb-4"></i>
+                        <p class="text-sm text-slate-500 font-medium">Select PDF File</p>
+                        <p id="pdfSelectedLabel" class="text-purple-400 font-bold mt-3 hidden"></p>
+                    </div>
+                    <button id="btnPdfToImg" class="w-full py-5 rounded-2xl font-black bg-white/5 text-slate-600 transition-all" disabled>EXTRACT PAGES</button>
+                </div>
+            </div>
+            <div id="pdfOutputGallery" class="grid grid-cols-2 md:grid-cols-4 gap-6 hidden mt-8"></div>
+        </section>
+
+        <!-- 3. IMAGE SECTION -->
+        <section id="imageSection" class="hidden space-y-8 animate-in fade-in duration-700">
+            <div class="premium-card rounded-[4rem] p-12 md:p-16 border-t border-white/5">
+                <div id="imageDrop" class="border-2 border-dashed border-white/5 rounded-[3rem] p-24 text-center hover:bg-white/5 cursor-pointer transition-all group">
+                    <input type="file" id="imageMasterInput" accept="image/*" class="hidden">
+                    <i data-lucide="camera" class="w-20 h-20 text-indigo-400 mx-auto mb-8 group-hover:rotate-12 transition-transform duration-500"></i>
+                    <h2 class="text-3xl font-bold text-white">Image Editor & Pro Converter</h2>
+                    <p class="text-slate-500 mt-3 text-lg">PNG, JPG, WEBP formats with High-End Filters.</p>
+                </div>
+
+                <div id="imageEditorUI" class="hidden mt-12 space-y-12 animate-in slide-in-from-bottom-4 duration-700">
+                    <div class="flex flex-col md:flex-row gap-12">
+                        <div class="flex-1 flex flex-col items-center justify-center p-6 bg-black/60 rounded-[3rem] border border-white/5 overflow-hidden shadow-2xl">
+                            <canvas id="filterCanvas" class="max-h-[400px] shadow-2xl"></canvas>
+                        </div>
+                        <div class="flex-1 space-y-8">
+                            <div class="p-8 bg-white/5 rounded-[2.5rem] space-y-8 border border-white/5">
+                                <label class="text-xs font-black text-indigo-400 uppercase tracking-[0.3em]">Master Filters</label>
+                                <div class="space-y-6">
+                                    <div class="space-y-4">
+                                        <div class="flex justify-between items-center px-1"><span class="text-xs font-bold text-slate-400">BRIGHTNESS</span><span class="text-xs text-indigo-400 font-mono" id="brightVal">100%</span></div>
+                                        <input type="range" id="bright" min="0" max="200" value="100" class="w-full">
+                                    </div>
+                                    <div class="space-y-4">
+                                        <div class="flex justify-between items-center px-1"><span class="text-xs font-bold text-slate-400">CONTRAST</span><span class="text-xs text-indigo-400 font-mono" id="contVal">100%</span></div>
+                                        <input type="range" id="contrast" min="0" max="200" value="100" class="w-full">
+                                    </div>
+                                    <button id="grayToggle" class="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all">GRAYSCALE: OFF</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="space-y-3">
+                                    <label class="text-[10px] font-black text-slate-500 tracking-[0.2em] uppercase">Format</label>
+                                    <select id="imgFormat" class="w-full bg-black/40 border border-white/10 p-4 rounded-2xl text-sm outline-none font-bold text-white">
+                                        <option value="png">PNG</option>
+                                        <option value="jpeg">JPG</option>
+                                        <option value="webp">WEBP</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="text-[10px] font-black text-slate-500 tracking-[0.2em] uppercase">Width (px)</label>
+                                    <input type="number" id="imgWidth" class="w-full bg-black/40 border border-white/10 p-4 rounded-2xl text-sm outline-none font-mono text-indigo-400">
+                                </div>
+                            </div>
+                            <button id="convertImageBtn" class="glow-button w-full py-7 rounded-[2rem] font-black text-2xl text-white">DOWNLOAD VIP IMAGE</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- 4. SECURITY SECTION -->
+        <section id="securitySection" class="hidden space-y-8 animate-in fade-in duration-700">
+            <div class="max-w-4xl mx-auto">
+                <div class="premium-card rounded-[4rem] p-12 md:p-16 space-y-12 border-t border-white/5">
+                    <div class="text-center space-y-4">
+                        <div class="w-24 h-24 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/5">
+                            <i data-lucide="shield-ellipsis" class="w-12 h-12 text-emerald-400"></i>
+                        </div>
+                        <h2 class="text-4xl font-bold text-white">VIP Password Generator</h2>
+                        <p class="text-slate-500 text-lg">Mahfooz aur random passwords foran generate karein.</p>
+                    </div>
+
+                    <div class="space-y-10">
+                        <div class="relative group">
+                            <input type="text" id="passwordOutput" readonly placeholder="Aapka password..." class="w-full bg-black/60 border border-white/10 p-10 rounded-[3rem] text-3xl font-mono text-emerald-400 outline-none text-center shadow-inner tracking-widest">
+                            <button onclick="copyToClipboard('passwordOutput')" class="absolute right-8 top-1/2 -translate-y-1/2 p-5 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-2xl transition-all group-active:scale-95 shadow-xl">
+                                <i data-lucide="copy" class="w-7 h-7 text-emerald-400"></i>
+                            </button>
+                        </div>
+
+                        <div class="p-10 bg-white/5 rounded-[3rem] border border-white/5 space-y-8">
+                            <div class="flex justify-between items-center px-4">
+                                <label class="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">Password Length</label>
+                                <span id="passLenVal" class="text-3xl font-mono text-emerald-400">16</span>
+                            </div>
+                            <input type="range" id="passLength" min="8" max="32" value="16" class="w-full accent-emerald-500 h-2">
+                        </div>
+
+                        <button id="generatePassBtn" class="w-full py-8 rounded-[2.5rem] font-black text-2xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-2xl shadow-emerald-600/30 flex items-center justify-center gap-5 transition-all active:scale-[0.98]">
+                            <i data-lucide="refresh-cw" class="w-8 h-8"></i> GENERATE VIP PASSWORD
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. UTILITY SECTION -->
+        <section id="utilitySection" class="hidden space-y-8 animate-in fade-in duration-700">
+            <div class="max-w-5xl mx-auto">
+                <div class="premium-card rounded-[4rem] p-12 md:p-16 space-y-12 border-t border-white/5">
+                    <h3 class="text-3xl font-bold flex items-center gap-4"><div class="p-3 bg-indigo-500/20 rounded-2xl text-indigo-400"><i data-lucide="type"></i></div>Text Master (Gap Cleaner)</h3>
+                    <textarea id="textUtilInput" placeholder="Apna text yahan likhein (Caption, hashtags wagera)..." class="w-full h-80 bg-black/60 border border-white/10 rounded-[3rem] p-10 outline-none focus:border-indigo-500 text-lg leading-relaxed text-slate-300 shadow-inner"></textarea>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <button onclick="convertText('up')" class="p-6 bg-white/5 rounded-3xl text-sm font-black uppercase tracking-widest hover:bg-white/10 transition-all">UPPERCASE</button>
+                        <button onclick="convertText('low')" class="p-6 bg-white/5 rounded-3xl text-sm font-black uppercase tracking-widest hover:bg-white/10 transition-all">lowercase</button>
+                        <button onclick="cleanTextGaps()" class="p-6 bg-indigo-600 text-white rounded-3xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl shadow-indigo-500/20">
+                            <i data-lucide="align-left" class="w-5 h-5"></i> CLEAN GAPS
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-between items-center px-8 pt-8 border-t border-white/5">
+                        <div id="textStats" class="text-[10px] text-slate-500 font-black uppercase tracking-[0.3em] flex gap-10">
+                            <span>Words: 0</span><span>Characters: 0</span>
+                        </div>
+                        <button onclick="copyToClipboard('textUtilInput')" class="text-indigo-400 font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:text-white transition-all">
+                            <i data-lucide="copy" class="w-4 h-4"></i> COPY RESULT
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </div>
 
-    <!-- FIREBASE MODULE -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, getDoc, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Powered By Footer -->
+    <div class="mt-16 text-center pb-12">
+        <span class="powered-by font-black text-xl uppercase italic">Powered by Grow With Haider</span>
+    </div>
 
-        // Your Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyDad3GhgWdCKU3dU1_4BOrLZUqJWdBDWR4",
-            authDomain: "image-51860.firebaseapp.com",
-            databaseURL: "https://image-51860-default-rtdb.firebaseio.com",
-            projectId: "image-51860",
-            storageBucket: "image-51860.firebasestorage.app",
-            messagingSenderId: "153231836218",
-            appId: "1:153231836218:web:21d720207627e5f5e06103",
-            measurementId: "G-524HRCQZ8Z"
-        };
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-10 py-4 rounded-full text-sm font-black uppercase tracking-widest opacity-0 transition-all pointer-events-none shadow-2xl z-50">Copied to Clipboard!</div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'progen-studio';
-        const ADMIN_EMAIL = 'haideroffical16@gmail.com';
+    <script>
+        lucide.createIcons();
 
-        // UI References
-        const authContainer = document.getElementById('auth-container');
-        const mainApp = document.getElementById('main-app');
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const userDisplay = document.getElementById('user-email-display');
-        const authError = document.getElementById('auth-error');
-        const adminBtn = document.getElementById('admin-stats-btn');
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Logged In
-                authContainer.classList.add('hidden-app');
-                mainApp.classList.remove('hidden-app');
-                setTimeout(() => mainApp.classList.remove('opacity-0'), 100);
-                userDisplay.innerText = user.email || 'User';
-                
-                await initStats();
-                initAnnouncementListener();
-
-                if (user.email === ADMIN_EMAIL) {
-                    adminBtn.classList.remove('hidden');
-                    initAdminListener();
-                } else {
-                    adminBtn.classList.add('hidden');
-                }
-            } else {
-                mainApp.classList.add('hidden-app', 'opacity-0');
-                authContainer.classList.remove('hidden-app');
-                adminBtn.classList.add('hidden');
-            }
+        // TAB LOGIC
+        const tabs = ['Audio', 'Pdf', 'Image', 'Security', 'Utility'];
+        tabs.forEach(t => {
+            document.getElementById('tab' + t).onclick = () => {
+                tabs.forEach(x => {
+                    document.getElementById(x.toLowerCase() + 'Section').classList.add('hidden');
+                    document.getElementById('tab' + x).classList.remove('active');
+                });
+                document.getElementById(t.toLowerCase() + 'Section').classList.remove('hidden');
+                document.getElementById('tab' + t).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
         });
 
-        // Initialize Stats
-        async function initStats() {
-            try {
-                const statsRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_stats', 'summary');
-                const docSnap = await getDoc(statsRef);
-                if (!docSnap.exists()) {
-                    await setDoc(statsRef, {
-                        totalGenerated: 0,
-                        totalFailed: 0,
-                        totalUsers: 0,
-                        pendingJobs: 0
+        // --- AUDIO TOOLS ---
+        const audioInput = document.getElementById('audioInput');
+        const audioDrop = document.getElementById('audioDrop');
+        const audioEditor = document.getElementById('audioEditor');
+        const visualizer = document.getElementById('visualizer');
+        const playerBefore = document.getElementById('playerBefore');
+        const playerAfter = document.getElementById('playerAfter');
+        const audioDownload = document.getElementById('audioDownload');
+        let originalBuffer = null;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        audioDrop.onclick = () => audioInput.click();
+        document.getElementById('threshold').oninput = (e) => document.getElementById('sensVal').innerText = e.target.value + 'dB';
+        document.getElementById('gain').oninput = (e) => document.getElementById('gainVal').innerText = e.target.value + '%';
+
+        audioInput.onchange = async (e) => {
+            const file = e.target.files[0]; if(!file) return;
+            audioDrop.classList.add('hidden'); audioEditor.classList.remove('hidden');
+            playerBefore.src = URL.createObjectURL(file);
+            const arrBuf = await file.arrayBuffer();
+            originalBuffer = await audioCtx.decodeAudioData(arrBuf);
+            drawWave(originalBuffer);
+        };
+
+        function drawWave(buffer) {
+            visualizer.innerHTML = ''; const data = buffer.getChannelData(0); const bars = 150; const step = Math.floor(data.length / bars);
+            for(let i=0; i<bars; i++) {
+                let max = 0; for(let j=0; j<step; j++) { let v = Math.abs(data[i*step+j]); if(v>max) max=v; }
+                const b = document.createElement('div'); b.className = 'waveform-bar flex-1'; b.style.height = Math.max(10, max * 100) + '%';
+                visualizer.appendChild(b);
+            }
+        }
+
+        document.getElementById('processAudio').onclick = () => runAudioTask(true);
+        document.getElementById('extractAudio').onclick = () => runAudioTask(false);
+
+        async function runAudioTask(isCutter) {
+            document.getElementById('audioResults').classList.add('hidden');
+            const threshold = Math.pow(10, parseFloat(document.getElementById('threshold').value) / 20);
+            const gain = parseInt(document.getElementById('gain').value) / 100;
+            const sr = originalBuffer.sampleRate; const data = originalBuffer.getChannelData(0); const len = originalBuffer.length;
+            let outBuf;
+            if(isCutter) {
+                const voiceMap = new Uint8Array(len); const win = 256;
+                for(let i=0; i<len; i+=win) {
+                    let sum = 0; const end = Math.min(i+win, len);
+                    for(let j=i; j<end; j++) sum += data[j]*data[j];
+                    if(Math.sqrt(sum/win) > threshold) for(let j=i; j<end; j++) voiceMap[j] = 1;
+                }
+                const segments = []; let inS = false, start = 0;
+                for(let i=0; i<len; i++) {
+                    if(voiceMap[i] && !inS) { start = i; inS = true; }
+                    else if(!voiceMap[i] && inS) { segments.push({s: start, e: i}); inS = false; }
+                }
+                if(inS) segments.push({s: start, e: len});
+                let outLen = 0; segments.forEach(seg => outLen += (seg.e - seg.s));
+                outBuf = audioCtx.createBuffer(originalBuffer.numberOfChannels, outLen, sr);
+                for(let c=0; c<outBuf.numberOfChannels; c++) {
+                    const src = originalBuffer.getChannelData(c), dst = outBuf.getChannelData(c);
+                    let off = 0; segments.forEach(seg => {
+                        const chunk = src.subarray(seg.s, seg.e);
+                        for(let i=0; i<chunk.length; i++) dst[off + i] = Math.max(-1, Math.min(1, chunk[i] * gain));
+                        off += chunk.length;
                     });
                 }
-            } catch(e) { console.log("Stats check info:", e); }
-        }
-
-        // Announcement Logic (Global)
-        function initAnnouncementListener() {
-            const announcementRef = doc(db, 'artifacts', appId, 'public', 'data', 'system_data', 'announcement');
-            
-            onSnapshot(announcementRef, (doc) => {
-                const banner = document.getElementById('announcement-banner');
-                const textSpan = document.getElementById('announcement-text');
-                const adminMsg = document.getElementById('admin-current-msg');
-                
-                if (doc.exists() && doc.data().text) {
-                    textSpan.innerText = doc.data().text;
-                    banner.classList.remove('hidden');
-                    if(adminMsg) adminMsg.innerText = doc.data().text;
-                } else {
-                    banner.classList.add('hidden');
-                    if(adminMsg) adminMsg.innerText = "None";
-                }
-            });
-        }
-
-        // Admin Only Logic
-        function initAdminListener() {
-            const statsRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_stats', 'summary');
-            let lastData = {};
-
-            setInterval(() => {
-                document.getElementById('last-update-time').innerText = `Last Sync: ${new Date().toLocaleTimeString()}`;
-                const spinner = document.getElementById('refresh-spinner');
-                spinner.style.opacity = spinner.style.opacity === '0.5' ? '1' : '0.5';
-            }, 1000);
-
-            onSnapshot(statsRef, (doc) => {
-                if (doc.exists()) {
-                    const data = doc.data();
-                    
-                    updateStatWithEffect('stat-generated', data.totalGenerated || 0, 'card-generated');
-                    updateStatWithEffect('stat-pending', data.pendingJobs || 0, 'card-pending');
-                    updateStatWithEffect('stat-users', data.totalUsers || 0, 'card-users');
-                    updateStatWithEffect('stat-failed', data.totalFailed || 0, 'card-failed');
-                    
-                    lastData = data;
-                }
-            });
-        }
-
-        function updateStatWithEffect(elementId, newValue, cardId) {
-            const el = document.getElementById(elementId);
-            if(el.innerText != newValue) {
-                el.innerText = newValue;
-                const card = document.getElementById(cardId);
-                card.classList.remove('flash-update');
-                void card.offsetWidth; 
-                card.classList.add('flash-update');
-            }
-        }
-
-        // Reset Stats Logic
-        window.resetAdminStats = async () => {
-            if(!confirm("Are you sure you want to RESET all counters to 0? This cannot be undone.")) return;
-            
-            const statsRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_stats', 'summary');
-            try {
-                await setDoc(statsRef, {
-                    totalGenerated: 0,
-                    totalFailed: 0,
-                    totalUsers: 0,
-                    pendingJobs: 0
-                });
-                alert("All stats reset to 0.");
-            } catch(e) {
-                alert("Reset Failed: " + e.message);
-            }
-        };
-
-        // Exposed Actions
-        window.postAnnouncement = async () => {
-            const input = document.getElementById('admin-announcement-input');
-            if(!input.value) return;
-            const announcementRef = doc(db, 'artifacts', appId, 'public', 'data', 'system_data', 'announcement');
-            try {
-                await setDoc(announcementRef, { text: input.value, timestamp: Date.now() });
-                input.value = '';
-            } catch(e) { alert("Failed to post: " + e.message); }
-        };
-
-        window.deleteAnnouncement = async () => {
-            const announcementRef = doc(db, 'artifacts', appId, 'public', 'data', 'system_data', 'announcement');
-            try {
-                await deleteDoc(announcementRef);
-            } catch(e) { alert("Failed to delete"); }
-        };
-
-        window.updateStats = async (type) => {
-            if (!auth.currentUser) return;
-            const statsRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_stats', 'summary');
-            try {
-                if (type === 'start') await updateDoc(statsRef, { pendingJobs: increment(1) });
-                else if (type === 'success') await updateDoc(statsRef, { pendingJobs: increment(-1), totalGenerated: increment(1) });
-                else if (type === 'fail') await updateDoc(statsRef, { pendingJobs: increment(-1), totalFailed: increment(1) });
-                else if (type === 'user_add') await updateDoc(statsRef, { totalUsers: increment(1) });
-            } catch (e) {}
-        };
-
-        // Form Handlers
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-password').value;
-            authError.classList.add('hidden');
-            
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (error) {
-                let msg = "Login failed.";
-                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') msg = "Incorrect credentials.";
-                authError.innerText = msg;
-                authError.classList.remove('hidden');
-            }
-        });
-
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('signup-email').value;
-            const pass = document.getElementById('signup-password').value;
-            authError.classList.add('hidden');
-
-            try {
-                await createUserWithEmailAndPassword(auth, email, pass);
-                window.updateStats('user_add');
-            } catch (error) {
-                let msg = error.message;
-                if (error.code === 'auth/email-already-in-use') msg = "This email is already registered. Please Login instead.";
-                else if (error.code === 'auth/weak-password') msg = "Password needs 6+ characters.";
-                authError.innerText = msg;
-                authError.classList.remove('hidden');
-            }
-        });
-
-        window.handleLogout = () => signOut(auth);
-        
-        window.toggleAuthMode = () => {
-            loginForm.classList.toggle('hidden');
-            signupForm.classList.toggle('hidden');
-            authError.classList.add('hidden');
-        };
-        
-        window.toggleAdminPanel = () => {
-            const panel = document.getElementById('admin-dashboard');
-            panel.classList.toggle('hidden');
-        };
-    </script>
-
-    <!-- APP LOGIC (Global Scope) -->
-    <script>
-        let generatedItems = [];
-        let isProcessing = false;
-
-        const BASE_TAGS = "(masterpiece), (best quality), (detailed), (high resolution), (sharp focus)";
-        const NEGATIVE_PROMPT = "blur, blurry, haze, noise, grain, grit, dots, distortion, low quality, jpeg artifacts, compression artifacts, dirty, messy, out of focus";
-
-        document.getElementById('promptInput').addEventListener('input', function(e) {
-            const lines = e.target.value.split('\n').filter(line => line.trim() !== '').length;
-            document.getElementById('lineCount').innerText = `${lines} Ready`;
-        });
-
-        async function startBatch() {
-            if (isProcessing) return;
-            const input = document.getElementById('promptInput').value;
-            const prompts = input.split('\n').filter(line => line.trim() !== '');
-            if (prompts.length === 0) return alert("Please input prompts");
-
-            isProcessing = true;
-            toggleUI(true);
-            
-            // Auto Clear
-            generatedItems = [];
-            document.getElementById('imageGrid').innerHTML = '';
-            document.getElementById('downloadBtn').classList.add('hidden'); // Reset download button
-
-            const ratio = document.getElementById('ratioSelect').value;
-            let width, height;
-            
-            switch(ratio) {
-                case 'landscape': width = 2560; height = 1440; break;
-                case 'portrait': width = 1440; height = 2560; break;
-                case 'square': width = 2048; height = 2048; break;
-            }
-
-            // Initialize Slots
-            for (let i = 0; i < prompts.length; i++) {
-                const lockedSeed = Math.floor(Math.random() * 1000000000);
-                generatedItems.push({ 
-                    id: `img-${Date.now()}-${i}`,
-                    prompt: prompts[i].trim(),
-                    status: 'pending',
-                    blob: null,
-                    finalUrl: null,
-                    width: width,
-                    height: height,
-                    seed: lockedSeed
-                });
-                createSlot(generatedItems[i].id, generatedItems[i].prompt, i + 1);
-            }
-
-            // FAST BATCH LOOP
-            for (let i = 0; i < prompts.length; i++) {
-                const item = generatedItems[i];
-                
-                updateProgress(i, prompts.length, "GENERATING...");
-                updateSlotStatus(item.id, "GENERATING...", "text-[#00ff88]");
-                updateLog(`Pipeline Active: Item ${i+1}`);
-                
-                if(window.updateStats) window.updateStats('start');
-
-                try {
-                    if(i > 0) await new Promise(r => setTimeout(r, 1500));
-                    
-                    // INFINITE RETRY LOGIC FOR BASE
-                    const baseBlob = await generateBaseImage(item.prompt, item.width, item.height, item.seed);
-                    const baseUrl = URL.createObjectURL(baseBlob);
-                    
-                    // Store
-                    item.blob = baseBlob;
-                    item.finalUrl = baseUrl;
-                    item.status = 'done';
-
-                    // Render as Final
-                    renderImage(item.id, baseUrl, item.prompt, i, true); // true = final state
-                    
-                    if(window.updateStats) window.updateStats('success');
-                    
-                    // Activate Download Button immediately on first success
-                    document.getElementById('downloadBtn').classList.remove('hidden');
-                    
-                    checkAllDone();
-
-                } catch (e) {
-                    console.error("Critical failure should not happen here due to infinite retry logic");
-                }
-            }
-            
-            updateLog("Batch Complete.");
-        }
-
-        async function generateBaseImage(prompt, w, h, seed, attempts = 0) {
-            const finalPrompt = `${prompt}, ${BASE_TAGS} | negative_prompt: ${NEGATIVE_PROMPT}`;
-            const encodedPrompt = encodeURIComponent(finalPrompt);
-            const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${w}&height=${h}&nologo=true&model=flux&enhance=false&seed=${seed}&t=${Date.now()}`;
-            
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("Gen Failed");
-                const blob = await response.blob();
-                if (blob.size < 4000) throw new Error("File too small");
-                return blob;
-            } catch (e) {
-                // Infinite Retry with Backoff
-                const delay = Math.min((attempts + 1) * 2000, 10000); 
-                console.warn(`Base Gen Retry ${attempts+1} after ${delay}ms`);
-                await new Promise(r => setTimeout(r, delay));
-                return generateBaseImage(prompt, w, h, seed, attempts + 1);
-            }
-        }
-
-        function checkAllDone() {
-            const allDone = generatedItems.every(i => i.status === 'done' || i.status === 'failed'); 
-            if(allDone && generatedItems.length > 0) {
-                 isProcessing = false;
-                 toggleUI(false);
-                 document.getElementById('statusText').innerText = "ALL COMPLETED";
-                 document.getElementById('statusText').className = "text-[#00ff88]";
-                 updateLog("Batch Complete");
-            }
-        }
-
-        function createSlot(id, prompt, idx) {
-            const grid = document.getElementById('imageGrid');
-            const div = document.createElement('div');
-            div.id = id;
-            div.className = "image-card relative aspect-video bg-[#050505] flex flex-col justify-between overflow-hidden rounded-lg";
-            div.innerHTML = `
-                <div class="loading-overlay absolute inset-0 flex items-center justify-center z-20">
-                    <div class="w-8 h-8 border-2 border-[#1a1a1a] border-t-[#00ff88] rounded-full animate-spin"></div>
-                </div>
-                <div class="img-container absolute inset-0 w-full h-full"></div>
-                <div class="z-30 p-3 bg-black/60 backdrop-blur-sm border-b border-white/5 flex justify-between items-center absolute top-0 w-full">
-                    <span class="status-text text-[10px] text-[#00ff88] font-bold font-mono">QUEUED...</span>
-                    <span class="text-[10px] text-gray-500">#{idx}</span>
-                </div>
-            `;
-            grid.prepend(div);
-        }
-
-        function renderImage(id, url, prompt, idx, isFinal) {
-            const slot = document.getElementById(id);
-            if (!slot) return;
-            
-            const container = slot.querySelector('.img-container');
-            container.innerHTML = `<img src="${url}" class="w-full h-full object-cover animate-[fadeIn_0.5s_ease-out]" loading="lazy">`;
-
-            const spinner = slot.querySelector('.loading-overlay');
-            if(spinner) spinner.classList.add('hidden');
-
-            if(isFinal) {
-                slot.classList.remove('enhancing');
-                slot.classList.add('done');
-                
-                updateSlotStatus(id, "HQ FINISHED", "text-[#00ff88]");
-                
-                if(!slot.querySelector('.badge')) {
-                    const badge = document.createElement('div');
-                    badge.className = `badge absolute bottom-2 right-2 bg-black/70 px-2 py-1 border border-[#00ff88]/30 rounded z-30`;
-                    badge.innerHTML = `<span class="text-[9px] font-bold tracking-widest text-[#00ff88]">HQ</span>`;
-                    slot.appendChild(badge);
-                }
-
-                if(!slot.querySelector('.actions')) {
-                    const actions = document.createElement('div');
-                    actions.className = "actions absolute inset-0 bg-black/80 opacity-0 hover:opacity-100 transition-opacity duration-200 flex flex-col justify-center items-center gap-3 backdrop-blur-[2px] z-40";
-                    actions.innerHTML = `
-                        <p class="text-[10px] text-gray-300 font-mono px-4 text-center line-clamp-2">${prompt}</p>
-                        <div class="flex gap-3">
-                            <button onclick="window.open('${url}', '_blank')" class="bg-[#00ff88] text-black text-[10px] px-4 py-2 font-bold uppercase tracking-wider hover:bg-white transition rounded-full">Zoom</button>
-                            <a href="${url}" download="ProGen_${idx}.png" class="border border-white text-white text-[10px] px-4 py-2 font-bold uppercase tracking-wider hover:bg-white hover:text-black transition rounded-full">Save</a>
-                        </div>
-                    `;
-                    slot.appendChild(actions);
-                } else {
-                    const zoomBtn = slot.querySelector('button');
-                    const saveBtn = slot.querySelector('a');
-                    zoomBtn.onclick = () => window.open(url, '_blank');
-                    saveBtn.href = url;
-                }
-            }
-        }
-
-        function updateSlotStatus(id, text, colorClass) {
-            const slot = document.getElementById(id);
-            if(slot) {
-                const statusText = slot.querySelector('.status-text');
-                if(statusText) {
-                    statusText.innerText = text;
-                    statusText.className = `status-text text-[10px] font-bold font-mono ${colorClass}`;
-                }
-            }
-        }
-
-        function toggleUI(processing) {
-            const btn = document.getElementById('genBtn');
-            const spinner = document.getElementById('btnSpinner');
-            const progress = document.getElementById('progressArea');
-            const download = document.getElementById('downloadBtn');
-            
-            btn.disabled = processing;
-            processing ? spinner.classList.remove('hidden') : spinner.classList.add('hidden');
-            processing ? progress.classList.remove('hidden') : null;
-            
-            if(processing) {
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.querySelector('span').innerText = "GENERATING...";
             } else {
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.querySelector('span').innerText = "START BATCH";
-            }
-        }
-
-        function updateProgress(curr, total, text) {
-            const pct = ((curr + 1)/total)*100;
-            document.getElementById('progressBar').style.width = `${pct}%`;
-            document.getElementById('progressText').innerText = `${Math.round(pct)}%`;
-            if(text) document.getElementById('statusText').innerText = `${text} ${curr+1}/${total}`;
-        }
-        
-        function updateLog(text) {
-            document.getElementById('logText').innerText = text;
-        }
-
-        function clearGallery() {
-            if(isProcessing) return;
-            document.getElementById('imageGrid').innerHTML = `
-                <div id="emptyState" class="col-span-full h-96 flex flex-col items-center justify-center border border-dashed border-gray-900 text-gray-800">
-                    <p class="font-mono text-xs tracking-widest">READY...</p>
-                </div>
-            `;
-            generatedItems = [];
-            toggleUI(false);
-            document.getElementById('progressArea').classList.add('hidden');
-            document.getElementById('downloadBtn').classList.add('hidden');
-        }
-
-        async function downloadAll() {
-            // Check if any item has a blob
-            const hasData = generatedItems.some(i => i.blob);
-            if (!hasData) return;
-            
-            const btn = document.getElementById('downloadBtn');
-            const oldText = btn.innerText;
-            btn.innerText = "ZIPPING...";
-            btn.disabled = true;
-
-            const zip = new JSZip();
-            const folder = zip.folder("ProGen_Images");
-            
-            let count = 0;
-            generatedItems.forEach((i, idx) => {
-                // Download anything that has a blob
-                if(i.blob) {
-                    folder.file(`ProGen_${idx+1}.png`, i.blob);
-                    count++;
+                outBuf = audioCtx.createBuffer(originalBuffer.numberOfChannels, len, sr);
+                for(let c=0; c<outBuf.numberOfChannels; c++) {
+                    const src = originalBuffer.getChannelData(c), dst = outBuf.getChannelData(c);
+                    for(let i=0; i<len; i++) dst[i] = Math.max(-1, Math.min(1, src[i] * gain));
                 }
-            });
-            
-            if (count > 0) {
-                const content = await zip.generateAsync({type:"blob"});
-                saveAs(content, "ProGen_Batch_Output.zip");
-            } else {
-                alert("Nothing ready to download yet.");
             }
-            
-            btn.innerText = oldText;
-            btn.disabled = false;
+            const wavBlob = encodeWAV(outBuf);
+            playerAfter.src = URL.createObjectURL(wavBlob);
+            audioDownload.href = playerAfter.src;
+            audioDownload.download = "VIP_Studio_Pro.wav";
+            document.getElementById('audioResults').classList.remove('hidden');
+        }
+
+        function encodeWAV(buf) {
+            const nc = buf.numberOfChannels, sr = buf.sampleRate, len = buf.length * nc * 2 + 44;
+            const ab = new ArrayBuffer(len), view = new DataView(ab); let p = 0;
+            const wS = (s) => { for(let i=0; i<s.length; i++) view.setUint8(p++, s.charCodeAt(i)); };
+            const w16 = (v) => { view.setUint16(p, v, true); p += 2; };
+            const w32 = (v) => { view.setUint32(p, v, true); p += 4; };
+            wS("RIFF"); w32(len - 8); wS("WAVE"); wS("fmt "); w32(16); w16(1); w16(nc);
+            w32(sr); w32(sr * nc * 2); w16(nc * 2); w16(16); wS("data"); w32(len - p - 4);
+            for (let i = 0; i < buf.length; i++) {
+                for (let c = 0; c < nc; c++) {
+                    let s = Math.max(-1, Math.min(1, buf.getChannelData(c)[i]));
+                    s = s < 0 ? s * 32768 : s * 32767; view.setInt16(p, s, true); p += 2;
+                }
+            }
+            return new Blob([ab], {type: 'audio/wav'});
+        }
+
+        // --- IMAGE TOOLS ---
+        const filterCanvas = document.getElementById('filterCanvas'); const ctx = filterCanvas.getContext('2d');
+        let activeImg = new Image(); let isGray = false;
+        document.getElementById('imageDrop').onclick = () => document.getElementById('imageMasterInput').click();
+        document.getElementById('imageMasterInput').onchange = (e) => {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader(); reader.onload = (re) => {
+                activeImg.src = re.target.result;
+                activeImg.onload = () => {
+                    document.getElementById('imgWidth').value = activeImg.width;
+                    document.getElementById('imageDrop').classList.add('hidden'); document.getElementById('imageEditorUI').classList.remove('hidden');
+                    applyFilters();
+                };
+            };
+            reader.readAsDataURL(file);
+        };
+        function applyFilters() {
+            const b = document.getElementById('bright').value, c = document.getElementById('contrast').value;
+            const w = parseInt(document.getElementById('imgWidth').value) || activeImg.width; const h = (activeImg.height * w) / activeImg.width;
+            document.getElementById('brightVal').innerText = b + '%';
+            document.getElementById('contVal').innerText = c + '%';
+            filterCanvas.width = w; filterCanvas.height = h;
+            ctx.filter = `brightness(${b}%) contrast(${c}%) grayscale(${isGray ? 100 : 0}%)`;
+            ctx.drawImage(activeImg, 0, 0, w, h);
+        }
+        document.getElementById('bright').oninput = applyFilters;
+        document.getElementById('contrast').oninput = applyFilters;
+        document.getElementById('imgWidth').oninput = applyFilters;
+        document.getElementById('grayToggle').onclick = () => {
+            isGray = !isGray; document.getElementById('grayToggle').innerText = `GRAYSCALE: ${isGray ? 'ON' : 'OFF'}`; applyFilters();
+        };
+        document.getElementById('convertImageBtn').onclick = () => {
+            const fmt = document.getElementById('imgFormat').value; const link = document.createElement('a');
+            link.download = `VIP_Pro_Image.${fmt==='jpeg'?'jpg':fmt}`; link.href = filterCanvas.toDataURL('image/'+fmt); link.click();
+        };
+
+        // --- PDF TOOLS ---
+        const { jsPDF } = window.jspdf;
+        const imgToPdfInput = document.getElementById('imgToPdfInput');
+        imgToPdfInput.onchange = () => {
+            if(imgToPdfInput.files.length > 0) {
+                document.getElementById('imgSelectedLabel').innerText = imgToPdfInput.files.length + " SELECTED";
+                document.getElementById('imgSelectedLabel').classList.remove('hidden');
+                document.getElementById('btnImgToPdf').disabled = false;
+                document.getElementById('btnImgToPdf').classList.add('bg-indigo-600', 'text-white');
+            }
+        };
+        document.getElementById('btnImgToPdf').onclick = async () => {
+            const doc = new jsPDF(); const files = Array.from(imgToPdfInput.files);
+            for(let i=0; i<files.length; i++) {
+                const data = await new Promise(r => { const f = new FileReader(); f.onload = (e) => r(e.target.result); f.readAsDataURL(files[i]); });
+                const props = doc.getImageProperties(data); const w = doc.internal.pageSize.getWidth(); const h = (props.height * w) / props.width;
+                if(i > 0) doc.addPage(); doc.addImage(data, 'JPEG', 0, 0, w, h);
+            }
+            doc.save("VIP_Studio_Pro.pdf");
+        };
+        const pdfInput = document.getElementById('pdfInput');
+        pdfInput.onchange = () => {
+            if(pdfInput.files[0]) {
+                document.getElementById('pdfSelectedLabel').innerText = pdfInput.files[0].name; document.getElementById('pdfSelectedLabel').classList.remove('hidden');
+                document.getElementById('btnPdfToImg').disabled = false; document.getElementById('btnPdfToImg').classList.add('bg-purple-600', 'text-white');
+            }
+        };
+        document.getElementById('btnPdfToImg').onclick = async () => {
+            const gal = document.getElementById('pdfOutputGallery'); gal.innerHTML = ''; gal.classList.remove('hidden');
+            const ab = await pdfInput.files[0].arrayBuffer(); const pdf = await pdfjsLib.getDocument(ab).promise;
+            for(let i=1; i<=pdf.numPages; i++) {
+                const pg = await pdf.getPage(i); const vp = pg.getViewport({scale: 1.5}); const cv = document.createElement('canvas'); cv.height = vp.height; cv.width = vp.width;
+                await pg.render({canvasContext: cv.getContext('2d'), viewport: vp}).promise;
+                const div = document.createElement('div'); div.className = "premium-card p-4 rounded-3xl text-center shadow-xl animate-in zoom-in-95";
+                div.innerHTML = `<img src="${cv.toDataURL()}" class="rounded-2xl mb-4 shadow-lg"><a href="${cv.toDataURL()}" download="Page_${i}.png" class="text-[10px] font-black uppercase bg-white/10 p-2 rounded-xl hover:bg-white/20">Download Page</a>`;
+                gal.appendChild(div);
+            }
+        };
+
+        // --- SECURITY ---
+        document.getElementById('passLength').oninput = (e) => document.getElementById('passLenVal').innerText = e.target.value;
+        document.getElementById('generatePassBtn').onclick = () => {
+            const len = parseInt(document.getElementById('passLength').value);
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+            let pass = ""; const arr = new Uint32Array(len); window.crypto.getRandomValues(arr);
+            for(let i=0; i<len; i++) pass += charset.charAt(arr[i] % charset.length);
+            document.getElementById('passwordOutput').value = pass;
+        };
+
+        // --- UTILITY ---
+        const textIn = document.getElementById('textUtilInput');
+        textIn.oninput = () => {
+            const v = textIn.value.trim();
+            document.getElementById('textStats').innerHTML = `<span>Words: ${v ? v.split(/\s+/).length : 0}</span><span>Characters: ${textIn.value.length}</span>`;
+        };
+        window.cleanTextGaps = () => {
+            textIn.value = textIn.value.split('\n').filter(l => l.trim() !== '').join('\n');
+            textIn.dispatchEvent(new Event('input')); showToast("Lines Cleaned!");
+        };
+        window.convertText = (m) => {
+            textIn.value = m === 'up' ? textIn.value.toUpperCase() : textIn.value.toLowerCase();
+            textIn.dispatchEvent(new Event('input'));
+        };
+
+        // Clipboard
+        window.copyToClipboard = (id) => {
+            const el = document.getElementById(id); if(!el.value) return;
+            el.select(); document.execCommand('copy'); showToast("Copied to Clipboard!");
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast'); t.innerText = msg; t.style.opacity = '1';
+            setTimeout(() => t.style.opacity = '0', 2000);
         }
     </script>
 </body>
